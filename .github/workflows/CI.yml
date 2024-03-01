@@ -1,0 +1,62 @@
+name: Build Test
+
+on:
+  push:
+    branches-ignore:
+      - develop
+      - prod
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:latest
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{secrets.TOKEN.GITHUB}}
+          submodules: recuresive
+          
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'correto'
+          java-version: 17
+          
+      - name: Submodule Update
+        run: git submodule update --remote --recursive
+        
+      - name: Grant execute permission for gradlew
+        run: chomd +x ./gradlew
+        shell: bash
+        
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        
+      - name: Build with Gradle
+        id: buildWithGradle
+        run: ./gradlew clean build
+        shell: bash
+        
+      - name: Move *.jar File
+        run: |
+          mkdir content
+          mv ./build/libs/*.jar ./content/
+          
+      - name: Extract .jar File
+        uses: actions/upload-artifact@v3
+        with:
+          name: jar-File
+          path: ./content/*.jar
+            
+      - name: Upload Report Artifact When Build Failed
+        if: ${{ failure() && steps.buildWithGradle.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-artifact
+          path: ./build/reports/
