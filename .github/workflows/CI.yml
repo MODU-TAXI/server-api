@@ -25,7 +25,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'correto'
+          distribution: 'corretto'
           java-version: 17
           
       - name: Submodule Update
