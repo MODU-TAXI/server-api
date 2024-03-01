@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{secrets.TOKEN.GITHUB}}
+          token: ${{secrets.TOKEN_GITHUB}}
           submodules: recuresive
           
       - name: Setup Java JDK
