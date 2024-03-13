@@ -7,8 +7,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 public class PrincipalDetails implements UserDetails {
@@ -25,9 +25,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(member.getRole().toString()));
-        return authorities;
+        return List.of(new SimpleGrantedAuthority(member.getRole().toString()));
     }
 
     @Override
