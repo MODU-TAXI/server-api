@@ -1,5 +1,7 @@
 package com.modutaxi.api.common.auth;
 
+import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.Member;
 import com.modutaxi.api.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
