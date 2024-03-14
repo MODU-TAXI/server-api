@@ -11,4 +11,10 @@ public class MemberRequestDto {
         private String email;
         private String name;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CheckNameRequest {
+        private String name;
+    }
 }

@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.member.service;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.CheckNameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
@@ -41,4 +42,10 @@ public class RegisterMemberService {
         }
     }
 
+    /**
+     * 닉네임 중복 체크
+     */
+    public CheckNameResponse checkName(String name) {
+        return new CheckNameResponse(!memberRepository.existsByName(name));
+    }
 }
