@@ -13,6 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTime {
@@ -28,23 +29,26 @@ public class Member extends BaseTime {
     @Email
     private String email;
     @NotNull
-    @ColumnDefault("")
-    private String refreshToken;
+    @Builder.Default
+    private String refreshToken = "";
     @NotNull
-    @ColumnDefault("0")
-    private double score; // 평점
+    @Builder.Default
+    private double score = 0.0; // 평점
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.ROLE_VISITOR;
 
     @NotNull
-    @ColumnDefault("true")
-    private boolean status;
+    @Builder.Default
+    private int reportCount = 0;
+    @NotNull
+    @Builder.Default
+    private boolean status = true;
 
-    public Member(String name, String email) {
-        this.name = name;
-        this.email = email;
+    public void changeRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
 }
