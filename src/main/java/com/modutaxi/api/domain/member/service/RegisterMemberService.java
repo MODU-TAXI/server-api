@@ -28,15 +28,14 @@ public class RegisterMemberService {
         // member entity 생성
         Member member = memberMapper.ToEntity(email, name);
         // 로그인 토큰 생성 및 저장
-        TokenResponse tokenResponse = jwtTokenProvider.generateToken(member.getId());
-        member.changeRefreshToken(tokenResponse.getRefreshToken());
-        return tokenResponse;
+        return generateMemberToken(member);
     }
 
     private void checkRegister(String email, String name) {
+        // 이메일 중복 체크
         if (memberRepository.existsByEmail(email)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_MEMBER);
-        }
+        } // 닉네임 중복 체크
         if (memberRepository.existsByName(name)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
         }
@@ -47,5 +46,23 @@ public class RegisterMemberService {
      */
     public CheckNameResponse checkName(String name) {
         return new CheckNameResponse(!memberRepository.existsByName(name));
+    }
+
+    /**
+     * 로그인
+     */
+    public TokenResponse login(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new BaseException(MemberErrorCode.UN_REGISTERED_MEMBER));
+        return generateMemberToken(member);
+    }
+
+    /**
+     * 로그인 토큰 생성 및 리프레시 토큰 저장 함수
+     */
+    private TokenResponse generateMemberToken(Member member) {
+        TokenResponse tokenResponse = jwtTokenProvider.generateToken(member.getId());
+        member.changeRefreshToken(tokenResponse.getRefreshToken());
+        return tokenResponse;
     }
 }

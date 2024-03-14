@@ -1,7 +1,8 @@
 package com.modutaxi.api.domain.member.controller;
 
-import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.CheckNameRequest;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.LoginRequest;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CheckNameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
@@ -22,7 +23,6 @@ public class RegisterMemberController {
     /**
      * [POST] 소셜 회원가입
      * /sign-up
-     * TODO: 온보딩 작업되면 request에 문항 답변도 추가
      */
     @PostMapping("/sign-up")
     public ResponseEntity<TokenResponse> register(
@@ -41,6 +41,18 @@ public class RegisterMemberController {
             @Valid @RequestBody CheckNameRequest checkNameRequest) {
         return new ResponseEntity<>(registerMemberService.checkName(
                 checkNameRequest.getName()),
+                HttpStatus.OK);
+    }
+
+    /**
+     * [POST] 로그인
+     * /login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(
+            @Valid @RequestBody LoginRequest loginRequest) {
+        return new ResponseEntity<>(registerMemberService.login(
+                loginRequest.getEmail()),
                 HttpStatus.OK);
     }
 
