@@ -2,8 +2,8 @@ package com.modutaxi.api.common.auth;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
-import com.modutaxi.api.domain.member.Member;
-import com.modutaxi.api.domain.member.MemberRepository;
+import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,6 +1,6 @@
 package com.modutaxi.api.common.auth;
 
-import com.modutaxi.api.domain.member.Member;
+import com.modutaxi.api.domain.member.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

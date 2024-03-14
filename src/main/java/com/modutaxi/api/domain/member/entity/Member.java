@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.member;
+package com.modutaxi.api.domain.member.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
 import jakarta.persistence.*;
