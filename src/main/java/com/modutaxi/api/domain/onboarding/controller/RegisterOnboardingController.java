@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/onboardings")
+@RequestMapping("/api/onboardings")
 public class RegisterOnboardingController {
 
 }

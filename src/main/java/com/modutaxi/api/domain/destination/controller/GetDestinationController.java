@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/destinations")
+@RequestMapping("/api/destinations")
 public class GetDestinationController {
 
 }

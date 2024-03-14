@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/member-destinations")
+@RequestMapping("/api/member-destinations")
 public class UpdateMemberDestinationController {
 
 }
