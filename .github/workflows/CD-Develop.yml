@@ -1,0 +1,94 @@
+name: Develop Profile Deploy
+
+on:
+  push:
+    branches:
+      - MS-2-CI-CD
+
+env:
+  REGISTRY: ghcr.io
+  ORGANIZATION: modu-taxi
+  IMAGE_NAME: ${{ github.repository }}
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_PORT: ${{ secrets.SSH_PORT }}
+  SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  GITHUB_ACTOR: ${{ github.actor }}
+  TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_ACTOR }}
+          password: ${{ env.TOKEN_GITHUB }}
+
+      - name: Build
+        run: docker build --no-cache -t ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_NAME }}:latest -f Dockerfile-dev .
+
+      - name: Push
+        run: docker push ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          source: "docker-compose.dev.yml, dockerEnv/*"
+          target: /home/ubuntu
+
+      - name: Check Docker
+        id: dockerChecker
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            docker --version
+            docker-compose --version
+
+      - name: Install Docker
+        if: ${{ failure() && steps.dockerChecker.conclusion == 'failure' }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            sudo apt-get update
+            sudo apt-get install docker.io
+            sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
+            sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+            docker --version
+            docker-compose --version
+
+      - name: Deploy
+        if: ${{ always() }}
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USERNAME }}
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu
+            sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ env.TOKEN_GITHUB }}
+            sudo docker container stop capple-dev
+            sudo docker container rm capple-dev
+            sudo docker image rm  ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_NAME }}:latest
+            sudo docker-compose --env-file=dockerEnv/dev.env -f docker-compose.dev.yml -p backend up -d
+            sudo docker container prune -f
+            sudo docker image prune -a -f
