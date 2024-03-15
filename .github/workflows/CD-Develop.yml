@@ -38,7 +38,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker-compose.dev.yml, config/dockerEnv/*"
+          source: "docker-compose.dev.yml,config/dockerEnv/*"
           target: /home/ubuntu
 
       - name: Check Docker
