@@ -3,7 +3,7 @@ name: Develop Profile Deploy
 on:
   push:
     branches:
-      - develop
+      - MS-2-CI-CD
 
 env:
   REGISTRY: ghcr.io
@@ -85,5 +85,3 @@ jobs:
             sudo docker container rm capple-dev
             sudo docker image rm  ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_TAG }}
             sudo docker-compose --env-file=dockerEnv/dev.env -f docker-compose.dev.yml -p backend up -d
-            sudo docker container prune -f
-            sudo docker image prune -a -f
