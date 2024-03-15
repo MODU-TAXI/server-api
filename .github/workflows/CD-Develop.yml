@@ -3,7 +3,7 @@ name: Develop Profile Deploy
 on:
   push:
     branches:
-      - MS-2-CI-CD
+      - develop
 
 env:
   REGISTRY: ghcr.io
