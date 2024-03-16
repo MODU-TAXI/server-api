@@ -95,5 +95,5 @@ jobs:
             sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
             sudo docker container stop modu-taxi-dev
             sudo docker container rm modu-taxi-dev
-            sudo docker image rm  ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_TAG }}
             sudo docker-compose --env-file=config/dockerEnv/dev.env -f docker-compose.dev.yml -p backend up -d
+            sudo docker images -a
