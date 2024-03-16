@@ -41,7 +41,7 @@ jobs:
 
       - name: Write Docker Image Tag Information to .env File
         run: |
-          echo "DOCKER_IMAGE_TAG=${{ env.IMAGE_TAG }}" >> config/dockerEnv/dev.env
+          echo -e "\nDOCKER_IMAGE_TAG=${{ env.IMAGE_TAG }}" >> config/dockerEnv/dev.env
 
       - name: Copy docker-compose.dev.yml
         uses: appleboy/scp-action@master
