@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  spring-application:
+    container_name: modu-taxi-dev
+    image: ${CONTAINER_REGISTRY}/${GITHUB_ORGANIZATION}/${CONTAINER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    ports:
+      - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}

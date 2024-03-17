@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
 
-@Profile("local")
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
