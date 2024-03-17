@@ -23,10 +23,11 @@ public class Member extends BaseTime {
     private String name;
     @NotNull
     private Long snsId;
+    @NotNull
+    private Gender gender;
 
     @Email
     private String email;
-
 
     @NotNull
     @Builder.Default

@@ -7,6 +7,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CheckNameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
@@ -27,11 +28,11 @@ public class RegisterMemberService {
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(Long snsId, String name) {
+    public TokenResponse registerMember(Long snsId, String name, Gender gender) {
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId, name);
         // member entity 생성
-        Member member = memberMapper.ToEntity(snsId, name);
+        Member member = memberMapper.ToEntity(snsId, name, gender);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }

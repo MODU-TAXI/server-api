@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.member.dto;
 
+import com.modutaxi.api.domain.member.entity.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ public class MemberRequestDto {
     public static class SignUpRequest {
         private Long snsId;
         private String name;
+        private Gender gender;
     }
 
     @Getter
