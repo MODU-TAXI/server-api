@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+
 @Service
 @RequiredArgsConstructor
 public class RegisterMemberService {
@@ -33,6 +34,7 @@ public class RegisterMemberService {
         checkRegister(snsId, name);
         // member entity 생성
         Member member = memberMapper.ToEntity(snsId, name, gender);
+        memberRepository.save(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }
@@ -80,6 +82,7 @@ public class RegisterMemberService {
     private TokenResponse generateMemberToken(Member member) {
         TokenResponse tokenResponse = jwtTokenProvider.generateToken(member.getId());
         member.changeRefreshToken(tokenResponse.getRefreshToken());
+        memberRepository.save(member);
         return tokenResponse;
     }
 }
