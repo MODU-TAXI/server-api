@@ -1,7 +1,7 @@
 package com.modutaxi.api.domain.participant.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.member.Member;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

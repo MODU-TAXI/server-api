@@ -2,7 +2,7 @@ package com.modutaxi.api.domain.room.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.destination.entity.Destination;
-import com.modutaxi.api.domain.member.Member;
+import com.modutaxi.api.domain.member.entity.Member;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
