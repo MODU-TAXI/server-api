@@ -21,6 +21,6 @@ public class MemberRequestDto {
     @Getter
     @AllArgsConstructor
     public static class LoginRequest {
-        private String email;
+        private String accessToken;
     }
 }

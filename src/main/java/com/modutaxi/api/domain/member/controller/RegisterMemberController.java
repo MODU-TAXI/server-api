@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.member.controller;
 
+import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.CheckNameRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.LoginRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
@@ -11,10 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,9 +31,8 @@ public class RegisterMemberController {
     @PostMapping("/sign-up")
     public ResponseEntity<TokenResponse> register(
             @Valid @RequestBody SignUpRequest signUpRequest) {
-        return new ResponseEntity<>(registerMemberService.registerMember(
-                signUpRequest.getEmail(), signUpRequest.getName()),
-                HttpStatus.OK);
+        return ResponseEntity.ok(registerMemberService.registerMember(
+                signUpRequest.getEmail(), signUpRequest.getName()));
     }
 
     /**
@@ -44,22 +43,21 @@ public class RegisterMemberController {
     @PostMapping("/names")
     public ResponseEntity<CheckNameResponse> checkName(
             @Valid @RequestBody CheckNameRequest checkNameRequest) {
-        return new ResponseEntity<>(registerMemberService.checkName(
-                checkNameRequest.getName()),
-                HttpStatus.OK);
+        return ResponseEntity.ok(registerMemberService.checkName(
+                checkNameRequest.getName()));
     }
 
     /**
      * [POST] 소셜 로그인
-     * /login
+     * /{type}/login
      */
     @Operation(summary = "소셜 로그인")
-    @PostMapping("/login")
+    @PostMapping("/{type}/login")
     public ResponseEntity<TokenResponse> login(
-            @Valid @RequestBody LoginRequest loginRequest) {
-        return new ResponseEntity<>(registerMemberService.login(
-                loginRequest.getEmail()),
-                HttpStatus.OK);
+            @PathVariable(name = "type") SocialLoginType type,
+            @Valid @RequestBody LoginRequest loginRequest) throws IOException {
+        return ResponseEntity.ok(registerMemberService.login(
+                type, loginRequest.getAccessToken()));
     }
 
 

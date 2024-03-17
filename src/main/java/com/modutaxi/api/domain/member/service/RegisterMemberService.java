@@ -1,6 +1,8 @@
 package com.modutaxi.api.domain.member.service;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
+import com.modutaxi.api.common.auth.oauth.SocialLoginService;
+import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CheckNameResponse;
@@ -11,6 +13,8 @@ import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 public class RegisterMemberService {
@@ -18,6 +22,7 @@ public class RegisterMemberService {
     private final MemberMapper memberMapper;
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SocialLoginService socialLoginService;
 
     /**
      * 회원 가입
@@ -51,8 +56,14 @@ public class RegisterMemberService {
     /**
      * 로그인
      */
-    public TokenResponse login(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public TokenResponse login(SocialLoginType type, String accessToken) throws IOException {
+        Long snsId = 0L;
+        switch (type) {
+            case KAKAO -> snsId = socialLoginService.getSnsId(accessToken);
+            // TODO: 애플 로그인 구현
+            case APPLE -> snsId = 1L;
+        }
+        Member member = memberRepository.findBySnsId(snsId)
                 .orElseThrow(() -> new BaseException(MemberErrorCode.UN_REGISTERED_MEMBER));
         return generateMemberToken(member);
     }
