@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberMapper {
 
-    public Member ToEntity(String email, String name) {
+    public Member ToEntity(Long snsId, String name) {
         return Member.builder()
-                .email(email)
+                .snsId(snsId)
                 .name(name)
                 .build();
     }

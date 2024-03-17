@@ -8,7 +8,7 @@ public class MemberRequestDto {
     @Getter
     @AllArgsConstructor
     public static class SignUpRequest {
-        private String email;
+        private Long snsId;
         private String name;
     }
 

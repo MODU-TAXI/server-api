@@ -10,7 +10,6 @@ import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +31,7 @@ public class RegisterMemberController {
     public ResponseEntity<TokenResponse> register(
             @Valid @RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(registerMemberService.registerMember(
-                signUpRequest.getEmail(), signUpRequest.getName()));
+                signUpRequest.getSnsId(), signUpRequest.getName()));
     }
 
     /**

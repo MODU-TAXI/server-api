@@ -27,18 +27,18 @@ public class RegisterMemberService {
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(String email, String name) {
+    public TokenResponse registerMember(Long snsId, String name) {
         // DB에 가입 이력 있는지 중복 확인
-        checkRegister(email, name);
+        checkRegister(snsId, name);
         // member entity 생성
-        Member member = memberMapper.ToEntity(email, name);
+        Member member = memberMapper.ToEntity(snsId, name);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }
 
-    private void checkRegister(String email, String name) {
-        // 이메일 중복 체크
-        if (memberRepository.existsByEmail(email)) {
+    private void checkRegister(Long snsId, String name) {
+        // 계정 중복 체크
+        if (memberRepository.existsBySnsId(snsId)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_MEMBER);
         } // 닉네임 중복 체크
         if (memberRepository.existsByName(name)) {
@@ -63,8 +63,13 @@ public class RegisterMemberService {
             // TODO: 애플 로그인 구현
             case APPLE -> snsId = 1L;
         }
+        // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 snsId를 담아서 내려줌
+        Long finalSnsId = snsId;
         Member member = memberRepository.findBySnsId(snsId)
-                .orElseThrow(() -> new BaseException(MemberErrorCode.UN_REGISTERED_MEMBER));
+                .orElseThrow(() -> new BaseException(
+                        MemberErrorCode.UN_REGISTERED_MEMBER,
+                        finalSnsId.toString()));
+        // 존재하는 멤버라면 토큰 발급
         return generateMemberToken(member);
     }
 
