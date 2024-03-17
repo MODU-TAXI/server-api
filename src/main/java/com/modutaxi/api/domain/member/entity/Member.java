@@ -22,8 +22,12 @@ public class Member extends BaseTime {
     @Size(min = 2, max = 8)
     private String name;
     @NotNull
+    private Long snsId;
+
     @Email
     private String email;
+
+
     @NotNull
     @Builder.Default
     private String refreshToken = "";
