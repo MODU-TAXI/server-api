@@ -2,7 +2,7 @@ package com.modutaxi.api.domain.memberdestination.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.destination.entity.Destination;
-import com.modutaxi.api.domain.member.Member;
+import com.modutaxi.api.domain.member.entity.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

@@ -4,7 +4,7 @@ import com.modutaxi.api.common.auth.PrincipalDetails;
 import com.modutaxi.api.common.auth.PrincipalDetailsService;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
-import com.modutaxi.api.domain.member.MemberRepository;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
