@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/s3")
 public class S3Controller {
+
     private final S3Service s3Service;
 
     @PostMapping
@@ -25,7 +26,7 @@ public class S3Controller {
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteFile(@RequestParam String fileName){
+    public ResponseEntity<String> deleteFile(@RequestParam String fileName) {
         s3Service.deleteFile(fileName);
         return ResponseEntity.ok("파일을 삭제하였습니다.");
     }

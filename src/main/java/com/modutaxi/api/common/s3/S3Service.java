@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 @Service
 public class S3Service {
+
     private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -37,8 +38,9 @@ public class S3Service {
         objectMetadata.setContentType(multipartFile.getContentType());
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+            amazonS3Client.putObject(
+                new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
         } catch (Exception e) {
             throw new BaseException(S3ErrorCode.UPLOAD_ERROR);
         }
@@ -47,10 +49,9 @@ public class S3Service {
 
 
     public void deleteFile(String fileName) {
-        try{
+        try {
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
