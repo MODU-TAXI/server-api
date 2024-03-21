@@ -16,7 +16,7 @@ public class RedisExampleRepositoryImpl extends BaseRedisRepository implements S
     private ValueOperations<String, RedisExampleDomain> valueOperations;
     @PostConstruct
     protected void init() {
-        globalKeyPrefix = "redisExample-";
+        classInstance = RedisExampleRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
     }
 

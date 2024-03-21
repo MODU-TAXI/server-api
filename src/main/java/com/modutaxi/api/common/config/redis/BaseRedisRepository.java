@@ -1,8 +1,8 @@
 package com.modutaxi.api.common.config.redis;
 
 public abstract class BaseRedisRepository {
-    protected String globalKeyPrefix;
+    protected Class<?> classInstance;
     protected String generateGlobalKey(String localKey) {
-        return globalKeyPrefix + localKey;
+        return classInstance.getSimpleName().substring(0,classInstance.getSimpleName().length()-14) + "-" + localKey;
     }
 }
