@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  ORGANIZATION: modu-taxi
-  IMAGE_TAG: server-api:${{ github.sha }}
+  ORGANIZATION: jaewonleekor
+  IMAGE_TAG: modutaxi-server-api:${{ github.sha }}
   GITHUB_ACTOR: ${{ github.actor }}
 
 jobs:
@@ -20,11 +20,6 @@ jobs:
         with:
           token: ${{secrets.TOKEN_GITHUB}}
           submodules: recursive
-
-      - name: Git Submodule
-        run: |
-          cd config
-          git checkout develop
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
