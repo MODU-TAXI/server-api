@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class RedisExampleRepositoryImpl extends BaseRedisRepository implements Serializable, RedisExampleRepository {
     private final RedisTemplate<String, RedisExampleDomain> redisTemplate;
     private ValueOperations<String, RedisExampleDomain> valueOperations;
+
     @PostConstruct
     protected void init() {
         classInstance = RedisExampleRepositoryImpl.class;
@@ -25,6 +26,7 @@ public class RedisExampleRepositoryImpl extends BaseRedisRepository implements S
         valueOperations.set(generateGlobalKey(redisExampleDomain.getKey()), redisExampleDomain);
         return redisExampleDomain.getKey();
     }
+
     @Override
     public RedisExampleDomain findById(String key) {
         return valueOperations.get(generateGlobalKey(key));
