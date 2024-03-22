@@ -5,7 +5,6 @@ import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.CheckNameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -35,7 +34,7 @@ public class RegisterMemberService {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
         String snsId = redisSnsIdRepository.findById(key);
         // DB에 가입 이력 있는지 중복 확인
-        checkRegister(snsId, name);
+        checkRegister(snsId);
         // member entity 생성
         Member member = memberMapper.ToEntity(snsId, name, gender);
         memberRepository.save(member);
@@ -43,21 +42,11 @@ public class RegisterMemberService {
         return generateMemberToken(member);
     }
 
-    private void checkRegister(String snsId, String name) {
+    private void checkRegister(String snsId) {
         // 계정 중복 체크
         if (memberRepository.existsBySnsId(snsId)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_MEMBER);
-        } // 닉네임 중복 체크
-        if (memberRepository.existsByName(name)) {
-            throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
         }
-    }
-
-    /**
-     * 닉네임 중복 체크
-     */
-    public CheckNameResponse checkName(String name) {
-        return new CheckNameResponse(!memberRepository.existsByName(name));
     }
 
     /**

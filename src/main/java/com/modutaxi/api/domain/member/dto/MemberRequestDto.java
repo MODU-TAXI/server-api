@@ -19,13 +19,6 @@ public class MemberRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CheckNameRequest {
-        private String name;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class LoginRequest {
         private String accessToken;
     }
