@@ -29,7 +29,7 @@ public class RegisterMemberService {
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(Long snsId, String name, Gender gender) {
+    public TokenResponse registerMember(String snsId, String name, Gender gender) {
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId, name);
         // member entity 생성
@@ -39,7 +39,7 @@ public class RegisterMemberService {
         return generateMemberToken(member);
     }
 
-    private void checkRegister(Long snsId, String name) {
+    private void checkRegister(String snsId, String name) {
         // 계정 중복 체크
         if (memberRepository.existsBySnsId(snsId)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_MEMBER);
@@ -60,18 +60,18 @@ public class RegisterMemberService {
      * 로그인
      */
     public TokenResponse login(SocialLoginType type, String accessToken) throws IOException {
-        Long snsId = 0L;
+        String snsId = "";
         switch (type) {
-            case KAKAO -> snsId = socialLoginService.getSnsId(accessToken);
+            case KAKAO -> snsId = socialLoginService.getKaKaoSnsId(accessToken);
             // TODO: 애플 로그인 구현
-            case APPLE -> snsId = 1L;
+            case APPLE -> snsId = "";
         }
         // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 snsId를 담아서 내려줌
-        Long finalSnsId = snsId;
+        String finalSnsId = snsId;
         Member member = memberRepository.findBySnsId(snsId)
                 .orElseThrow(() -> new BaseException(
                         MemberErrorCode.UN_REGISTERED_MEMBER,
-                        finalSnsId.toString()));
+                        finalSnsId));
         // 존재하는 멤버라면 토큰 발급
         return generateMemberToken(member);
     }
