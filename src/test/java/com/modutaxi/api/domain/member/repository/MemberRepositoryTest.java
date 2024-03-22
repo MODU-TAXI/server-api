@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.member.repository;
 
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +19,26 @@ class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @Test
-    @DisplayName("Member Id로 객체를 잘 반환하는지 테스트")
-    void findByIdAndStatusTrue() {
-        // given
-        Member member1 = Member.builder()
+    Member member1, member2;
+    @BeforeEach
+    void setUp() {
+        member1 = Member.builder()
                 .snsId("123456")
                 .name("지수")
                 .gender(Gender.FEMALE)
                 .build();
-        Member member2 = Member.builder()
+        member2 = Member.builder()
                 .snsId("123457")
                 .name("이름")
                 .status(false)
                 .gender(Gender.FEMALE)
                 .build();
+    }
+
+    @Test
+    @DisplayName("Member Id로 객체를 잘 반환하는지 테스트")
+    void findByIdAndStatusTrue() {
+        // given
         memberRepository.save(member1);
         memberRepository.save(member2);
 
@@ -51,11 +57,6 @@ class MemberRepositoryTest {
     @DisplayName("SnsId로 객체를 잘 반환하는지 테스트")
     void findBySnsId() {
         // given
-        Member member1 = Member.builder()
-                .snsId("123456")
-                .name("지수")
-                .gender(Gender.FEMALE)
-                .build();
         memberRepository.save(member1);
 
         // when
@@ -72,11 +73,6 @@ class MemberRepositoryTest {
     @DisplayName("SnsId로 DB에 존재하는지 조회 테스트")
     void existsBySnsId() {
         // given
-        Member member1 = Member.builder()
-                .snsId("123456")
-                .name("지수")
-                .gender(Gender.FEMALE)
-                .build();
         memberRepository.save(member1);
 
         // when
