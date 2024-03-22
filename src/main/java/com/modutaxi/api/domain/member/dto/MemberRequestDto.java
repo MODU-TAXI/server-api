@@ -11,7 +11,7 @@ public class MemberRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SignUpRequest {
-        private String snsId;
+        private String key;
         private String name;
         private Gender gender;
     }

@@ -11,6 +11,7 @@ import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.member.repository.RedisSnsIdRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +26,14 @@ public class RegisterMemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final SocialLoginService socialLoginService;
+    private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
 
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(String snsId, String name, Gender gender) {
+    public TokenResponse registerMember(String key, String name, Gender gender) {
+        // key를 이용하여 redis 에서 snsId 추출, 삭제
+        String snsId = redisSnsIdRepository.findById(key);
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId, name);
         // member entity 생성
@@ -66,12 +70,12 @@ public class RegisterMemberService {
             // TODO: 애플 로그인 구현
             case APPLE -> snsId = "";
         }
-        // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 snsId를 담아서 내려줌
-        String finalSnsId = snsId;
+        // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 redis snsId key를 담아서 내려줌
+        String key = redisSnsIdRepository.save(snsId);
         Member member = memberRepository.findBySnsId(snsId)
                 .orElseThrow(() -> new BaseException(
                         MemberErrorCode.UN_REGISTERED_MEMBER,
-                        finalSnsId));
+                        key));
         // 존재하는 멤버라면 토큰 발급
         return generateMemberToken(member);
     }

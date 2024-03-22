@@ -31,7 +31,7 @@ public class RegisterMemberController {
     public ResponseEntity<TokenResponse> register(
             @Valid @RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(registerMemberService.registerMember(
-                signUpRequest.getSnsId(), signUpRequest.getName(), signUpRequest.getGender()));
+                signUpRequest.getKey(), signUpRequest.getName(), signUpRequest.getGender()));
     }
 
     /**

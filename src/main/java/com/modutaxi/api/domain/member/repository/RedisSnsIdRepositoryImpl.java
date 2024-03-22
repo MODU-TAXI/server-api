@@ -35,6 +35,6 @@ public class RedisSnsIdRepositoryImpl extends BaseRedisRepository implements Ser
 
     @Override
     public String findById(String key) {
-        return valueOperations.get(generateGlobalKey(key));
+        return valueOperations.getAndDelete(generateGlobalKey(key));
     }
 }
