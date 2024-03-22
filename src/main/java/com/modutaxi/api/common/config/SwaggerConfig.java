@@ -12,7 +12,6 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// TODO: 도메인 추가 후 수정 필요
 @OpenAPIDefinition(
         servers = {@Server(url = "${spring.swagger.domain}")},
         info = @Info(title = "Modu's Taxi Server's API",
