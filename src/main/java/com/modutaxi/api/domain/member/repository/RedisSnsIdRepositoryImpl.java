@@ -25,11 +25,11 @@ public class RedisSnsIdRepositoryImpl extends BaseRedisRepository implements Ser
     }
 
     @Override
-    public String save(String snsId) {
+    public String save(String snsId, int timeout, TimeUnit timeunit) {
         UUID randomUUID = UUID.randomUUID();
         String key = generateGlobalKey(randomUUID.toString());
         valueOperations.set(key, snsId);
-        redisTemplate.expire(key, 1, TimeUnit.HOURS);
+        redisTemplate.expire(key, timeout, timeunit);
         return randomUUID.toString();
     }
 

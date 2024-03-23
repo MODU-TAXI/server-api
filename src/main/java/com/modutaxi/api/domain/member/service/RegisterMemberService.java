@@ -4,6 +4,7 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -32,7 +34,7 @@ public class RegisterMemberService {
      */
     public TokenResponse registerMember(String key, String name, Gender gender) {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
-        String snsId = redisSnsIdRepository.findById(key);
+        String snsId = checkSnsIdKey(key);
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId);
         // member entity 생성
@@ -49,6 +51,12 @@ public class RegisterMemberService {
         }
     }
 
+    private String checkSnsIdKey(String key) {
+        String snsId = redisSnsIdRepository.findById(key);
+        if(snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
+        else return snsId;
+    }
+
     /**
      * 로그인
      */
@@ -60,11 +68,11 @@ public class RegisterMemberService {
             case APPLE -> snsId = "";
         }
         // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 redis snsId key를 담아서 내려줌
-        String key = redisSnsIdRepository.save(snsId);
+        String finalSnsId = snsId;
         Member member = memberRepository.findBySnsId(snsId)
                 .orElseThrow(() -> new BaseException(
                         MemberErrorCode.UN_REGISTERED_MEMBER,
-                        key));
+                        redisSnsIdRepository.save(finalSnsId, 1, TimeUnit.HOURS)));
         // 존재하는 멤버라면 토큰 발급
         return generateMemberToken(member);
     }
