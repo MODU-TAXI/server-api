@@ -22,7 +22,7 @@ public class Member extends BaseTime {
     @Size(min = 2, max = 8)
     private String name;
     @NotNull
-    private Long snsId;
+    private String snsId;
     @NotNull
     private Gender gender;
 

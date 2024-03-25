@@ -13,13 +13,13 @@ class MemberTest {
     void builder() {
         // given
         Member member = Member.builder()
-                .snsId(123456L)
+                .snsId("123456")
                 .name("지수")
                 .gender(Gender.FEMALE)
                 .build();
 
         // when, then
-        assertEquals(member.getSnsId(), 123456L);
+        assertEquals(member.getSnsId(), "123456");
         assertEquals(member.getName(), "지수");
         assertEquals(member.getGender(), Gender.FEMALE);
     }
@@ -29,7 +29,7 @@ class MemberTest {
     void changeRefreshToken() {
         // given
         Member member = Member.builder()
-                .snsId(123456L)
+                .snsId("123456")
                 .name("지수")
                 .gender(Gender.FEMALE)
                 .build();

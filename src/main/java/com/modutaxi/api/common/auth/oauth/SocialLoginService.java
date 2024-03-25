@@ -15,12 +15,11 @@ import java.net.URL;
 @Service
 public class SocialLoginService {
 
-    public Long getSnsId(String accessToken) throws IOException {
+    public String getKaKaoSnsId(String accessToken) throws IOException {
         String requestUrl = "https://kapi.kakao.com/v2/user/me";
         StringBuilder result = getKaKaoResponse(accessToken, requestUrl);
-        String snsId = new JsonParser().parse(result.toString()).
+        return new JsonParser().parse(result.toString()).
                 getAsJsonObject().get("id").getAsString();
-        return Long.parseLong(snsId);
     }
 
     public StringBuilder getKaKaoResponse(String accessToken, String requestUrl) throws IOException {
