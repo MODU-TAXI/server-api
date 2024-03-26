@@ -4,5 +4,7 @@ services:
   spring-application:
     container_name: modu-taxi-dev
     image: ${CONTAINER_REGISTRY}/${GITHUB_ORGANIZATION}/${CONTAINER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     ports:
       - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
