@@ -72,4 +72,26 @@ public class RegisterMemberController {
     ) {
         return ResponseEntity.ok(registerMemberService.sendEmailCertificationMail(key, receiver));
     }
+
+    /**
+     * [GET] 이메일 인증 확인
+     * /mail/confirm
+     */
+    @Operation(
+        summary = "이메일 인증 확인",
+        description = "수신한 인증 메일을 인증합니다.<br>" +
+            "로그인 실패 시 함께 반환받은 key 값을 이용하여 인증코드를 인증합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "메일 인증 성공"),
+        @ApiResponse(responseCode = "400", description = "메일 인증 실패")
+    })
+    @GetMapping("/mail/confirm")
+    public ResponseEntity<Boolean> confirmEmailCertification(
+        @Parameter(description = "로그인 실패 시 반환받은 key 값")
+        @RequestParam String key,
+        @Parameter(description = "인증 메일로 받은 인증 코드")
+        @RequestParam String code) {
+        return ResponseEntity.ok(registerMemberService.checkEmailCertificationCode(key, code));
+    }
 }

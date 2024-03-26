@@ -32,4 +32,15 @@ public class RedisMailCertCodeRepositoryImpl extends BaseRedisRepository impleme
         valueOperations.set(key, certificationCode, timeoutDuration);
         return true;
     }
+    @Override
+    public String findById(String signinKey) {
+        String key = generateGlobalKey(signinKey);
+        return valueOperations.get(key);
+    }
+
+    @Override
+    public Boolean deleteById(String signinKey) {
+        String key = generateGlobalKey(signinKey);
+        return redisTemplate.delete(key);
+    }
 }

@@ -112,4 +112,12 @@ public class RegisterMemberService {
         // 이메일 발송
         return mailService.sendEmailCertificationMail(key, receiver);
     }
+
+    public Boolean checkEmailCertificationCode(String key, String certificationCode) {
+        // key를 가지고 있는 사용자인지 체크
+        if(!redisSnsIdRepository.existsById(key)) {
+            throw new BaseException(MemberErrorCode.INVALID_SIGN_IN_KEY);
+        }
+        return mailService.checkEmailCertificationCode(key, certificationCode);
+    }
 }

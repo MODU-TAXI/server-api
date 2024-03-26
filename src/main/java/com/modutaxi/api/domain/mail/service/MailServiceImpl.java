@@ -27,4 +27,17 @@ public class MailServiceImpl implements MailService {
         String domainAddress = emailAddress.split("@")[1];
         return MailDomain.isExistDomain(domainAddress);
     }
+
+    @Override
+    public Boolean checkEmailCertificationCode(String signinKey, String certificationCode) {
+        String savedCertificationCode = redisMailCertCodeRepository.findById(signinKey);
+        if(savedCertificationCode == null) {
+            throw new BaseException(MailErrorCode.CERTIFICATION_CODE_EXPIRED);
+        }
+        if(!certificationCode.equals(savedCertificationCode)) {
+            throw new BaseException(MailErrorCode.CERTIFICATION_CODE_NOT_MATCH);
+        }
+        redisMailCertCodeRepository.deleteById(signinKey);
+        return true;
+    }
 }
