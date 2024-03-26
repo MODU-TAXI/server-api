@@ -1,0 +1,21 @@
+package com.modutaxi.api.common.exception.errorcode;
+
+import com.modutaxi.api.common.exception.ErrorCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public enum MailErrorCode implements ErrorCode {
+    SES_SERVER_ERROR("MAIL_001", "", HttpStatus.BAD_REQUEST),
+    MESSAGING_ERROR("MAIL_002", "메세지 발송에 실패했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL_FORM("MAIL_003", "유효하지 않은 이메일 형식입니다.", HttpStatus.BAD_REQUEST),
+    UNSUPPOERTED_DOMAIN("MAIL_004", "지원하지 않는 도메인입니다.", HttpStatus.BAD_REQUEST),
+    USED_EMAIL("MAIL_005", "이미 사용중인 이메일입니다.", HttpStatus.BAD_REQUEST),
+    ;
+
+    private final String errorCode;
+    private final String message;
+    private final HttpStatus status;
+}

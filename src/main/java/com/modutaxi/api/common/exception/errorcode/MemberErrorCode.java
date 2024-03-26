@@ -11,7 +11,8 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_MEMBER("MEMBER_001", "존재하지 않는 사용자입니다.", HttpStatus.CONFLICT),
     DUPLICATE_MEMBER("MEMBER_002", "중복된 사용자입니다.", HttpStatus.CONFLICT),
     DUPLICATE_NICKNAME("MEMBER_003", "중복된 닉네임입니다.", HttpStatus.CONFLICT),
-    UN_REGISTERED_MEMBER("MEMBER_004", "", HttpStatus.CONFLICT)
+    UN_REGISTERED_MEMBER("MEMBER_004", "", HttpStatus.CONFLICT),
+    INVALID_SIGN_IN_KEY("MEMBER_005", "유효하지 않은 로그인 키입니다.", HttpStatus.UNAUTHORIZED),
     ;
 
     private final String errorCode;

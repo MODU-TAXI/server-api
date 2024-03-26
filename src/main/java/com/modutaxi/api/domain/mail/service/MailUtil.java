@@ -1,20 +1,18 @@
 package com.modutaxi.api.domain.mail.service;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.RawMessage;
-import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
-import com.amazonaws.services.simpleemail.model.SendRawEmailResult;
+import com.amazonaws.services.simpleemail.model.*;
+import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.domain.mail.vo.MailTemplate;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -22,11 +20,52 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Properties;
 
+import static com.modutaxi.api.common.exception.errorcode.MailErrorCode.SES_SERVER_ERROR;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class MailUtil {
     private final AmazonSimpleEmailService amazonSimpleEmailService;
+    @Value("${mail.sender-address.no-reply}")
+    private String noReplySender;
+
+    public static Boolean emailAddressFormVerification(String emailAddress) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        return emailAddress.matches(emailRegex);
+    }
+
+    public String sendEmailCertificationHtmlMail(String receiver) {
+        String certificationCode = generateCertificationCode();
+        sendSimpleEmailOnlyHtml(
+            "[모두의 택시] 인증코드를 안내해드립니다."
+            , noReplySender
+            , MailTemplate.getCertMailContent(receiver, certificationCode)
+            , receiver);
+        return certificationCode;
+    }
+
+    private String generateCertificationCode() {
+        final String candidateChars = "1234567890";
+        String code = "";
+        for (int i = 0; i < 5; i++) {
+            Long idx = Math.round(Math.random() * candidateChars.length());
+            code += candidateChars.charAt(idx.intValue());
+        }
+        return code;
+    }
+    private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent, String receiver) {
+        Message message = new Message();
+        message.setSubject(new Content(title));
+        message.setBody(new Body().withHtml(new Content(htmlContent)));
+
+        SendEmailRequest request = new SendEmailRequest(sender, new Destination().withToAddresses(receiver), message);
+        SendEmailResult result = amazonSimpleEmailService.sendEmail(request);
+        if (result.getSdkHttpMetadata().getHttpStatusCode() != 200) {
+            throw new BaseException(SES_SERVER_ERROR, "메일 발송에 실패했습니다.\n" + result.getSdkHttpMetadata().toString());
+        }
+        return result;
+    }
 
     // full content mail
     private SendRawEmailResult sendRawEmail(String title, String sender, String content, String receiver, String html, String fileRoot) throws MessagingException, IOException, NullPointerException {

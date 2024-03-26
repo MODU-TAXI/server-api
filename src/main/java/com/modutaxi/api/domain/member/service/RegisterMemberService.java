@@ -5,7 +5,10 @@ import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.domain.mail.service.MailService;
+import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -28,6 +31,8 @@ public class RegisterMemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SocialLoginService socialLoginService;
     private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
+    private final MailService mailService;
+    private final MailUtil mailUtil;
 
     /**
      * 회원 가입
@@ -85,5 +90,26 @@ public class RegisterMemberService {
         member.changeRefreshToken(tokenResponse.getRefreshToken());
         memberRepository.save(member);
         return tokenResponse;
+    }
+
+    public Boolean sendEmailCertificationMail(String key, String receiver) {
+        // key를 가지고 있는 사용자인지 체크
+        if(!redisSnsIdRepository.existsById(key)) {
+            throw new BaseException(MemberErrorCode.INVALID_SIGN_IN_KEY);
+        }
+        // 이메일 형식 체크
+        if(!mailUtil.emailAddressFormVerification(receiver)) {
+            throw new BaseException(MailErrorCode.INVALID_EMAIL_FORM);
+        }
+        // 지원 이메일 도메인 체크
+        if(!mailService.checkMailDomain(receiver)) {
+            throw new BaseException(MailErrorCode.UNSUPPOERTED_DOMAIN);
+        }
+        // 이메일 중복 체크
+        memberRepository.findByEmail(receiver).ifPresent(member -> {
+            throw new BaseException(MailErrorCode.USED_EMAIL);
+        });
+        // 이메일 발송
+        return mailService.sendEmailCertificationMail(key, receiver);
     }
 }

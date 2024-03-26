@@ -6,6 +6,10 @@ import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Tag(name = "회원 가입", description = "회원 가입 API")
 public class RegisterMemberController {
 
     private final RegisterMemberService registerMemberService;
@@ -45,5 +50,26 @@ public class RegisterMemberController {
                 type, loginRequest.getAccessToken()));
     }
 
-
+    /**
+     * [GET] 이메일 인증 메일 발송
+     * /mail-cert
+     */
+    @Operation(
+        summary = "이메일 인증 메일 발송",
+        description = "이메일 인증 메일을 발송합니다.<br>" +
+            "로그인 실패 시 함께 반환받은 key 값을 이용하여 인증 메일을 발송합니다."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "메일 발송 성공"),
+        @ApiResponse(responseCode = "400", description = "메일 발송 실패")
+    })
+    @GetMapping("/mail/cert")
+    public ResponseEntity<Boolean> sendEmailCertificationMail(
+        @Parameter(description = "로그인 실패 시 반환받은 key 값")
+        @RequestParam String key,
+        @Parameter(description = "인증 메일을 받을 이메일 주소")
+        @RequestParam String receiver
+    ) {
+        return ResponseEntity.ok(registerMemberService.sendEmailCertificationMail(key, receiver));
+    }
 }

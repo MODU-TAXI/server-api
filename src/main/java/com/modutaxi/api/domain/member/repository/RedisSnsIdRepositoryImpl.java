@@ -37,4 +37,8 @@ public class RedisSnsIdRepositoryImpl extends BaseRedisRepository implements Ser
     public String findById(String key) {
         return valueOperations.getAndDelete(generateGlobalKey(key));
     }
+
+    public Boolean existsById(String key) {
+        return valueOperations.get(generateGlobalKey(key)) != null;
+    }
 }
