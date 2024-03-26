@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   ORGANIZATION: modu-taxi
-  IMAGE_TAG: ${{ github.ref_name }}:${{ github.sha }}
+  IMAGE_TAG: ci:${{ github.ref_name }}-${{ github.sha }}
   GITHUB_ACTOR: ${{ github.actor }}
 
 jobs:
@@ -49,6 +49,9 @@ jobs:
         id: buildWithGradle
         run: ./gradlew clean build -x test
         shell: bash
+
+      - name: lowercase the image tag
+        run: echo "IMAGE_TAG=$(echo $IMAGE_TAG | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
