@@ -1,9 +1,8 @@
 package com.modutaxi.api.domain.room.controller;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.modutaxi.api.domain.room.service.GetRoomService;
 import com.modutaxi.api.domain.room.service.GetTaxiInfoService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
