@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UpdateMemberService {
@@ -37,18 +39,25 @@ public class UpdateMemberService {
             throw new BaseException(MailErrorCode.UNSUPPOERTED_DOMAIN);
         }
         // 이메일 중복 체크
-        memberRepository.findByEmail(receiver).ifPresent(member -> {
-            throw new BaseException(MailErrorCode.USED_EMAIL);
-        });
+        getNotCertificatedMember(memberId, receiver);
         // 이메일 발송
         return mailService.sendEmailCertificationMail(memberId, receiver);
     }
 
     @Transactional
     public Boolean checkEmailCertificationCode(Long memberId, String certificationCode) {
-        mailService.checkEmailCertificationCode(memberId, certificationCode);
+        String email = mailService.checkEmailCertificationCode(memberId, certificationCode);
+        // 이메일 중복 체크
+        getNotCertificatedMember(memberId, email);
         Member member = memberRepository.findByIdAndStatusTrue(memberId).get();
-        member.changeRole(Role.ROLE_MEMBER);
+        member.certificateEmail(email);
         return true;
+    }
+
+    private void getNotCertificatedMember(Long memberId, String email) {
+        Optional<Member> member = memberRepository.findCertificatedMember(memberId, email, Role.ROLE_VISITOR);
+        if (member.isEmpty()) return;
+        if (member.get().getId() == memberId) throw new BaseException(MailErrorCode.ALREADY_CERTIFIED_EMAIL);
+        throw new BaseException(MailErrorCode.USED_EMAIL);
     }
 }

@@ -39,7 +39,7 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public Boolean checkEmailCertificationCode(Long memberId, String certificationCode) {
+    public String checkEmailCertificationCode(Long memberId, String certificationCode) {
         CertCodeEntity certCodeEntity = redisMailCertCodeRepository.findById(memberId);
         if (certCodeEntity == null) {
             throw new BaseException(MailErrorCode.CERTIFICATION_CODE_EXPIRED);
@@ -48,6 +48,6 @@ public class MailServiceImpl implements MailService {
             throw new BaseException(MailErrorCode.CERTIFICATION_CODE_NOT_MATCH);
         }
         redisMailCertCodeRepository.deleteById(memberId);
-        return true;
+        return certCodeEntity.getEmailAddress();
     }
 }

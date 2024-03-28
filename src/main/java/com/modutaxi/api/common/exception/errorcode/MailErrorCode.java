@@ -16,6 +16,7 @@ public enum MailErrorCode implements ErrorCode {
     CERTIFICATION_CODE_EXPIRED("MAIL_006", "인증 코드가 만료되었거나 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     CERTIFICATION_CODE_NOT_MATCH("MAIL_007", "인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     TOO_MANY_CERTIFICATION_CODE_REQUEST("MAIL_008", "이미 발송된 인증메일 요청입니다.", HttpStatus.TOO_MANY_REQUESTS),
+    ALREADY_CERTIFIED_EMAIL("MAIL_009", "이미 인증된 계정입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String errorCode;

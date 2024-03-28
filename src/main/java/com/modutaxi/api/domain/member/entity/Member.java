@@ -52,7 +52,8 @@ public class Member extends BaseTime {
         this.refreshToken = refreshToken;
     }
 
-    public void changeRole(Role role) {
-        this.role = role;
+    public void certificateEmail(String email) {
+        this.role = Role.ROLE_MEMBER;
+        this.email = email;
     }
 }
