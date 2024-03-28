@@ -39,7 +39,7 @@ public class RedisConfig {
         ObjectMapper objectMapper = new ObjectMapper()
             .findAndRegisterModules()
             .enable(SerializationFeature.INDENT_OUTPUT) // 들여쓰기를 활성화
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // 날짜를 timesatmp로 변환하지 않도록 함
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // 날짜를 timestamp 변환하지 않도록 함
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true) // 데이터가 불일치하는 상황이면 예외를 발생시킴
             .enableDefaultTypingAsProperty(ObjectMapper.DefaultTyping.NON_FINAL, "@class") //  final이 아닌 타입도 저장할 수 있음, 객체의 클래스 정보를 저장
             .registerModules(new JavaTimeModule()); // Java8의 날짜와 시간을 사용하기 위한 모듈을 등록

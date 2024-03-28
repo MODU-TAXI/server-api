@@ -47,7 +47,7 @@ public class UpdateMemberController {
         @ApiResponse(responseCode = "400", description = "메일 발송 실패"),
         @ApiResponse(responseCode = "429", description = "단기간 중복 메일 발송 요청"),
     })
-    @GetMapping("/mail/cert")
+    @GetMapping("/mail/certificate")
     public ResponseEntity<Boolean> sendEmailCertificationMail(
         @CurrentMember Member member,
         @Parameter(description = "인증 메일을 받을 이메일 주소")
