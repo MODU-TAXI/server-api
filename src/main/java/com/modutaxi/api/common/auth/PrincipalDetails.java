@@ -35,7 +35,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getSnsId().toString();
+        return member.getSnsId();
     }
 
     @Override

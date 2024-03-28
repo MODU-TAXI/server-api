@@ -69,7 +69,7 @@ public class RegisterMemberService {
         }
         // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 redis snsId key를 담아서 내려줌
         String finalSnsId = snsId;
-        Member member = memberRepository.findBySnsId(snsId)
+        Member member = memberRepository.findBySnsIdAndStatusTrue(snsId)
                 .orElseThrow(() -> new BaseException(
                         MemberErrorCode.UN_REGISTERED_MEMBER,
                         redisSnsIdRepository.save(finalSnsId, 1, TimeUnit.HOURS)));
