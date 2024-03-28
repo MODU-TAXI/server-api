@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class MailServiceImpl implements MailService {
     private final MailUtil mailUtil;
     private final RedisMailCertCodeRepository redisMailCertCodeRepository;
-    @Value("${mail.cert-mail-restrcution-seconds}")
+    @Value("${mail.cert-mail-restriction-seconds}")
     private Integer certMailRestrictionSeconds;
 
     @Override
