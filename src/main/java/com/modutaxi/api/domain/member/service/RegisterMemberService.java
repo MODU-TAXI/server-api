@@ -92,17 +92,13 @@ public class RegisterMemberService {
         return tokenResponse;
     }
 
-    public Boolean sendEmailCertificationMail(String key, String receiver) {
-        // key를 가지고 있는 사용자인지 체크
-        if(!redisSnsIdRepository.existsById(key)) {
-            throw new BaseException(MemberErrorCode.INVALID_SIGN_IN_KEY);
-        }
+    public Boolean sendEmailCertificationMail(Long memberId, String receiver) {
         // 이메일 형식 체크
-        if(!mailUtil.emailAddressFormVerification(receiver)) {
+        if (!mailUtil.emailAddressFormVerification(receiver)) {
             throw new BaseException(MailErrorCode.INVALID_EMAIL_FORM);
         }
         // 지원 이메일 도메인 체크
-        if(!mailService.checkMailDomain(receiver)) {
+        if (!mailService.checkMailDomain(receiver)) {
             throw new BaseException(MailErrorCode.UNSUPPOERTED_DOMAIN);
         }
         // 이메일 중복 체크
@@ -110,14 +106,10 @@ public class RegisterMemberService {
             throw new BaseException(MailErrorCode.USED_EMAIL);
         });
         // 이메일 발송
-        return mailService.sendEmailCertificationMail(key, receiver);
+        return mailService.sendEmailCertificationMail(memberId, receiver);
     }
 
-    public Boolean checkEmailCertificationCode(String key, String certificationCode) {
-        // key를 가지고 있는 사용자인지 체크
-        if(!redisSnsIdRepository.existsById(key)) {
-            throw new BaseException(MemberErrorCode.INVALID_SIGN_IN_KEY);
-        }
-        return mailService.checkEmailCertificationCode(key, certificationCode);
+    public Boolean checkEmailCertificationCode(Long memberId, String certificationCode) {
+        return mailService.checkEmailCertificationCode(memberId, certificationCode);
     }
 }

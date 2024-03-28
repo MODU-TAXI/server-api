@@ -25,22 +25,24 @@ public class RedisMailCertCodeRepositoryImpl extends BaseRedisRepository impleme
         classInstance = RedisMailCertCodeRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
     }
+
     @Override
-    public Boolean save(String signinKey, String certificationCode) {
-        String key = generateGlobalKey(signinKey);
+    public Boolean save(Long memberId, String certificationCode) {
+        String key = generateGlobalKey(memberId.toString());
         Duration timeoutDuration = Duration.ofMinutes(certMailExpireMinutes);
         valueOperations.set(key, certificationCode, timeoutDuration);
         return true;
     }
+
     @Override
-    public String findById(String signinKey) {
-        String key = generateGlobalKey(signinKey);
+    public String findById(Long memberId) {
+        String key = generateGlobalKey(memberId.toString());
         return valueOperations.get(key);
     }
 
     @Override
-    public Boolean deleteById(String signinKey) {
-        String key = generateGlobalKey(signinKey);
+    public Boolean deleteById(Long memberId) {
+        String key = generateGlobalKey(memberId.toString());
         return redisTemplate.delete(key);
     }
 }
