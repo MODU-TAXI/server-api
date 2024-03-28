@@ -54,6 +54,7 @@ public class MailUtil {
         }
         return code;
     }
+
     private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent, String receiver) {
         Message message = new Message();
         message.setSubject(new Content(title));
