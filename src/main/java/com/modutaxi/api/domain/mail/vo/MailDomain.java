@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum MailDomain {
-    INHA_UNIVERSITY("inha.edu"),
+    INHA_UNIVERSITY_1("inha.edu"),
+    INHA_UNIVERSITY_2("inha.ac.kr"),
+    INHA_TECHNICAL_COLLEGE_1("itc.ac.kr"),
+    INHA_TECHNICAL_COLLEGE_2("inhatc.ac.kr"),
     ;
     private final String domain;
     public static Boolean isExistDomain(String domain){
