@@ -1,16 +1,11 @@
 package com.modutaxi.api.domain.member.controller;
 
-import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.LoginRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
-import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,49 +45,5 @@ public class RegisterMemberController {
             @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
                 type, loginRequest.getAccessToken()));
-    }
-
-    /**
-     * [GET] 이메일 인증 메일 발송
-     * /mail-cert
-     */
-    @Operation(
-        summary = "이메일 인증 메일 발송",
-        description = "이메일 인증 메일을 발송합니다.<br>" +
-            "인증메일을 요청한 메일 주소로 인증 메일을 발송합니다."
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "메일 발송 성공"),
-        @ApiResponse(responseCode = "400", description = "메일 발송 실패"),
-        @ApiResponse(responseCode = "429", description = "단기간 중복 메일 발송 요청"),
-    })
-    @GetMapping("/mail/cert")
-    public ResponseEntity<Boolean> sendEmailCertificationMail(
-        @CurrentMember Member member,
-        @Parameter(description = "인증 메일을 받을 이메일 주소")
-        @RequestParam String receiver
-    ) {
-        return ResponseEntity.ok(registerMemberService.sendEmailCertificationMail(member.getId(), receiver));
-    }
-
-    /**
-     * [GET] 이메일 인증 확인
-     * /mail/confirm
-     */
-    @Operation(
-        summary = "이메일 인증 확인",
-        description = "수신한 인증 메일을 인증합니다.<br>" +
-            "인증코드를 인증합니다."
-    )
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "메일 인증 성공"),
-        @ApiResponse(responseCode = "400", description = "메일 인증 실패")
-    })
-    @GetMapping("/mail/confirm")
-    public ResponseEntity<Boolean> confirmEmailCertification(
-        @CurrentMember Member member,
-        @Parameter(description = "인증 메일로 받은 인증 코드")
-        @RequestParam String code) {
-        return ResponseEntity.ok(registerMemberService.checkEmailCertificationCode(member.getId(), code));
     }
 }

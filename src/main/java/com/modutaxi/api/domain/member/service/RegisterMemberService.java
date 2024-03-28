@@ -5,7 +5,6 @@ import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
-import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
@@ -58,7 +57,7 @@ public class RegisterMemberService {
 
     private String checkSnsIdKey(String key) {
         String snsId = redisSnsIdRepository.findById(key);
-        if(snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
+        if (snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
         else return snsId;
     }
 
@@ -90,26 +89,5 @@ public class RegisterMemberService {
         member.changeRefreshToken(tokenResponse.getRefreshToken());
         memberRepository.save(member);
         return tokenResponse;
-    }
-
-    public Boolean sendEmailCertificationMail(Long memberId, String receiver) {
-        // 이메일 형식 체크
-        if (!mailUtil.emailAddressFormVerification(receiver)) {
-            throw new BaseException(MailErrorCode.INVALID_EMAIL_FORM);
-        }
-        // 지원 이메일 도메인 체크
-        if (!mailService.checkMailDomain(receiver)) {
-            throw new BaseException(MailErrorCode.UNSUPPOERTED_DOMAIN);
-        }
-        // 이메일 중복 체크
-        memberRepository.findByEmail(receiver).ifPresent(member -> {
-            throw new BaseException(MailErrorCode.USED_EMAIL);
-        });
-        // 이메일 발송
-        return mailService.sendEmailCertificationMail(memberId, receiver);
-    }
-
-    public Boolean checkEmailCertificationCode(Long memberId, String certificationCode) {
-        return mailService.checkEmailCertificationCode(memberId, certificationCode);
     }
 }
