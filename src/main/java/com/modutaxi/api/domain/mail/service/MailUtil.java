@@ -49,8 +49,7 @@ public class MailUtil {
         final String candidateChars = "1234567890";
         String code = "";
         for (int i = 0; i < 5; i++) {
-            Long idx = Math.round(Math.random() * candidateChars.length());
-            code += candidateChars.charAt(idx.intValue());
+            code += candidateChars.charAt((int) (Math.random() * candidateChars.length()));
         }
         return code;
     }
