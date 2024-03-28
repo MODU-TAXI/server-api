@@ -7,9 +7,11 @@ import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +44,11 @@ public class UpdateMemberService {
         return mailService.sendEmailCertificationMail(memberId, receiver);
     }
 
+    @Transactional
     public Boolean checkEmailCertificationCode(Long memberId, String certificationCode) {
-        return mailService.checkEmailCertificationCode(memberId, certificationCode);
+        mailService.checkEmailCertificationCode(memberId, certificationCode);
+        Member member = memberRepository.findByIdAndStatusTrue(memberId).get();
+        member.changeRole(Role.ROLE_MEMBER);
+        return true;
     }
 }

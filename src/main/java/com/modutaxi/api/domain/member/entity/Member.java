@@ -52,4 +52,7 @@ public class Member extends BaseTime {
         this.refreshToken = refreshToken;
     }
 
+    public void changeRole(Role role) {
+        this.role = role;
+    }
 }
