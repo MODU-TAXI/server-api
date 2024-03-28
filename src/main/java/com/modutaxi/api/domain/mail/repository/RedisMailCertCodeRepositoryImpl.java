@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.mail.repository;
 
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
+import com.modutaxi.api.domain.mail.dto.CertCodeEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,13 +11,14 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
 public class RedisMailCertCodeRepositoryImpl extends BaseRedisRepository implements Serializable, RedisMailCertCodeRepository {
 
-    private final RedisTemplate<String, String> redisTemplate;
-    private ValueOperations<String, String> valueOperations;
+    private final RedisTemplate<String, CertCodeEntity> redisTemplate;
+    private ValueOperations<String, CertCodeEntity> valueOperations;
     @Value("${mail.cert-mail-expire-minutes}")
     private Integer certMailExpireMinutes;
 
@@ -27,15 +29,16 @@ public class RedisMailCertCodeRepositoryImpl extends BaseRedisRepository impleme
     }
 
     @Override
-    public Boolean save(Long memberId, String certificationCode) {
+    public Boolean save(Long memberId, String emailAddress, String certificationCode) {
         String key = generateGlobalKey(memberId.toString());
         Duration timeoutDuration = Duration.ofMinutes(certMailExpireMinutes);
-        valueOperations.set(key, certificationCode, timeoutDuration);
+        CertCodeEntity certCodeEntity = new CertCodeEntity(certificationCode, emailAddress, LocalDateTime.now());
+        valueOperations.set(key, certCodeEntity, timeoutDuration);
         return true;
     }
 
     @Override
-    public String findById(Long memberId) {
+    public CertCodeEntity findById(Long memberId) {
         String key = generateGlobalKey(memberId.toString());
         return valueOperations.get(key);
     }
