@@ -26,7 +26,7 @@ public class UpdateMemberController {
     @PatchMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshLogin(
             @CurrentMember Member member) {
-        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member),
+        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member.getId()),
                 HttpStatus.OK);
     }
 }

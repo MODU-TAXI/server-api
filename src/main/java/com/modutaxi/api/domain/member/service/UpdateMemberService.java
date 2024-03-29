@@ -14,9 +14,8 @@ public class UpdateMemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
-    public TokenResponse refreshAccessToken(Member member) {
-        TokenResponse newTokenResponse = jwtTokenProvider.generateToken(member.getId());
-        return new TokenResponse(newTokenResponse.getAccessToken(), member.getRefreshToken());
+    public TokenResponse refreshAccessToken(Long memberId) {
+        return jwtTokenProvider.generateToken(memberId);
     }
 
 }
