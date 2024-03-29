@@ -32,9 +32,8 @@ public class JwtTokenProvider {
     private final PrincipalDetailsService principalDetailsService;
     private static final String AUTHORIZATION_HEADER = "Authorization"; // 액세스 토큰 헤더 key name
     private static final String REFRESH_HEADER = "refreshToken";  // 리프레시 토큰 헤더 key name
-    private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L;  // 유효기간 24시간
-    private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 60L;  // 유효기간 2달
-    private final MemberRepository memberRepository;
+    private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 유효기간 1시간
+    private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 유효기간 일주일
 
     /**
      * 의존성 주입 후 (호출 없어도) 오직 1번만 초기화 수행
