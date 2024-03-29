@@ -19,7 +19,7 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
 
     @PostConstruct
     protected void init() {
-        classInstance = RedisExampleRepositoryImpl.class;
+        classInstance = RedisRTKRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
     }
 
