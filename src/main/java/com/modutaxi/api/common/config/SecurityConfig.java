@@ -34,9 +34,10 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((authorizeRequests) ->
                 authorizeRequests
-                    .requestMatchers("/**/member").hasAnyRole("MEMBER", "MANAGER")
-                    .requestMatchers("/**/manager").hasRole("MANAGER")
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/members/KAKAO/login",
+                            "api/members/APPLE/login",
+                            "/api/members/sign-up").permitAll() // 허용된 주소
+                    .anyRequest().authenticated() // Authentication 필요한 주소
             )
             .exceptionHandling((exceptionConfig) ->
                 exceptionConfig.accessDeniedHandler(customAccessDeniedHandler))

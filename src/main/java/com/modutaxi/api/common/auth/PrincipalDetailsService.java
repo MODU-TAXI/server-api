@@ -24,7 +24,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public PrincipalDetails loadUserByUsername(String username)
         throws UsernameNotFoundException {
-        Member member = memberRepository.findBySnsIdAndStatusTrue(username)
+        Member member = memberRepository.findByIdAndStatusTrue(Long.parseLong(username))
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         return new PrincipalDetails(member);
     }
