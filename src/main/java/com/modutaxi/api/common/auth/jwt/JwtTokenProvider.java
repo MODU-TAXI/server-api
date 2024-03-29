@@ -4,8 +4,8 @@ import com.modutaxi.api.common.auth.PrincipalDetails;
 import com.modutaxi.api.common.auth.PrincipalDetailsService;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
-import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.repository.RedisRTKRepositoryImpl;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -34,6 +35,8 @@ public class JwtTokenProvider {
     private static final String REFRESH_HEADER = "refreshToken";  // 리프레시 토큰 헤더 key name
     private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 유효기간 1시간
     private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 유효기간 일주일
+
+    private final RedisRTKRepositoryImpl redisRTKRepository;
 
     /**
      * 의존성 주입 후 (호출 없어도) 오직 1번만 초기화 수행
@@ -78,11 +81,16 @@ public class JwtTokenProvider {
      * memberId로 AccessToken, RefreshToken 생성 후 리턴
      */
     public TokenResponse generateToken(Long memberId) {
-        Claims claims = Jwts.claims();
-        claims.put("memberId", memberId);
+        // ATK에는 memberId를 담음
+        Claims atkClaims = Jwts.claims();
+        atkClaims.put("memberId", memberId);
+        // RTK에는 random UUID를 담음
+        Claims rtkClaims = Jwts.claims();
+        rtkClaims.put("memberId", UUID.randomUUID());
 
-        String accessToken = generateAccessToken(claims);
-        String refreshToken = generateRefreshToken(claims);
+        String accessToken = generateAccessToken(atkClaims);
+        String refreshToken = generateRefreshToken(rtkClaims);
+        redisRTKRepository.save(refreshToken, memberId); // 레디스에 저장
 
         return new TokenResponse(accessToken, refreshToken);
     }

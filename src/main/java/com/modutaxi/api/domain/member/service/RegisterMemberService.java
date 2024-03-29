@@ -81,9 +81,6 @@ public class RegisterMemberService {
      * 로그인 토큰 생성 및 리프레시 토큰 저장 함수
      */
     private TokenResponse generateMemberToken(Member member) {
-        TokenResponse tokenResponse = jwtTokenProvider.generateToken(member.getId());
-        member.changeRefreshToken(tokenResponse.getRefreshToken());
-        memberRepository.save(member);
-        return tokenResponse;
+        return jwtTokenProvider.generateToken(member.getId());
     }
 }
