@@ -25,7 +25,11 @@ public class UpdateMemberController {
     /**
      * [PATCH] 로그인 토큰 갱신
      */
-    @Operation(summary = "로그인 토큰 갱신")
+    @Operation(
+            summary = "로그인 토큰 갱신",
+            description = "Header에 refreshToken을 넣어보내주세요.<br>" +
+                    "key: refreshToken, value: ${refreshToken}."
+    )
     @PatchMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshLogin(
             @CurrentMember Member member) {
