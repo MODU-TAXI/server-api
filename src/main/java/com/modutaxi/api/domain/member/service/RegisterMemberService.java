@@ -6,6 +6,8 @@ import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.domain.mail.service.MailService;
+import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -28,6 +30,8 @@ public class RegisterMemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SocialLoginService socialLoginService;
     private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
+    private final MailService mailService;
+    private final MailUtil mailUtil;
 
     /**
      * 회원 가입
@@ -53,7 +57,7 @@ public class RegisterMemberService {
 
     private String checkSnsIdKey(String key) {
         String snsId = redisSnsIdRepository.findById(key);
-        if(snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
+        if (snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
         else return snsId;
     }
 

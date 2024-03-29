@@ -6,6 +6,7 @@ import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
+@Tag(name = "회원 가입", description = "회원 가입 API")
 public class RegisterMemberController {
 
     private final RegisterMemberService registerMemberService;
@@ -44,6 +46,4 @@ public class RegisterMemberController {
         return ResponseEntity.ok(registerMemberService.login(
                 type, loginRequest.getAccessToken()));
     }
-
-
 }
