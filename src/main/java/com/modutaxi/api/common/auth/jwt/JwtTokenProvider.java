@@ -11,7 +11,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -63,7 +62,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * memberId가 적힌 클레임을 넘겨 받아 RefreshToken 생성
+     * random UUID가 적힌 클레임을 넘겨 받아 RefreshToken 생성
      */
     public String generateRefreshToken(Claims claims) {
         Date now = new Date();
@@ -106,7 +105,10 @@ public class JwtTokenProvider {
      * RefreshToken으로 사용자 정보 인증하고 Authentication 객체를 반환하는 함수
      */
     public Authentication getRefreshAuthentication(String token) {
-        return getAuthentication(getMemberIdByRefreshToken(token));
+        String memberId = redisRTKRepository.findById(token);
+        if(memberId == null) {
+            throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
+        } return getAuthentication(memberId);
     }
 
     /**
@@ -129,26 +131,26 @@ public class JwtTokenProvider {
     /**
      * AccessToken 을 검증하는 함수
      */
-    public boolean validateAccessToken(String token) {
-        return validateToken(jwtSecretKey, token);
+    public void validateAccessToken(String token) {
+        validateToken(jwtSecretKey, token);
     }
 
     /**
      * RefreshToken 을 검증하는 함수
      */
-    public boolean validateRefreshToken(String token) {
-        return validateToken(refreshSecretKey, token);
+    public void validateRefreshToken(String token) {
+        validateToken(refreshSecretKey, token);
     }
 
     /**
      * 토큰을 검증하는 함수
-     * @param key jwtSecretKey, refreshSecretKey 둘 중 하나
+     *
+     * @param key   jwtSecretKey, refreshSecretKey 둘 중 하나
      * @param token accessToken, refreshToken 둘 중 하나
      */
-    public boolean validateToken(String key, String token) {
+    public void validateToken(String key, String token) {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            return true;
         } catch (SecurityException | MalformedJwtException e) {
             throw new BaseException(AuthErrorCode.INVALID_JWT);
         } catch (ExpiredJwtException e) {
@@ -166,15 +168,6 @@ public class JwtTokenProvider {
      */
     public String getMemberIdByAccessToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).
-            getBody().get("memberId").toString();
-    }
-
-    /**
-     * RefreshToken 에서 memberId를 추출하는 함수
-     * @return memberId (String)
-     */
-    public String getMemberIdByRefreshToken(String token) {
-        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).
             getBody().get("memberId").toString();
     }
 
