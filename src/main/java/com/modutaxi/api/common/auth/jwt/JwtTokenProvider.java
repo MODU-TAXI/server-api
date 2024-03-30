@@ -4,14 +4,13 @@ import com.modutaxi.api.common.auth.PrincipalDetails;
 import com.modutaxi.api.common.auth.PrincipalDetailsService;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
-import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.repository.RedisRTKRepositoryImpl;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -32,9 +32,10 @@ public class JwtTokenProvider {
     private final PrincipalDetailsService principalDetailsService;
     private static final String AUTHORIZATION_HEADER = "Authorization"; // 액세스 토큰 헤더 key name
     private static final String REFRESH_HEADER = "refreshToken";  // 리프레시 토큰 헤더 key name
-    private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L;  // 유효기간 24시간
-    private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 60L;  // 유효기간 2달
-    private final MemberRepository memberRepository;
+    private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 유효기간 1시간
+    private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 유효기간 일주일
+
+    private final RedisRTKRepositoryImpl redisRTKRepository;
 
     /**
      * 의존성 주입 후 (호출 없어도) 오직 1번만 초기화 수행
@@ -61,7 +62,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * memberId가 적힌 클레임을 넘겨 받아 RefreshToken 생성
+     * random UUID가 적힌 클레임을 넘겨 받아 RefreshToken 생성
      */
     public String generateRefreshToken(Claims claims) {
         Date now = new Date();
@@ -79,11 +80,16 @@ public class JwtTokenProvider {
      * memberId로 AccessToken, RefreshToken 생성 후 리턴
      */
     public TokenResponse generateToken(Long memberId) {
-        Claims claims = Jwts.claims();
-        claims.put("memberId", memberId);
+        // ATK에는 memberId를 담음
+        Claims atkClaims = Jwts.claims();
+        atkClaims.put("memberId", memberId);
+        // RTK에는 random UUID를 담음
+        Claims rtkClaims = Jwts.claims();
+        rtkClaims.put("memberId", UUID.randomUUID());
 
-        String accessToken = generateAccessToken(claims);
-        String refreshToken = generateRefreshToken(claims);
+        String accessToken = generateAccessToken(atkClaims);
+        String refreshToken = generateRefreshToken(rtkClaims);
+        redisRTKRepository.save(refreshToken, memberId); // 레디스에 저장
 
         return new TokenResponse(accessToken, refreshToken);
     }
@@ -99,7 +105,10 @@ public class JwtTokenProvider {
      * RefreshToken으로 사용자 정보 인증하고 Authentication 객체를 반환하는 함수
      */
     public Authentication getRefreshAuthentication(String token) {
-        return getAuthentication(getMemberIdByRefreshToken(token));
+        String memberId = redisRTKRepository.findById(token);
+        if(memberId == null) {
+            throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
+        } return getAuthentication(memberId);
     }
 
     /**
@@ -122,26 +131,26 @@ public class JwtTokenProvider {
     /**
      * AccessToken 을 검증하는 함수
      */
-    public boolean validateAccessToken(String token) {
-        return validateToken(jwtSecretKey, token);
+    public void validateAccessToken(String token) {
+        validateToken(jwtSecretKey, token);
     }
 
     /**
      * RefreshToken 을 검증하는 함수
      */
-    public boolean validateRefreshToken(String token) {
-        return validateToken(refreshSecretKey, token);
+    public void validateRefreshToken(String token) {
+        validateToken(refreshSecretKey, token);
     }
 
     /**
      * 토큰을 검증하는 함수
-     * @param key jwtSecretKey, refreshSecretKey 둘 중 하나
+     *
+     * @param key   jwtSecretKey, refreshSecretKey 둘 중 하나
      * @param token accessToken, refreshToken 둘 중 하나
      */
-    public boolean validateToken(String key, String token) {
+    public void validateToken(String key, String token) {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
-            return true;
         } catch (SecurityException | MalformedJwtException e) {
             throw new BaseException(AuthErrorCode.INVALID_JWT);
         } catch (ExpiredJwtException e) {
@@ -159,15 +168,6 @@ public class JwtTokenProvider {
      */
     public String getMemberIdByAccessToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).
-            getBody().get("memberId").toString();
-    }
-
-    /**
-     * RefreshToken 에서 memberId를 추출하는 함수
-     * @return memberId (String)
-     */
-    public String getMemberIdByRefreshToken(String token) {
-        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).
             getBody().get("memberId").toString();
     }
 

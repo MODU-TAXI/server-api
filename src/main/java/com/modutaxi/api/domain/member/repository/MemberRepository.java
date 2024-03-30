@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByIdAndStatusTrue(@Param("memberId") Long memberId);
-    Optional<Member> findBySnsId(String snsId);
+    Optional<Member> findBySnsIdAndStatusTrue(String snsId);
     Boolean existsBySnsId(String snsId);
     @Query("SELECT m " +
         "FROM Member m " +

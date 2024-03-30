@@ -73,7 +73,7 @@ public class RegisterMemberService {
         }
         // 존재하지 않는다면 UN_REGISTERED_MEMBER 에러에 redis snsId key를 담아서 내려줌
         String finalSnsId = snsId;
-        Member member = memberRepository.findBySnsId(snsId)
+        Member member = memberRepository.findBySnsIdAndStatusTrue(snsId)
                 .orElseThrow(() -> new BaseException(
                         MemberErrorCode.UN_REGISTERED_MEMBER,
                         redisSnsIdRepository.save(finalSnsId, 1, TimeUnit.HOURS)));
@@ -85,9 +85,6 @@ public class RegisterMemberService {
      * 로그인 토큰 생성 및 리프레시 토큰 저장 함수
      */
     private TokenResponse generateMemberToken(Member member) {
-        TokenResponse tokenResponse = jwtTokenProvider.generateToken(member.getId());
-        member.changeRefreshToken(tokenResponse.getRefreshToken());
-        memberRepository.save(member);
-        return tokenResponse;
+        return jwtTokenProvider.generateToken(member.getId());
     }
 }
