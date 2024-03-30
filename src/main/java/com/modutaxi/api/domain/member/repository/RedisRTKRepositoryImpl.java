@@ -17,6 +17,8 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
     private final RedisTemplate<String, String> redisTemplate;
     private ValueOperations<String, String> valueOperations;
 
+    public static final int REFRESH_TOKEN_VALID_DAYS = 7;
+
     @PostConstruct
     protected void init() {
         classInstance = RedisRTKRepositoryImpl.class;
@@ -27,7 +29,7 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
     public Boolean save(String refreshToken, Long memberId) {
         String key = generateGlobalKey(refreshToken);
         valueOperations.set(key, memberId.toString());
-        redisTemplate.expire(key, 7, TimeUnit.DAYS);
+        redisTemplate.expire(key, REFRESH_TOKEN_VALID_DAYS, TimeUnit.DAYS);
         return true;
     }
 
