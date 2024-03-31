@@ -14,6 +14,7 @@ public class MemberRequestDto {
         private String key;
         private String name;
         private Gender gender;
+        private String phoneNumber;
     }
 
     @Getter

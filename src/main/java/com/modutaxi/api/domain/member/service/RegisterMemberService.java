@@ -30,19 +30,17 @@ public class RegisterMemberService {
     private final JwtTokenProvider jwtTokenProvider;
     private final SocialLoginService socialLoginService;
     private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
-    private final MailService mailService;
-    private final MailUtil mailUtil;
 
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(String key, String name, Gender gender) {
+    public TokenResponse registerMember(String key, String name, Gender gender, String phoneNumber) {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
         String snsId = checkSnsIdKey(key);
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId);
         // member entity 생성
-        Member member = memberMapper.ToEntity(snsId, name, gender);
+        Member member = memberMapper.ToEntity(snsId, name, gender, phoneNumber);
         memberRepository.save(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);

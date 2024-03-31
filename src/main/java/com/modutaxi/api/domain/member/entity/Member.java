@@ -25,6 +25,8 @@ public class Member extends BaseTime {
     private String snsId;
     @NotNull
     private Gender gender;
+    @NotNull
+    private String phoneNumber;
 
     @Email
     private String email;
