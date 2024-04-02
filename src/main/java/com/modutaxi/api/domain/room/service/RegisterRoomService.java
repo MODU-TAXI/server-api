@@ -25,12 +25,13 @@ public class RegisterRoomService {
     private final RoomRepository roomRepository;
     private final DestinationRepository destinationRepository;
 
-    private final GetTaxiInfoService taxiInfoService;
+    private final GetTaxiInfoService getTaxiInfoService;
     private final RegisterTaxiInfoService registerTaxiInfoService;
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest roomRequest) {
 
+        // TODO: 2024/04/03 망고스틴님 거점 조회에러 만들면 넣던가 하겠습니다!
         //거점 찾기
         Destination destination = destinationRepository.findById(roomRequest.getDestinationId())
             .orElseThrow();
@@ -43,7 +44,7 @@ public class RegisterRoomService {
             Converter.coordinateToString(destination.getLongitude(), destination.getLatitude());
 
         //택시 정보 조회
-        JsonNode taxiInfo = taxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
+        JsonNode taxiInfo = getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
 
         int expectedCharge = taxiInfo.get("taxiFare").asInt();
 
