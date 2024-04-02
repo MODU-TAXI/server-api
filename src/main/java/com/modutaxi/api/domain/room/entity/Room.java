@@ -87,7 +87,9 @@ public class Room extends BaseTime {
         float startLongitude,
         float startLatitude,
         LocalTime departTime,
-        int wishHeadcount)
+        int wishHeadcount,
+        int expectedCharge,
+        Long duration)
     {
         this.destination = destination;
         this.description = description;
@@ -96,5 +98,7 @@ public class Room extends BaseTime {
         this.startLatitude = startLatitude;
         this.departTime = departTime;
         this.wishHeadcount = wishHeadcount;
+        this.expectedCharge = expectedCharge;
+        this.duration = duration;
     }
 }

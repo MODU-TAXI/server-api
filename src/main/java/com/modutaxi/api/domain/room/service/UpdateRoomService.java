@@ -53,6 +53,10 @@ public class UpdateRoomService {
         float startLatitude = room.getStartLatitude();
         LocalTime departTime = room.getDepartTime();
         int wishHeadcount = room.getWishHeadcount();
+        int expectedCharge = room.getExpectedCharge();
+            //taxiInfo.get("taxiFare").asInt();
+        long duration = room.getDuration();
+            //taxiInfo.get("duration").asLong();
 
         // 단순 수정
         if (updateRoomRequest.getDescription() != null) {
@@ -92,11 +96,15 @@ public class UpdateRoomService {
                 getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
 
             List<Point> path = Converter.jsonNodeToPointList(jsonNode.get("path"));
+
+            expectedCharge = jsonNode.get("taxiFare").asInt();
+            duration = jsonNode.get("duration").asLong();
+
             taxiInfoRepository.save(TaxiInfo.toEntity(roomId, path));
         }
 
         room.update(destination, description, roomTagBitMask, startLongitude, startLatitude,
-            departTime, wishHeadcount);
+            departTime, wishHeadcount, expectedCharge, duration);
 
         return RoomDetailResponse.toDto(room, taxiInfo.getPath());
     }
