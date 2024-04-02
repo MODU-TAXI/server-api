@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+      - ${MYSQL_OUTER_PORT}:${MYSQL_INNER_PORT}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_MYSQL_IP}
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - ${REDIS_OUTER_PORT}:${REDIS_INNER_PORT}
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_REDIS_IP}
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - ${MONGO_OUTER_PORT}:${MONGO_INNER_PORT}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_MONGO_IP}
+networks:
+  modutaxi_network:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
+          ip_range: ${NETWORK_IP_RANGE}
+          gateway: ${NETWORK_GATEWAY}
