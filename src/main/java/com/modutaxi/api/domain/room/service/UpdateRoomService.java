@@ -14,14 +14,12 @@ import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
-import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoRepository;
+import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
-import com.modutaxi.api.domain.taxiinfo.service.RegisterTaxiInfoService;
 import jakarta.transaction.Transactional;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class UpdateRoomService {
 
     private final RoomRepository roomRepository;
-    private final TaxiInfoRepository taxiInfoRepository;
+    private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final DestinationRepository destinationRepository;
 
     private final GetTaxiInfoService getTaxiInfoService;
@@ -41,7 +39,7 @@ public class UpdateRoomService {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        TaxiInfo taxiInfo = taxiInfoRepository.findById(roomId)
+        TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
         checkManager(room.getRoomManager().getId(), member.getId());
@@ -54,9 +52,7 @@ public class UpdateRoomService {
         LocalTime departTime = room.getDepartTime();
         int wishHeadcount = room.getWishHeadcount();
         int expectedCharge = room.getExpectedCharge();
-            //taxiInfo.get("taxiFare").asInt();
         long duration = room.getDuration();
-            //taxiInfo.get("duration").asLong();
 
         // 단순 수정
         if (updateRoomRequest.getDescription() != null) {
@@ -72,6 +68,7 @@ public class UpdateRoomService {
             wishHeadcount = updateRoomRequest.getWishHeadcount();
         }
 
+        // TODO: 2024/04/03 망고스틴의 거점에러 추가 시 삽입
         //경로를 바꿔줘야 하는 경우
         if (updateRoomRequest.getDestinationId() != null) {
             destination = destinationRepository.findById(updateRoomRequest.getDestinationId())
@@ -85,6 +82,7 @@ public class UpdateRoomService {
             startLatitude = updateRoomRequest.getStartLatitude();
         }
 
+        //db 업데이트
         if (updateRoomRequest.getDestinationId() != null
             || updateRoomRequest.getStartLongitude() != 0
             || updateRoomRequest.getStartLatitude() != 0) {
@@ -100,7 +98,7 @@ public class UpdateRoomService {
             expectedCharge = jsonNode.get("taxiFare").asInt();
             duration = jsonNode.get("duration").asLong();
 
-            taxiInfoRepository.save(TaxiInfo.toEntity(roomId, path));
+            taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
         }
 
         room.update(destination, description, roomTagBitMask, startLongitude, startLatitude,
@@ -113,15 +111,15 @@ public class UpdateRoomService {
     public void deleteRoom(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-        TaxiInfo taxiInfo = taxiInfoRepository.findById(roomId)
+        TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
         checkManager(room.getRoomManager().getId(), member.getId());
 
         roomRepository.delete(room);
-        taxiInfoRepository.delete(taxiInfo);
+        taxiInfoMongoRepository.delete(taxiInfo);
     }
-
+    
     void checkManager(Long managerId, Long memberId) {
         if (!managerId.equals(memberId)) {
             throw new BaseException(RoomErrorCode.NOT_ROOM_MANAGER);

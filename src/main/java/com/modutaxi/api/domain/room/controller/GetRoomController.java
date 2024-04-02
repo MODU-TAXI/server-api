@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/rooms")
-@Tag(name = "방 조회", description = "방 조회 API, key = roomID")
+@Tag(name = "방 조회", description = "방 조회 API")
 public class GetRoomController {
 
     /**
