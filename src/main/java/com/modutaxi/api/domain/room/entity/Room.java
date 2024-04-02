@@ -43,7 +43,11 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String name = "훈";
+    private long duration = 3600000;
+
+    @NotNull
+    @Builder.Default
+    private String roomName = "기본 방제";
 
     @Nullable
     @Column(length = 200)
@@ -76,23 +80,21 @@ public class Room extends BaseTime {
     @Builder.Default
     private int reportCount = 0;
 
-    public static Room toEntity(
-        Member member, Destination destination, int expectedCharge,
-        String name, String description, RoomStatus roomStatus, int roomTagBitMask,
-        float startLongitude, float startLatitude, LocalTime departTime
-    ){
-        return Room.builder()
-            .destination(destination)
-            .roomManager(member)
-            .expectedCharge(expectedCharge)
-            .name(name)
-            .description(description)
-            .roomStatus(roomStatus)
-            .roomTagBitMask(roomTagBitMask)
-            .startLatitude(startLatitude)
-            .startLongitude(startLongitude)
-            .departTime(departTime)
-            .build();
-    }
 
+    public void update(Destination destination,
+        String description,
+        int roomTagBitMask,
+        float startLongitude,
+        float startLatitude,
+        LocalTime departTime,
+        int wishHeadcount)
+    {
+        this.destination = destination;
+        this.description = description;
+        this.roomTagBitMask = roomTagBitMask;
+        this.startLongitude = startLongitude;
+        this.startLatitude = startLatitude;
+        this.departTime = departTime;
+        this.wishHeadcount = wishHeadcount;
+    }
 }
