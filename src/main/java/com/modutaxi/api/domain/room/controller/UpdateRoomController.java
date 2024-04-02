@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.room.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.UpdateRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,7 @@ public class UpdateRoomController {
      */
     @Operation(summary = "모집방 업데이트")
     @PatchMapping("/{roomId}")
-    public ResponseEntity<?> updateRoom (
+    public ResponseEntity<RoomDetailResponse> updateRoom (
         @CurrentMember Member member,
         @PathVariable Long roomId,
         @Valid @RequestBody RoomRequestDto.UpdateRoomRequest updateRoomRequest) {
@@ -40,7 +41,7 @@ public class UpdateRoomController {
      */
     @Operation(summary = "모집방 삭제")
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<?> deleteRoom(
+    public ResponseEntity<String> deleteRoom(
         @CurrentMember Member member,
         @PathVariable Long roomId
     ){

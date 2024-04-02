@@ -4,6 +4,7 @@ package com.modutaxi.api.domain.room.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.RegisterRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -28,7 +29,7 @@ public class RegisterRoomController {
      */
     @Operation(summary = "모집방 생성")
     @PostMapping
-    public ResponseEntity<?> createRoom (
+    public ResponseEntity<RoomDetailResponse> createRoom (
         @CurrentMember Member member,
         @Valid @RequestBody RoomRequestDto.CreateRoomRequest roomRequest) {
         return ResponseEntity.ok(roomService.createRoom(member, roomRequest));
