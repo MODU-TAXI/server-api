@@ -76,10 +76,6 @@ public class Room extends BaseTime {
     @Builder.Default
     private int wishHeadcount = 4;
 
-    @NotNull
-    @Builder.Default
-    private int reportCount = 0;
-
 
     public void update(Destination destination,
         String description,
