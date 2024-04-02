@@ -93,7 +93,8 @@ jobs:
           script: |
             cd /home/ubuntu
             sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
-            sudo docker container stop modu-taxi-dev
-            sudo docker container rm modu-taxi-dev
+            sudo docker container stop spring
+            sudo docker container rm spring
             sudo docker-compose --env-file=config/dockerEnv/dev.env -f docker-compose.dev.yml -p backend up -d
             sudo docker image prune -af
+            sudo docker network prune -f
