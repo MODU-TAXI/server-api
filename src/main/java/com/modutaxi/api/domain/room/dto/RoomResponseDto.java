@@ -13,6 +13,8 @@ public class RoomResponseDto {
     @Builder
     @AllArgsConstructor
     public static class RoomDetailResponse {
+        private Long roomId;
+
         private Long destinationId;
 
         private String description;
@@ -35,6 +37,7 @@ public class RoomResponseDto {
 
         public static RoomDetailResponse toDto(Room room, List<Point>  path){
             return RoomDetailResponse.builder()
+                .roomId(room.getId())
                 .destinationId(room.getDestination().getId())
                 .description(room.getDescription())
                 .roomTagBitMask(room.getRoomTagBitMask())
