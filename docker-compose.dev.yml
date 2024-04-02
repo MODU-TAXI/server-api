@@ -1,10 +1,39 @@
 version: '3.8'
 
 services:
-  spring-application:
-    container_name: modu-taxi-dev
+  spring:
+    container_name: spring
     image: ${CONTAINER_REGISTRY}/${GITHUB_ORGANIZATION}/${CONTAINER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     ports:
       - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_SPRING_IP}
+    depends_on:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    ports:
+      - ${MONGO_OUTER_PORT}:${MONGO_INNER_PORT}
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    volumes:
+      - ${MONGO_VOLUME}:/data/db
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_MONGO_IP}
+networks:
+  modutaxi_network:
+    driver: bridge
+    internal: false
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}
+          ip_range: ${NETWORK_IP_RANGE}
+          gateway: ${NETWORK_GATEWAY}
