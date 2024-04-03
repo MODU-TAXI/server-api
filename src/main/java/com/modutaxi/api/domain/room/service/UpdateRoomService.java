@@ -1,7 +1,7 @@
 package com.modutaxi.api.domain.room.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.modutaxi.api.common.converter.Converter;
+import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
@@ -104,17 +104,17 @@ public class UpdateRoomService {
     @Transactional
     public void updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
         String startCoordinate =
-            Converter.coordinateToString(internalUpdateRoomDto.getStartLongitude(),
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getStartLongitude(),
                 internalUpdateRoomDto.getStartLatitude());
 
         String goalCoordinate =
-            Converter.coordinateToString(internalUpdateRoomDto.getDestination().getLongitude(),
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getDestination().getLongitude(),
                 internalUpdateRoomDto.getDestination().getLatitude());
 
         JsonNode jsonNode =
             getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
 
-        List<Point> path = Converter.jsonNodeToPointList(jsonNode.get("path"));
+        List<Point> path = NaverMapConverter.jsonNodeToPointList(jsonNode.get("path"));
 
         internalUpdateRoomDto.setExpectedCharge(jsonNode.get("taxiFare").asInt());
         internalUpdateRoomDto.setDuration(jsonNode.get("duration").asLong());
