@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.mail.dto;
+package com.modutaxi.api.domain.mail.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

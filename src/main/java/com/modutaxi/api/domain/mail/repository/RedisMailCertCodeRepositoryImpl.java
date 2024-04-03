@@ -1,7 +1,7 @@
 package com.modutaxi.api.domain.mail.repository;
 
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
-import com.modutaxi.api.domain.mail.dto.CertCodeEntity;
+import com.modutaxi.api.domain.mail.dao.CertCodeEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

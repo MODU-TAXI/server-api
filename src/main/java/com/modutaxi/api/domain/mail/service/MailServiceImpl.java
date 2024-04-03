@@ -2,7 +2,7 @@ package com.modutaxi.api.domain.mail.service;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
-import com.modutaxi.api.domain.mail.dto.CertCodeEntity;
+import com.modutaxi.api.domain.mail.dao.CertCodeEntity;
 import com.modutaxi.api.domain.mail.repository.RedisMailCertCodeRepository;
 import com.modutaxi.api.domain.mail.vo.MailDomain;
 import lombok.RequiredArgsConstructor;
