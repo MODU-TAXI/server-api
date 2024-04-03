@@ -29,24 +29,24 @@ public class UpdateRoomController {
      * [Patch] 방 정보 수정
      */
     @Operation(summary = "모집방 업데이트")
-    @PatchMapping("/{roomId}")
+    @PatchMapping("/{id}")
     public ResponseEntity<RoomDetailResponse> updateRoom(
         @CurrentMember Member member,
-        @PathVariable Long roomId,
+        @PathVariable Long id,
         @Valid @RequestBody RoomRequestDto.UpdateRoomRequest updateRoomRequest) {
-        return ResponseEntity.ok(updateRoomService.updateRoom(member, roomId, updateRoomRequest));
+        return ResponseEntity.ok(updateRoomService.updateRoom(member, id, updateRoomRequest));
     }
 
     /**
      * [Delete] 방 삭제
      */
     @Operation(summary = "모집방 삭제")
-    @DeleteMapping("/{roomId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRoom(
         @CurrentMember Member member,
-        @PathVariable Long roomId
+        @PathVariable Long id
     ) {
-        updateRoomService.deleteRoom(member, roomId);
+        updateRoomService.deleteRoom(member, id);
         return ResponseEntity.ok("삭제 되었습니다.");
     }
 }

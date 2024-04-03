@@ -21,8 +21,8 @@ public class GetRoomController {
      */
     private final GetRoomService getRoomService;
 
-    @GetMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
-        return ResponseEntity.ok(getRoomService.getRoomDetail(roomId));
+    @GetMapping("/{id}")
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(getRoomService.getRoomDetail(id));
     }
 }
