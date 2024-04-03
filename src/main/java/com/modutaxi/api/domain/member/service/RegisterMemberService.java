@@ -54,7 +54,7 @@ public class RegisterMemberService {
     private String checkSnsIdKey(String key) {
         String snsId = redisSnsIdRepository.findById(key);
         if (snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
-        else return snsId;
+        return snsId;
     }
 
     /**
@@ -73,8 +73,13 @@ public class RegisterMemberService {
     public MembershipResponse checkMembership(SocialLoginType type, String accessToken) throws IOException {
         String snsId = getSnsIdByAccessToken(type, accessToken);
         // 해당 snsId를 가진 member가 있다면 true 반환
-        return new MembershipResponse(
-                memberRepository.findBySnsIdAndStatusTrue(snsId).isPresent());
+        if(memberRepository.findBySnsIdAndStatusTrue(snsId).isPresent()) {
+            return new MembershipResponse(true, null);
+        }
+        else {
+            String key = redisSnsIdRepository.save(snsId);
+            return new MembershipResponse(false, key);
+        }
     }
 
     /**

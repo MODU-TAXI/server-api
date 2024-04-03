@@ -16,5 +16,6 @@ public class MemberResponseDto {
     @AllArgsConstructor
     public static class MembershipResponse {
         private boolean existent;
+        private String key;
     }
 }
