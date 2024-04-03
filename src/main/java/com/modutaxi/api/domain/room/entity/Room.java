@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.room.entity;
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,30 +72,22 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private LocalTime departTime = LocalTime.of(0, 0);
+    private LocalDateTime departTime = LocalDateTime.now();
 
     @NotNull
     @Builder.Default
-    private int wishHeadcount = 4;
+    private int wishHeadcount = 3;
 
 
-    public void update(Destination destination,
-        String description,
-        int roomTagBitMask,
-        float startLongitude,
-        float startLatitude,
-        LocalTime departTime,
-        int wishHeadcount,
-        int expectedCharge,
-        Long duration) {
-        this.destination = destination;
-        this.description = description;
-        this.roomTagBitMask = roomTagBitMask;
-        this.startLongitude = startLongitude;
-        this.startLatitude = startLatitude;
-        this.departTime = departTime;
-        this.wishHeadcount = wishHeadcount;
-        this.expectedCharge = expectedCharge;
-        this.duration = duration;
+    public void update(InternalUpdateRoomDto updateRoomDto) {
+        this.destination = updateRoomDto.getDestination();
+        this.description = updateRoomDto.getDescription();
+        this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
+        this.startLongitude = updateRoomDto.getStartLongitude();
+        this.startLatitude = updateRoomDto.getStartLatitude();
+        this.departTime = updateRoomDto.getDepartTime();
+        this.wishHeadcount = updateRoomDto.getWishHeadcount();
+        this.expectedCharge = updateRoomDto.getExpectedCharge();
+        this.duration = updateRoomDto.getDuration();
     }
 }

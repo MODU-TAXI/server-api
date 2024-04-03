@@ -1,6 +1,6 @@
 package com.modutaxi.api.domain.room.dto;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class RoomRequestDto {
 
         private float startLatitude;
 
-        private LocalTime departTime;
+        private LocalDateTime departTime;
 
         private int wishHeadcount;
     }
@@ -43,7 +43,7 @@ public class RoomRequestDto {
 
         private float startLatitude;
 
-        private LocalTime departTime;
+        private LocalDateTime departTime;
 
         private int wishHeadcount;
     }

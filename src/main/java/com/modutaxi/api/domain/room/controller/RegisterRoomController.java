@@ -3,11 +3,10 @@ package com.modutaxi.api.domain.room.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.RegisterRoomService;
 import io.swagger.v3.oas.annotations.Operation;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,7 @@ public class RegisterRoomController {
     @PostMapping
     public ResponseEntity<RoomDetailResponse> createRoom(
         @CurrentMember Member member,
-        @Valid @RequestBody RoomRequestDto.CreateRoomRequest roomRequest) {
+        @Valid @RequestBody CreateRoomRequest roomRequest) {
         return ResponseEntity.ok(roomService.createRoom(member, roomRequest));
     }
 }

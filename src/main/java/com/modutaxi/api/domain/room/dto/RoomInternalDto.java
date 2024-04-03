@@ -1,23 +1,20 @@
 package com.modutaxi.api.domain.room.dto;
 
+import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.room.entity.Room;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import java.time.LocalDateTime;
-import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-public class RoomResponseDto {
+public class RoomInternalDto {
 
     @Getter
+    @Setter
     @Builder
-    @AllArgsConstructor
-    public static class RoomDetailResponse {
+    public static class InternalUpdateRoomDto {
 
-        private Long roomId;
-
-        private Long destinationId;
+        private Destination destination;
 
         private String description;
 
@@ -31,16 +28,13 @@ public class RoomResponseDto {
 
         private int wishHeadcount;
 
-        private long duration;
-
         private int expectedCharge;
 
-        private List<Point> path;
+        private long duration;
 
-        public static RoomDetailResponse toDto(Room room, List<Point> path) {
-            return RoomDetailResponse.builder()
-                .roomId(room.getId())
-                .destinationId(room.getDestination().getId())
+        public static InternalUpdateRoomDto toDto(Room room) {
+            return InternalUpdateRoomDto.builder()
+                .destination(room.getDestination())
                 .description(room.getDescription())
                 .roomTagBitMask(room.getRoomTagBitMask())
                 .startLatitude(room.getStartLatitude())
@@ -49,8 +43,8 @@ public class RoomResponseDto {
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())
-                .path(path)
                 .build();
         }
     }
+
 }

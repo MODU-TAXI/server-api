@@ -5,9 +5,9 @@ import com.modutaxi.api.common.converter.Converter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
-import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.destination.repository.DestinationRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
@@ -17,7 +17,6 @@ import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import jakarta.transaction.Transactional;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,65 +43,16 @@ public class UpdateRoomService {
 
         checkManager(room.getRoomManager().getId(), member.getId());
 
-        Destination destination = room.getDestination();
-        String description = room.getDescription();
-        int roomTagBitMask = room.getRoomTagBitMask();
-        float startLongitude = room.getStartLongitude();
-        float startLatitude = room.getStartLatitude();
-        LocalTime departTime = room.getDepartTime();
-        int wishHeadcount = room.getWishHeadcount();
-        int expectedCharge = room.getExpectedCharge();
-        long duration = room.getDuration();
+        InternalUpdateRoomDto oldRoomData = InternalUpdateRoomDto.toDto(room);
 
-        // 단순 수정
-        if (updateRoomRequest.getDescription() != null) {
-            description = updateRoomRequest.getDescription();
-        }
-        if (updateRoomRequest.getRoomTagBitMask() != 0) {
-            roomTagBitMask = updateRoomRequest.getRoomTagBitMask();
-        }
-        if (updateRoomRequest.getDepartTime() != null) {
-            departTime = room.getDepartTime();
-        }
-        if (updateRoomRequest.getWishHeadcount() != 0) {
-            wishHeadcount = updateRoomRequest.getWishHeadcount();
+        InternalUpdateRoomDto newRoomData = validateAndReturnNewDto(oldRoomData, updateRoomRequest);
+
+        //TaxiInfo db 업데이트
+        if (shouldUpdateTaxiInfo(updateRoomRequest)) {
+            updateTaxiInfo(roomId, newRoomData);
         }
 
-        // TODO: 2024/04/03 망고스틴의 거점에러 추가 시 삽입
-        //경로를 바꿔줘야 하는 경우
-        if (updateRoomRequest.getDestinationId() != null) {
-            destination = destinationRepository.findById(updateRoomRequest.getDestinationId())
-                .orElseThrow();
-        }
-
-        if (updateRoomRequest.getStartLongitude() != 0) {
-            startLongitude = updateRoomRequest.getStartLongitude();
-        }
-        if (updateRoomRequest.getStartLatitude() != 0) {
-            startLatitude = updateRoomRequest.getStartLatitude();
-        }
-
-        //db 업데이트
-        if (updateRoomRequest.getDestinationId() != null
-            || updateRoomRequest.getStartLongitude() != 0
-            || updateRoomRequest.getStartLatitude() != 0) {
-            String startCoordinate =
-                Converter.coordinateToString(startLongitude, startLatitude);
-            String goalCoordinate =
-                Converter.coordinateToString(destination.getLongitude(), destination.getLatitude());
-            JsonNode jsonNode =
-                getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
-
-            List<Point> path = Converter.jsonNodeToPointList(jsonNode.get("path"));
-
-            expectedCharge = jsonNode.get("taxiFare").asInt();
-            duration = jsonNode.get("duration").asLong();
-
-            taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
-        }
-
-        room.update(destination, description, roomTagBitMask, startLongitude, startLatitude,
-            departTime, wishHeadcount, expectedCharge, duration);
+        room.update(newRoomData);
 
         return RoomDetailResponse.toDto(room, taxiInfo.getPath());
     }
@@ -118,6 +68,64 @@ public class UpdateRoomService {
 
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
+    }
+
+    public InternalUpdateRoomDto validateAndReturnNewDto(InternalUpdateRoomDto oldRoomData,
+        UpdateRoomRequest updateRoomRequest) {
+
+        if (updateRoomRequest.getDescription() != null) {
+            oldRoomData.setDescription(updateRoomRequest.getDescription());
+        }
+        if (updateRoomRequest.getRoomTagBitMask() != 0) {
+            oldRoomData.setRoomTagBitMask(updateRoomRequest.getRoomTagBitMask());
+        }
+        if (updateRoomRequest.getDepartTime() != null) {
+            oldRoomData.setDepartTime(updateRoomRequest.getDepartTime());
+        }
+        if (updateRoomRequest.getWishHeadcount() != 0) {
+            oldRoomData.setWishHeadcount(updateRoomRequest.getWishHeadcount());
+        }
+        // TODO: 2024/04/03 망고스틴의 거점에러 추가 시 삽입
+        if (updateRoomRequest.getDestinationId() != null) {
+            oldRoomData.setDestination(
+                destinationRepository.findById(updateRoomRequest.getDestinationId())
+                    .orElseThrow());
+        }
+        if (updateRoomRequest.getStartLongitude() != 0) {
+            oldRoomData.setStartLongitude(updateRoomRequest.getStartLongitude());
+        }
+        if (updateRoomRequest.getStartLatitude() != 0) {
+            oldRoomData.setStartLatitude(updateRoomRequest.getStartLatitude());
+        }
+
+        return oldRoomData;
+    }
+
+    @Transactional
+    public void updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
+        String startCoordinate =
+            Converter.coordinateToString(internalUpdateRoomDto.getStartLongitude(),
+                internalUpdateRoomDto.getStartLatitude());
+
+        String goalCoordinate =
+            Converter.coordinateToString(internalUpdateRoomDto.getDestination().getLongitude(),
+                internalUpdateRoomDto.getDestination().getLatitude());
+
+        JsonNode jsonNode =
+            getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
+
+        List<Point> path = Converter.jsonNodeToPointList(jsonNode.get("path"));
+
+        internalUpdateRoomDto.setExpectedCharge(jsonNode.get("taxiFare").asInt());
+        internalUpdateRoomDto.setDuration(jsonNode.get("duration").asLong());
+
+        taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
+    }
+
+    public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
+        return updateRoomRequest.getDestinationId() != null
+            || updateRoomRequest.getStartLongitude() != 0
+            || updateRoomRequest.getStartLatitude() != 0;
     }
 
     void checkManager(Long managerId, Long memberId) {
