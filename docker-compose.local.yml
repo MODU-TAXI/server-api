@@ -1,18 +1,27 @@
 version: '3.8'
 
 services:
-  spring:
-    container_name: spring
-    image: ${CONTAINER_REGISTRY}/${GITHUB_ORGANIZATION}/${CONTAINER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
+  mysql:
+    container_name: mysql
+    image: mysql:latest
     ports:
-      - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
+      - ${MYSQL_OUTER_PORT}:${MYSQL_INNER_PORT}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     networks:
       modutaxi_network:
-        ipv4_address: ${NETWORK_SPRING_IP}
-    depends_on:
-      - mongo
+        ipv4_address: ${NETWORK_MYSQL_IP}
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - ${REDIS_OUTER_PORT}:${REDIS_INNER_PORT}
+    networks:
+      modutaxi_network:
+        ipv4_address: ${NETWORK_REDIS_IP}
   mongo:
     container_name: mongo
     image: mongo:latest
@@ -22,8 +31,6 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
-    volumes:
-      - ${MONGO_VOLUME}:/data/db
     networks:
       modutaxi_network:
         ipv4_address: ${NETWORK_MONGO_IP}

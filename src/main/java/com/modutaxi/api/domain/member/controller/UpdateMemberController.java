@@ -1,6 +1,8 @@
 package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.MailResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
@@ -52,7 +54,7 @@ public class UpdateMemberController {
         @ApiResponse(responseCode = "429", description = "단기간 중복 메일 발송 요청"),
     })
     @GetMapping("/mail/certificate")
-    public ResponseEntity<Boolean> sendEmailCertificationMail(
+    public ResponseEntity<MailResponse> sendEmailCertificationMail(
         @CurrentMember Member member,
         @Parameter(description = "인증 메일을 받을 이메일 주소")
         @RequestParam String receiver
@@ -74,7 +76,7 @@ public class UpdateMemberController {
         @ApiResponse(responseCode = "400", description = "메일 인증 실패")
     })
     @GetMapping("/mail/confirm")
-    public ResponseEntity<Boolean> confirmEmailCertification(
+    public ResponseEntity<MailResponse> confirmEmailCertification(
         @CurrentMember Member member,
         @Parameter(description = "인증 메일로 받은 인증 코드")
         @RequestParam String code) {
