@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component("commonConverter")
-public class Converter {
+public class NaverMapConverter {
     public static String coordinateToString(float longitude, float latitude) {
         return String.format("%.6f, %.6f", longitude, latitude);
     }
