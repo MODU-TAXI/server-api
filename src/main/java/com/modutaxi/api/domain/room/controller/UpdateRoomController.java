@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rooms")
 @Tag(name = "방 정보 업데이트", description = "방 정보 업데이트 및 삭제")
 public class UpdateRoomController {
+
     private final UpdateRoomService updateRoomService;
 
     /**
@@ -29,7 +30,7 @@ public class UpdateRoomController {
      */
     @Operation(summary = "모집방 업데이트")
     @PatchMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> updateRoom (
+    public ResponseEntity<RoomDetailResponse> updateRoom(
         @CurrentMember Member member,
         @PathVariable Long roomId,
         @Valid @RequestBody RoomRequestDto.UpdateRoomRequest updateRoomRequest) {
@@ -44,7 +45,7 @@ public class UpdateRoomController {
     public ResponseEntity<String> deleteRoom(
         @CurrentMember Member member,
         @PathVariable Long roomId
-    ){
+    ) {
         updateRoomService.deleteRoom(member, roomId);
         return ResponseEntity.ok("삭제 되었습니다.");
     }

@@ -11,12 +11,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Document(collection = "taxi-info")
 public class TaxiInfo implements Serializable {
+
     @Id
     private Long id;
 
     private List<Point> path;
 
-    public static TaxiInfo toEntity(Long id, List<Point>  path){
+    public static TaxiInfo toEntity(Long id, List<Point> path) {
         return TaxiInfo.builder()
             .id(id)
             .path(path)

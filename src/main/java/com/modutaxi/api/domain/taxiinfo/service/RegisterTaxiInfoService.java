@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class RegisterTaxiInfoService {
+
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
-    public void savePath(Long id, List<Point> path){
+
+    public void savePath(Long id, List<Point> path) {
         taxiInfoMongoRepository.save(TaxiInfo.toEntity(id, path));
     }
 }

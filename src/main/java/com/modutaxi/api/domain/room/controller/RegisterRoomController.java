@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rooms")
 @Tag(name = "방 등록", description = "방 등록 API")
 public class RegisterRoomController {
+
     private final RegisterRoomService roomService;
 
     /**
@@ -29,7 +30,7 @@ public class RegisterRoomController {
      */
     @Operation(summary = "모집방 생성")
     @PostMapping
-    public ResponseEntity<RoomDetailResponse> createRoom (
+    public ResponseEntity<RoomDetailResponse> createRoom(
         @CurrentMember Member member,
         @Valid @RequestBody RoomRequestDto.CreateRoomRequest roomRequest) {
         return ResponseEntity.ok(roomService.createRoom(member, roomRequest));

@@ -119,7 +119,7 @@ public class UpdateRoomService {
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
     }
-    
+
     void checkManager(Long managerId, Long memberId) {
         if (!managerId.equals(memberId)) {
             throw new BaseException(RoomErrorCode.NOT_ROOM_MANAGER);

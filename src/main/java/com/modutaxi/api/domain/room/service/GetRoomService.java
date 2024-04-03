@@ -23,8 +23,9 @@ public class GetRoomService {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        List<Point> path = taxiInfoMongoRepository.findById(roomId).orElseThrow(() -> new BaseException(
-            TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
+        List<Point> path = taxiInfoMongoRepository.findById(roomId)
+            .orElseThrow(() -> new BaseException(
+                TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
         return RoomDetailResponse.toDto(room, path);
     }

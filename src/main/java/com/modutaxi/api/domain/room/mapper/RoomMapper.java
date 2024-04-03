@@ -14,7 +14,7 @@ public class RoomMapper {
         Member member, String roomName, Destination destination, int expectedCharge, long duration,
         String description, int roomTagBitMask,
         float startLongitude, float startLatitude, LocalTime departTime
-    ){
+    ) {
         return Room.builder()
             .destination(destination)
             .roomManager(member)

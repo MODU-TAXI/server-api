@@ -9,10 +9,12 @@ import lombok.Builder;
 import lombok.Getter;
 
 public class RoomResponseDto {
+
     @Getter
     @Builder
     @AllArgsConstructor
     public static class RoomDetailResponse {
+
         private Long roomId;
 
         private Long destinationId;
@@ -35,7 +37,7 @@ public class RoomResponseDto {
 
         private List<Point> path;
 
-        public static RoomDetailResponse toDto(Room room, List<Point>  path){
+        public static RoomDetailResponse toDto(Room room, List<Point> path) {
             return RoomDetailResponse.builder()
                 .roomId(room.getId())
                 .destinationId(room.getDestination().getId())

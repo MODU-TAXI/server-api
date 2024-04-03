@@ -11,6 +11,7 @@ public class RoomRequestDto {
     @Builder
     @AllArgsConstructor
     public static class CreateRoomRequest {
+
         private Long destinationId;
 
         private String description;
@@ -31,6 +32,7 @@ public class RoomRequestDto {
     @Getter
     @Builder
     public static class UpdateRoomRequest {
+
         private Long destinationId;
 
         private String description;

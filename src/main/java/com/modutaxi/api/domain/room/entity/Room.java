@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Builder
 public class Room extends BaseTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -70,7 +71,7 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private LocalTime departTime = LocalTime.of(0,0);
+    private LocalTime departTime = LocalTime.of(0, 0);
 
     @NotNull
     @Builder.Default
@@ -85,8 +86,7 @@ public class Room extends BaseTime {
         LocalTime departTime,
         int wishHeadcount,
         int expectedCharge,
-        Long duration)
-    {
+        Long duration) {
         this.destination = destination;
         this.description = description;
         this.roomTagBitMask = roomTagBitMask;

@@ -20,8 +20,9 @@ public class GetRoomController {
      * [GET] 경로를 포함한 방 정보 상세 조회
      */
     private final GetRoomService getRoomService;
+
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId){
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long roomId) {
         return ResponseEntity.ok(getRoomService.getRoomDetail(roomId));
     }
 }
