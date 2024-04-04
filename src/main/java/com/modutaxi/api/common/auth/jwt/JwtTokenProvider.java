@@ -105,7 +105,7 @@ public class JwtTokenProvider {
      * RefreshToken으로 사용자 정보 인증하고 Authentication 객체를 반환하는 함수
      */
     public Authentication getRefreshAuthentication(String token) {
-        String memberId = redisRTKRepository.findById(token);
+        String memberId = redisRTKRepository.findAndDeleteById(token);
         if(memberId == null) {
             throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
         } return getAuthentication(memberId);

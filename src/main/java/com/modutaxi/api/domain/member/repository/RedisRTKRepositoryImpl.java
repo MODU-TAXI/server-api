@@ -1,7 +1,6 @@
 package com.modutaxi.api.domain.member.repository;
 
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
-import com.modutaxi.api.common.config.redis.redisExample.RedisExampleRepositoryImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,7 +33,7 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
     }
 
     @Override
-    public String findById(String key) {
+    public String findAndDeleteById(String key) {
         return valueOperations.getAndDelete(generateGlobalKey(key));
     }
 }

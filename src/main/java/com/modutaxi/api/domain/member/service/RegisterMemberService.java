@@ -52,7 +52,7 @@ public class RegisterMemberService {
     }
 
     private String checkSnsIdKey(String key) {
-        String snsId = redisSnsIdRepository.findById(key);
+        String snsId = redisSnsIdRepository.findAndDeleteById(key);
         if (snsId == null) throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
         return snsId;
     }
