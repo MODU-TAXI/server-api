@@ -17,4 +17,11 @@ public class MemberResponseDto {
     public static class MailResponse {
         private Boolean isConfirm;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class MembershipResponse {
+        private boolean existent;
+        private String key;
+    }
 }

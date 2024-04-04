@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.member.controller;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.LoginRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.MembershipResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,10 @@ public class RegisterMemberController {
     public ResponseEntity<TokenResponse> register(
             @Valid @RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(registerMemberService.registerMember(
-                signUpRequest.getKey(), signUpRequest.getName(), signUpRequest.getGender()));
+                signUpRequest.getKey(),
+                signUpRequest.getName(),
+                signUpRequest.getGender(),
+                signUpRequest.getPhoneNumber()));
     }
 
     /**
@@ -44,6 +48,19 @@ public class RegisterMemberController {
             @PathVariable(name = "type") SocialLoginType type,
             @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
+                type, loginRequest.getAccessToken()));
+    }
+
+    /**
+     * [POST] 가입 여부 확인
+     * /{type}/membership
+     */
+    @Operation(summary = "가입 여부 확인")
+    @PostMapping("/{type}/membership")
+    public ResponseEntity<MembershipResponse> checkMembership(
+            @PathVariable(name = "type") SocialLoginType type,
+            @Valid @RequestBody LoginRequest loginRequest) throws IOException {
+        return ResponseEntity.ok(registerMemberService.checkMembership(
                 type, loginRequest.getAccessToken()));
     }
 }

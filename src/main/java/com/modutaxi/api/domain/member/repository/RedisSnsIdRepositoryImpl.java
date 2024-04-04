@@ -18,6 +18,8 @@ public class RedisSnsIdRepositoryImpl extends BaseRedisRepository implements Ser
     private final RedisTemplate<String, String> redisTemplate;
     private ValueOperations<String, String> valueOperations;
 
+    public static final int SNS_ID_VALID_HOURS = 1;
+
     @PostConstruct
     protected void init() {
         classInstance = RedisExampleRepositoryImpl.class;
@@ -25,16 +27,16 @@ public class RedisSnsIdRepositoryImpl extends BaseRedisRepository implements Ser
     }
 
     @Override
-    public String save(String snsId, int timeout, TimeUnit timeunit) {
+    public String save(String snsId) {
         UUID randomUUID = UUID.randomUUID();
         String key = generateGlobalKey(randomUUID.toString());
         valueOperations.set(key, snsId);
-        redisTemplate.expire(key, timeout, timeunit);
+        redisTemplate.expire(key, SNS_ID_VALID_HOURS, TimeUnit.HOURS);
         return randomUUID.toString();
     }
 
     @Override
-    public String findById(String key) {
+    public String findAndDeleteById(String key) {
         return valueOperations.getAndDelete(generateGlobalKey(key));
     }
 }
