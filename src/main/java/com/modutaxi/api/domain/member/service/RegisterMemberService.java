@@ -38,7 +38,7 @@ public class RegisterMemberService {
         // DB에 가입 이력 있는지 중복 확인
         checkRegister(snsId);
         // member entity 생성
-        Member member = memberMapper.ToEntity(snsId, name, gender, phoneNumber);
+        Member member = memberMapper.toEntity(snsId, name, gender, phoneNumber);
         memberRepository.save(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
