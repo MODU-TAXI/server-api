@@ -3,6 +3,9 @@ package com.modutaxi.api.domain.room.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
+import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.ErrorCode;
+import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.destination.repository.DestinationRepository;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -29,17 +32,21 @@ public class RegisterRoomService {
     private final RegisterTaxiInfoService registerTaxiInfoService;
 
     @Transactional
-    public RoomDetailResponse createRoom(Member member, CreateRoomRequest roomRequest) {
+    public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
+        if (roomRepository.existsRoomByRoomManagerId(member.getId())) {
+            throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
+        }
 
         // TODO: 2024/04/03 망고스틴님 거점 조회에러 만들면 넣던가 하겠습니다!
         //거점 찾기
-        Destination destination = destinationRepository.findById(roomRequest.getDestinationId())
+        Destination destination = destinationRepository.findById(
+                createRoomRequest.getDestinationId())
             .orElseThrow();
 
         //시작 지점, 목표 지점 설정
         String startCoordinate =
-            NaverMapConverter.coordinateToString(roomRequest.getPoint().getY(),
-                roomRequest.getPoint().getX());
+            NaverMapConverter.coordinateToString(createRoomRequest.getPoint().getX(),
+                createRoomRequest.getPoint().getY());
         String goalCoordinate =
             NaverMapConverter.coordinateToString(destination.getLongitude(),
                 destination.getLatitude());
@@ -50,14 +57,13 @@ public class RegisterRoomService {
         int expectedCharge = taxiInfo.get("taxiFare").asInt();
 
         long duration = taxiInfo.get("duration").asLong();
-        System.out.println("duration = " + roomRequest.getPoint().getX());
-        System.out.println("duration = " + roomRequest.getPoint().getY());
 
-        Room room = RoomMapper.toEntity(member, roomRequest.getRoomName(), destination,
+        Room room = RoomMapper.toEntity(member, createRoomRequest.getRoomName(), destination,
             expectedCharge, duration,
-            roomRequest.getDescription(),
-            RoomTagBitMaskConverter.convertRoomTagListToBitMask(roomRequest.getRoomTagBitMask()),
-            roomRequest.getPoint(), roomRequest.getDepartTime()
+            createRoomRequest.getDescription(),
+            RoomTagBitMaskConverter.convertRoomTagListToBitMask(
+                createRoomRequest.getRoomTagBitMask()),
+            createRoomRequest.getPoint(), createRoomRequest.getDepartTime()
         );
 
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
