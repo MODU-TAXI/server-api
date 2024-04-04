@@ -2,7 +2,7 @@ package com.modutaxi.api.domain.room.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.*;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.UpdateRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,12 +30,13 @@ public class UpdateRoomController {
      */
     @Operation(summary = "모집방 업데이트",
         description = "**RoomTag Enum 종류**\n\n**RoomTagBitMask**: "
-            + "ONLY\\_WOMAN, ONLY\\_MAN, REGARDLESS\\_OF\\_GENDER, STUDENT\\_CERTIFICATION")
+            + "ONLY\\_WOMAN, ONLY\\_MAN, REGARDLESS\\_OF\\_GENDER, STUDENT\\_CERTIFICATION"
+            + "\n\n\nPoint(X:경도, Y:위도)\n\n**예시: Point(127.xxx,36.xxx)**")
     @PatchMapping("/{id}")
     public ResponseEntity<RoomDetailResponse> updateRoom(
         @CurrentMember Member member,
         @PathVariable Long id,
-        @Valid @RequestBody RoomRequestDto.UpdateRoomRequest updateRoomRequest) {
+        @Valid @RequestBody UpdateRoomRequest updateRoomRequest) {
         return ResponseEntity.ok(updateRoomService.updateRoom(member, id, updateRoomRequest));
     }
 

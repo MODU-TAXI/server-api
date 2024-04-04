@@ -11,11 +11,10 @@ import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.modutaxi.api.domain.taxiinfo.service.RegisterTaxiInfoService;
+import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +38,8 @@ public class RegisterRoomService {
 
         //시작 지점, 목표 지점 설정
         String startCoordinate =
-            NaverMapConverter.coordinateToString(roomRequest.getStartLongitude(),
-                roomRequest.getStartLatitude());
+            NaverMapConverter.coordinateToString(roomRequest.getPoint().getY(),
+                roomRequest.getPoint().getX());
         String goalCoordinate =
             NaverMapConverter.coordinateToString(destination.getLongitude(),
                 destination.getLatitude());
@@ -51,16 +50,17 @@ public class RegisterRoomService {
         int expectedCharge = taxiInfo.get("taxiFare").asInt();
 
         long duration = taxiInfo.get("duration").asLong();
+        System.out.println("duration = " + roomRequest.getPoint().getX());
+        System.out.println("duration = " + roomRequest.getPoint().getY());
 
         Room room = RoomMapper.toEntity(member, roomRequest.getRoomName(), destination,
             expectedCharge, duration,
             roomRequest.getDescription(),
             RoomTagBitMaskConverter.convertRoomTagListToBitMask(roomRequest.getRoomTagBitMask()),
-            roomRequest.getStartLongitude(), roomRequest.getStartLatitude(),
-            roomRequest.getDepartTime()
+            roomRequest.getPoint(), roomRequest.getDepartTime()
         );
 
-        List<Point> path = NaverMapConverter.jsonNodeToPointList(taxiInfo.get("path"));
+        LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
         roomRepository.save(room);
         registerTaxiInfoService.savePath(room.getId(), path);

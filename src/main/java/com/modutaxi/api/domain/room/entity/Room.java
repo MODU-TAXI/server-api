@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.geo.Point;
 
 @Getter
 @AllArgsConstructor
@@ -62,13 +63,10 @@ public class Room extends BaseTime {
     @Nullable
     private int roomTagBitMask;
 
-    @NotNull
-    @Builder.Default
-    private float startLongitude = 0.0F;
 
     @NotNull
     @Builder.Default
-    private float startLatitude = 0.0F;
+    private Point point = new Point(126.678890, 37.513137);
 
     @NotNull
     @Builder.Default
@@ -83,8 +81,7 @@ public class Room extends BaseTime {
         this.destination = updateRoomDto.getDestination();
         this.description = updateRoomDto.getDescription();
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
-        this.startLongitude = updateRoomDto.getStartLongitude();
-        this.startLatitude = updateRoomDto.getStartLatitude();
+        this.point = updateRoomDto.getPoint();
         this.departTime = updateRoomDto.getDepartTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();

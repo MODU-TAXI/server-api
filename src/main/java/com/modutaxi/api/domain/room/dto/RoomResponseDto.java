@@ -4,12 +4,13 @@ import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertB
 
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
+import com.mongodb.client.model.geojson.LineString;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.geo.Point;
 
 public class RoomResponseDto {
 
@@ -26,9 +27,7 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private float startLongitude;
-
-        private float startLatitude;
+        private Point point;
 
         private LocalDateTime departTime;
 
@@ -38,16 +37,15 @@ public class RoomResponseDto {
 
         private int expectedCharge;
 
-        private List<Point> path;
+        private LineString path;
 
-        public static RoomDetailResponse toDto(Room room, List<Point> path) {
+        public static RoomDetailResponse toDto(Room room, LineString path) {
             return RoomDetailResponse.builder()
                 .roomId(room.getId())
                 .destinationId(room.getDestination().getId())
                 .description(room.getDescription())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .startLatitude(room.getStartLatitude())
-                .startLongitude(room.getStartLongitude())
+                .point(room.getPoint())
                 .departTime(room.getDepartTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())

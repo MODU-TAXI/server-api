@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.geo.Point;
 
 public class RoomInternalDto {
 
@@ -20,9 +21,7 @@ public class RoomInternalDto {
 
         private int roomTagBitMask;
 
-        private float startLongitude;
-
-        private float startLatitude;
+        private Point point;
 
         private LocalDateTime departTime;
 
@@ -37,8 +36,7 @@ public class RoomInternalDto {
                 .destination(room.getDestination())
                 .description(room.getDescription())
                 .roomTagBitMask(room.getRoomTagBitMask())
-                .startLatitude(room.getStartLatitude())
-                .startLongitude(room.getStartLongitude())
+                .point(room.getPoint())
                 .departTime(room.getDepartTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())

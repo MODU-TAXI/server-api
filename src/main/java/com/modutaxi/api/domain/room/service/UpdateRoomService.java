@@ -14,12 +14,11 @@ import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
+import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,13 +49,15 @@ public class UpdateRoomService {
         InternalUpdateRoomDto newRoomData = validateAndReturnNewDto(oldRoomData, updateRoomRequest);
 
         //TaxiInfo db 업데이트
+        // TODO: 2024/04/05 JPA와 달리 모든 과정이 끝난 후 db에 반영되는 이슈가 있기에 임시 변수 추가
+        LineString path = taxiInfo.getPath();
         if (shouldUpdateTaxiInfo(updateRoomRequest)) {
-            updateTaxiInfo(roomId, newRoomData);
+            path = updateTaxiInfo(roomId, newRoomData);
         }
 
         room.update(newRoomData);
 
-        return RoomDetailResponse.toDto(room, taxiInfo.getPath());
+        return RoomDetailResponse.toDto(room, path);
     }
 
     @Transactional
@@ -100,22 +101,18 @@ public class UpdateRoomService {
             updateRoomRequest.getDestinationId() != null ? destinationRepository.findById(
                 updateRoomRequest.getDestinationId()).orElseThrow() : oldRoomData.getDestination());
 
-        oldRoomData.setStartLongitude(
-            updateRoomRequest.getStartLongitude() != 0 ? updateRoomRequest.getStartLongitude()
-                : oldRoomData.getStartLongitude());
-
-        oldRoomData.setStartLatitude(
-            updateRoomRequest.getStartLatitude() != 0 ? updateRoomRequest.getStartLatitude()
-                : oldRoomData.getStartLatitude());
+        oldRoomData.setPoint(
+            updateRoomRequest.getPoint() != null ? updateRoomRequest.getPoint()
+                : oldRoomData.getPoint());
 
         return oldRoomData;
     }
 
     @Transactional
-    public void updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
+    public LineString updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
         String startCoordinate =
-            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getStartLongitude(),
-                internalUpdateRoomDto.getStartLatitude());
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getPoint().getX(),
+                internalUpdateRoomDto.getPoint().getY());
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(
@@ -125,18 +122,18 @@ public class UpdateRoomService {
         JsonNode jsonNode =
             getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
 
-        List<Point> path = NaverMapConverter.jsonNodeToPointList(jsonNode.get("path"));
+        LineString path = NaverMapConverter.jsonNodeToLineString(jsonNode.get("path"));
 
         internalUpdateRoomDto.setExpectedCharge(jsonNode.get("taxiFare").asInt());
         internalUpdateRoomDto.setDuration(jsonNode.get("duration").asLong());
 
         taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
+        return path;
     }
 
     public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
         return updateRoomRequest.getDestinationId() != null
-            || updateRoomRequest.getStartLongitude() != 0
-            || updateRoomRequest.getStartLatitude() != 0;
+            || updateRoomRequest.getPoint() != null;
     }
 
     void checkManager(Long managerId, Long memberId) {

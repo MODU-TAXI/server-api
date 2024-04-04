@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.geo.Point;
 
 public class RoomRequestDto {
 
@@ -22,9 +23,7 @@ public class RoomRequestDto {
 
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private float startLongitude;
-
-        private float startLatitude;
+        private Point point;
 
         private LocalDateTime departTime;
 
@@ -41,9 +40,7 @@ public class RoomRequestDto {
 
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private float startLongitude;
-
-        private float startLatitude;
+        private Point point;
 
         private LocalDateTime departTime;
 
