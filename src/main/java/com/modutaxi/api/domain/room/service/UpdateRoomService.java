@@ -73,30 +73,34 @@ public class UpdateRoomService {
     public InternalUpdateRoomDto validateAndReturnNewDto(InternalUpdateRoomDto oldRoomData,
         UpdateRoomRequest updateRoomRequest) {
 
-        if (updateRoomRequest.getDescription() != null) {
-            oldRoomData.setDescription(updateRoomRequest.getDescription());
-        }
-        if (updateRoomRequest.getRoomTagBitMask() != 0) {
-            oldRoomData.setRoomTagBitMask(updateRoomRequest.getRoomTagBitMask());
-        }
-        if (updateRoomRequest.getDepartTime() != null) {
-            oldRoomData.setDepartTime(updateRoomRequest.getDepartTime());
-        }
-        if (updateRoomRequest.getWishHeadcount() != 0) {
-            oldRoomData.setWishHeadcount(updateRoomRequest.getWishHeadcount());
-        }
+        oldRoomData.setDescription(
+            updateRoomRequest.getDescription() != null ? updateRoomRequest.getDescription()
+                : oldRoomData.getDescription());
+
+        oldRoomData.setRoomTagBitMask(
+            updateRoomRequest.getRoomTagBitMask() != 0 ? updateRoomRequest.getRoomTagBitMask()
+                : oldRoomData.getRoomTagBitMask());
+
+        oldRoomData.setDepartTime(
+            updateRoomRequest.getDepartTime() != null ? updateRoomRequest.getDepartTime()
+                : oldRoomData.getDepartTime());
+
+        oldRoomData.setWishHeadcount(
+            updateRoomRequest.getWishHeadcount() != 0 ? updateRoomRequest.getWishHeadcount()
+                : oldRoomData.getWishHeadcount());
+
         // TODO: 2024/04/03 망고스틴의 거점에러 추가 시 삽입
-        if (updateRoomRequest.getDestinationId() != null) {
-            oldRoomData.setDestination(
-                destinationRepository.findById(updateRoomRequest.getDestinationId())
-                    .orElseThrow());
-        }
-        if (updateRoomRequest.getStartLongitude() != 0) {
-            oldRoomData.setStartLongitude(updateRoomRequest.getStartLongitude());
-        }
-        if (updateRoomRequest.getStartLatitude() != 0) {
-            oldRoomData.setStartLatitude(updateRoomRequest.getStartLatitude());
-        }
+        oldRoomData.setDestination(
+            updateRoomRequest.getDestinationId() != null ? destinationRepository.findById(
+                updateRoomRequest.getDestinationId()).orElseThrow() : oldRoomData.getDestination());
+
+        oldRoomData.setStartLongitude(
+            updateRoomRequest.getStartLongitude() != 0 ? updateRoomRequest.getStartLongitude()
+                : oldRoomData.getStartLongitude());
+
+        oldRoomData.setStartLatitude(
+            updateRoomRequest.getStartLatitude() != 0 ? updateRoomRequest.getStartLatitude()
+                : oldRoomData.getStartLatitude());
 
         return oldRoomData;
     }
@@ -108,7 +112,8 @@ public class UpdateRoomService {
                 internalUpdateRoomDto.getStartLatitude());
 
         String goalCoordinate =
-            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getDestination().getLongitude(),
+            NaverMapConverter.coordinateToString(
+                internalUpdateRoomDto.getDestination().getLongitude(),
                 internalUpdateRoomDto.getDestination().getLatitude());
 
         JsonNode jsonNode =
