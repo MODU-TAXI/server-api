@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.room.entity;
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Builder
 public class Room extends BaseTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,7 +45,11 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String name = "훈";
+    private long duration = 3600000;
+
+    @NotNull
+    @Builder.Default
+    private String roomName = "기본 방제";
 
     @Nullable
     @Column(length = 200)
@@ -66,33 +72,22 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private LocalTime departTime = LocalTime.of(0,0);
+    private LocalDateTime departTime = LocalDateTime.now();
 
     @NotNull
     @Builder.Default
-    private int wishHeadcount = 4;
+    private int wishHeadcount = 3;
 
-    @NotNull
-    @Builder.Default
-    private int reportCount = 0;
 
-    public static Room toEntity(
-        Member member, Destination destination, int expectedCharge,
-        String name, String description, RoomStatus roomStatus, int roomTagBitMask,
-        float startLongitude, float startLatitude, LocalTime departTime
-    ){
-        return Room.builder()
-            .destination(destination)
-            .roomManager(member)
-            .expectedCharge(expectedCharge)
-            .name(name)
-            .description(description)
-            .roomStatus(roomStatus)
-            .roomTagBitMask(roomTagBitMask)
-            .startLatitude(startLatitude)
-            .startLongitude(startLongitude)
-            .departTime(departTime)
-            .build();
+    public void update(InternalUpdateRoomDto updateRoomDto) {
+        this.destination = updateRoomDto.getDestination();
+        this.description = updateRoomDto.getDescription();
+        this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
+        this.startLongitude = updateRoomDto.getStartLongitude();
+        this.startLatitude = updateRoomDto.getStartLatitude();
+        this.departTime = updateRoomDto.getDepartTime();
+        this.wishHeadcount = updateRoomDto.getWishHeadcount();
+        this.expectedCharge = updateRoomDto.getExpectedCharge();
+        this.duration = updateRoomDto.getDuration();
     }
-
 }

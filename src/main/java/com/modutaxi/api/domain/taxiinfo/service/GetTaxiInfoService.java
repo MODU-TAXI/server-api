@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.room.service;
+package com.modutaxi.api.domain.taxiinfo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -33,16 +34,13 @@ public class GetTaxiInfoService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public JsonNode getDrivingInfo() {
-
-        // 출발지와 도착지 좌표
-        String startCoord = "126.679554, 37.464164";
-        String goalCoord = "126.656386, 37.451319";
+    @Transactional
+    public JsonNode getDrivingInfo(String startCoordinate, String goalCoordinate) {
 
         // 파라미터 설정
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
-            .queryParam("start", startCoord)
-            .queryParam("goal", goalCoord);
+            .queryParam("start", startCoordinate)
+            .queryParam("goal", goalCoordinate);
 
         String jsonResponse = webClient.get()
             .uri(builder.toUriString())
@@ -90,41 +88,40 @@ public class GetTaxiInfoService {
         //diriving API에 정의된 예외처리
         if (code == 0) {
 
-            //예상 도착시간 추가
-            long duration = jsonNode.get("route")
+            JsonNode tempNode = jsonNode.get("route")
                 .get("traoptimal")
-                .get(0)
-                .get("summary")
+                .get(0);
+
+            //예상 도착시간 추가
+            long duration = tempNode.get("summary")
                 .get("duration")
                 .asLong();
             extractedInfo.put("duration", duration);
 
             // 예상 택시요금 추가
-            double taxiFare = jsonNode.get("route")
-                .get("traoptimal")
-                .get(0)
-                .get("summary")
+            int taxiFare = tempNode.get("summary")
                 .get("taxiFare")
-                .asDouble();
+                .asInt();
             extractedInfo.put("taxiFare", taxiFare);
 
             // 시작 주소 추가
-            JsonNode startLocation = jsonNode.get("route")
-                .get("traoptimal")
-                .get(0)
-                .get("summary")
+            JsonNode startLocation = tempNode.get("summary")
                 .get("start")
                 .get("location");
             extractedInfo.set("startLocation", startLocation);
 
             // 경로 정보 추가
-            JsonNode pathArray = jsonNode.get("route")
-                .get("traoptimal")
-                .get(0)
-                .get("path");
+            JsonNode pathArray = tempNode.get("path");
             extractedInfo.set("path", pathArray);
+
+            //끝 주소 추가
+            JsonNode goalLocation = tempNode.get("summary")
+                .get("goal")
+                .get("location");
+            extractedInfo.set("endLocation", goalLocation);
         }
 
         return extractedInfo;
     }
+
 }

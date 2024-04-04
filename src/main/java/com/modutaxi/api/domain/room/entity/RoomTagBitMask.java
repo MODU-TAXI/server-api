@@ -8,14 +8,13 @@ public enum RoomTagBitMask {
     STUDENT_CERTIFICATION(8);
 
 
-
     private int value;
 
-    RoomTagBitMask(int value){
+    RoomTagBitMask(int value) {
         this.value = value;
     }
 
-    public int getValue(){
+    public int getValue() {
         return value;
     }
 

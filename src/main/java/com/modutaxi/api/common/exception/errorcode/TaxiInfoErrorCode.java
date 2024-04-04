@@ -13,7 +13,8 @@ public enum TaxiInfoErrorCode implements ErrorCode {
     FIND_ROUTE_FAIL("TAXI_INFO_003", "자동차 길찾기 결과 제공 불가합니다.", HttpStatus.CONFLICT),
     STOPOVER_NOT_AROUND_ROAD("TAXI_INFO_004", "경유지가 도로 주변이 아닙니다.", HttpStatus.BAD_REQUEST),
     TOO_LONG_PATH("TAXI_INFO_005", "요청 경로가 매우 깁니다.", HttpStatus.BAD_REQUEST),
-    JSON_PROCESSING_FAIL("TAXI_INFO_006", "JSON파일을 읽지 못했습니다.", HttpStatus.CONFLICT)
+    JSON_PROCESSING_FAIL("TAXI_INFO_006", "JSON파일을 읽지 못했습니다.", HttpStatus.CONFLICT),
+    EMPTY_TAXI_INFO("TAXI_INFO_007", "경로 정보가 없습니다.", HttpStatus.CONFLICT)
     ;
 
     private final String errorCode;
