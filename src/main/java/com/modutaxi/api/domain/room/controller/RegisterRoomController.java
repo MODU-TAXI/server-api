@@ -27,7 +27,9 @@ public class RegisterRoomController {
     /**
      * [POST] 방 생성
      */
-    @Operation(summary = "모집방 생성")
+    @Operation(summary = "모집방 생성",
+        description = "**RoomTag Enum 종류**\n\n**RoomTagBitMask**: "
+            + "ONLY\\_WOMAN, ONLY\\_MAN, REGARDLESS\\_OF\\_GENDER, STUDENT\\_CERTIFICATION")
     @PostMapping
     public ResponseEntity<RoomDetailResponse> createRoom(
         @CurrentMember Member member,

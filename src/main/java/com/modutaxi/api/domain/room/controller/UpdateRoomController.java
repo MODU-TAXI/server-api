@@ -28,7 +28,9 @@ public class UpdateRoomController {
     /**
      * [Patch] 방 정보 수정
      */
-    @Operation(summary = "모집방 업데이트")
+    @Operation(summary = "모집방 업데이트",
+        description = "**RoomTag Enum 종류**\n\n**RoomTagBitMask**: "
+            + "ONLY\\_WOMAN, ONLY\\_MAN, REGARDLESS\\_OF\\_GENDER, STUDENT\\_CERTIFICATION")
     @PatchMapping("/{id}")
     public ResponseEntity<RoomDetailResponse> updateRoom(
         @CurrentMember Member member,

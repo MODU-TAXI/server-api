@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.room.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
+import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.domain.destination.entity.Destination;
 import com.modutaxi.api.domain.destination.repository.DestinationRepository;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -41,7 +42,8 @@ public class RegisterRoomService {
             NaverMapConverter.coordinateToString(roomRequest.getStartLongitude(),
                 roomRequest.getStartLatitude());
         String goalCoordinate =
-            NaverMapConverter.coordinateToString(destination.getLongitude(), destination.getLatitude());
+            NaverMapConverter.coordinateToString(destination.getLongitude(),
+                destination.getLatitude());
 
         //택시 정보 조회
         JsonNode taxiInfo = getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
@@ -52,7 +54,8 @@ public class RegisterRoomService {
 
         Room room = RoomMapper.toEntity(member, roomRequest.getRoomName(), destination,
             expectedCharge, duration,
-            roomRequest.getDescription(), roomRequest.getRoomTagBitMask(),
+            roomRequest.getDescription(),
+            RoomTagBitMaskConverter.convertRoomTagListToBitMask(roomRequest.getRoomTagBitMask()),
             roomRequest.getStartLongitude(), roomRequest.getStartLatitude(),
             roomRequest.getDepartTime()
         );

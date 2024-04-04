@@ -1,6 +1,9 @@
 package com.modutaxi.api.domain.room.dto;
 
+import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
+
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +24,7 @@ public class RoomResponseDto {
 
         private String description;
 
-        private int roomTagBitMask;
+        private List<RoomTagBitMask> roomTagBitMaskList;
 
         private float startLongitude;
 
@@ -42,7 +45,7 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .destinationId(room.getDestination().getId())
                 .description(room.getDescription())
-                .roomTagBitMask(room.getRoomTagBitMask())
+                .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
                 .startLatitude(room.getStartLatitude())
                 .startLongitude(room.getStartLongitude())
                 .departTime(room.getDepartTime())

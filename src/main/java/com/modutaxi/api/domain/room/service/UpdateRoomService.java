@@ -1,7 +1,9 @@
 package com.modutaxi.api.domain.room.service;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
+import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
@@ -78,8 +80,12 @@ public class UpdateRoomService {
                 : oldRoomData.getDescription());
 
         oldRoomData.setRoomTagBitMask(
-            updateRoomRequest.getRoomTagBitMask() != 0 ? updateRoomRequest.getRoomTagBitMask()
-                : oldRoomData.getRoomTagBitMask());
+            RoomTagBitMaskConverter.convertRoomTagListToBitMask(
+                updateRoomRequest.getRoomTagBitMask()) != 0
+                ? RoomTagBitMaskConverter.convertRoomTagListToBitMask(
+                updateRoomRequest.getRoomTagBitMask())
+                : oldRoomData.getRoomTagBitMask()
+        );
 
         oldRoomData.setDepartTime(
             updateRoomRequest.getDepartTime() != null ? updateRoomRequest.getDepartTime()

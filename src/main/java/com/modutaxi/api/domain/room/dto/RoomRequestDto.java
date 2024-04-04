@@ -1,6 +1,8 @@
 package com.modutaxi.api.domain.room.dto;
 
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class RoomRequestDto {
 
         private String roomName;
 
-        private int roomTagBitMask;
+        private List<RoomTagBitMask> roomTagBitMask;
 
         private float startLongitude;
 
@@ -37,7 +39,7 @@ public class RoomRequestDto {
 
         private String description;
 
-        private int roomTagBitMask;
+        private List<RoomTagBitMask> roomTagBitMask;
 
         private float startLongitude;
 
