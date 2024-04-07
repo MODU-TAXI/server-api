@@ -6,9 +6,8 @@ import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
-import java.util.List;
+import com.mongodb.client.model.geojson.LineString;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class GetRoomService {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        List<Point> path = taxiInfoMongoRepository.findById(roomId)
+        LineString path = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 

@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.geo.Point;
 
 @Getter
 @AllArgsConstructor
@@ -49,14 +50,6 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String roomName = "기본 방제";
-
-    @Nullable
-    @Column(length = 200)
-    private String description;
-
-    @NotNull
-    @Builder.Default
     private RoomStatus roomStatus = RoomStatus.PROCEEDING;
 
     @Nullable
@@ -64,15 +57,11 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private float startLongitude = 0.0F;
+    private Point departurePoint = new Point(126.678890, 37.513137);
 
     @NotNull
     @Builder.Default
-    private float startLatitude = 0.0F;
-
-    @NotNull
-    @Builder.Default
-    private LocalDateTime departTime = LocalDateTime.now();
+    private LocalDateTime departureTime = LocalDateTime.now();
 
     @NotNull
     @Builder.Default
@@ -81,11 +70,9 @@ public class Room extends BaseTime {
 
     public void update(InternalUpdateRoomDto updateRoomDto) {
         this.destination = updateRoomDto.getDestination();
-        this.description = updateRoomDto.getDescription();
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
-        this.startLongitude = updateRoomDto.getStartLongitude();
-        this.startLatitude = updateRoomDto.getStartLatitude();
-        this.departTime = updateRoomDto.getDepartTime();
+        this.departurePoint = updateRoomDto.getDeparturePoint();
+        this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();
         this.duration = updateRoomDto.getDuration();

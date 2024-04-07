@@ -1,12 +1,16 @@
 package com.modutaxi.api.domain.room.dto;
 
+import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
+
 import com.modutaxi.api.domain.room.entity.Room;
-import com.modutaxi.api.domain.taxiinfo.entity.Point;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
+import com.mongodb.client.model.geojson.LineString;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.data.geo.Point;
 
 public class RoomResponseDto {
 
@@ -19,15 +23,11 @@ public class RoomResponseDto {
 
         private Long destinationId;
 
-        private String description;
+        private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private int roomTagBitMask;
+        private Point departurePoint;
 
-        private float startLongitude;
-
-        private float startLatitude;
-
-        private LocalDateTime departTime;
+        private LocalDateTime departureTime;
 
         private int wishHeadcount;
 
@@ -35,17 +35,15 @@ public class RoomResponseDto {
 
         private int expectedCharge;
 
-        private List<Point> path;
+        private LineString path;
 
-        public static RoomDetailResponse toDto(Room room, List<Point> path) {
+        public static RoomDetailResponse toDto(Room room, LineString path) {
             return RoomDetailResponse.builder()
                 .roomId(room.getId())
                 .destinationId(room.getDestination().getId())
-                .description(room.getDescription())
-                .roomTagBitMask(room.getRoomTagBitMask())
-                .startLatitude(room.getStartLatitude())
-                .startLongitude(room.getStartLongitude())
-                .departTime(room.getDepartTime())
+                .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
+                .departurePoint(room.getDeparturePoint())
+                .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())

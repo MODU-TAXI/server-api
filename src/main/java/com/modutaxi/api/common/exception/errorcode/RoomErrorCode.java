@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum RoomErrorCode implements ErrorCode {
     EMPTY_ROOM("ROOM_001", "존재하지 않는 방입니다.", HttpStatus.CONFLICT),
     NOT_ROOM_MANAGER("ROOM_002", "권한이 없는 사용자입니다.", HttpStatus.CONFLICT),
+    ALREADY_MEMBER_IS_MANAGER("ROOM_003", "방을 두 개 이상 만들 수 없습니다.", HttpStatus.CONFLICT),
     ;
 
     private final String errorCode;

@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.room.controller;
 
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.GetRoomService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class GetRoomController {
      */
     private final GetRoomService getRoomService;
 
+    @Operation(summary = "경로를 포함한 방 정보 상세 조회")
     @GetMapping("/{id}")
     public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long id) {
         return ResponseEntity.ok(getRoomService.getRoomDetail(id));
