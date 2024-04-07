@@ -17,13 +17,11 @@ public class RoomInternalDto {
 
         private Destination destination;
 
-        private String description;
-
         private int roomTagBitMask;
 
-        private Point point;
+        private Point departurePoint;
 
-        private LocalDateTime departTime;
+        private LocalDateTime departureTime;
 
         private int wishHeadcount;
 
@@ -34,10 +32,9 @@ public class RoomInternalDto {
         public static InternalUpdateRoomDto toDto(Room room) {
             return InternalUpdateRoomDto.builder()
                 .destination(room.getDestination())
-                .description(room.getDescription())
                 .roomTagBitMask(room.getRoomTagBitMask())
-                .point(room.getPoint())
-                .departTime(room.getDepartTime())
+                .departurePoint(room.getDeparturePoint())
+                .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())

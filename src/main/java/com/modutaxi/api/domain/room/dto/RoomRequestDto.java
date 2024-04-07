@@ -19,13 +19,11 @@ public class RoomRequestDto {
 
         private String description;
 
-        private String roomName;
-
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private Point point;
+        private Point departurePoint;
 
-        private LocalDateTime departTime;
+        private LocalDateTime departureTime;
 
         private int wishHeadcount;
     }
@@ -40,9 +38,9 @@ public class RoomRequestDto {
 
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private Point point;
+        private Point departurePoint;
 
-        private LocalDateTime departTime;
+        private LocalDateTime departureTime;
 
         private int wishHeadcount;
     }

@@ -76,10 +76,6 @@ public class UpdateRoomService {
     public InternalUpdateRoomDto validateAndReturnNewDto(InternalUpdateRoomDto oldRoomData,
         UpdateRoomRequest updateRoomRequest) {
 
-        oldRoomData.setDescription(
-            updateRoomRequest.getDescription() != null ? updateRoomRequest.getDescription()
-                : oldRoomData.getDescription());
-
         oldRoomData.setRoomTagBitMask(
             RoomTagBitMaskConverter.convertRoomTagListToBitMask(
                 updateRoomRequest.getRoomTagBitMask()) != 0
@@ -88,9 +84,9 @@ public class UpdateRoomService {
                 : oldRoomData.getRoomTagBitMask()
         );
 
-        oldRoomData.setDepartTime(
-            updateRoomRequest.getDepartTime() != null ? updateRoomRequest.getDepartTime()
-                : oldRoomData.getDepartTime());
+        oldRoomData.setDepartureTime(
+            updateRoomRequest.getDepartureTime() != null ? updateRoomRequest.getDepartureTime()
+                : oldRoomData.getDepartureTime());
 
         oldRoomData.setWishHeadcount(
             updateRoomRequest.getWishHeadcount() != 0 ? updateRoomRequest.getWishHeadcount()
@@ -101,9 +97,9 @@ public class UpdateRoomService {
             updateRoomRequest.getDestinationId() != null ? destinationRepository.findById(
                 updateRoomRequest.getDestinationId()).orElseThrow() : oldRoomData.getDestination());
 
-        oldRoomData.setPoint(
-            updateRoomRequest.getPoint() != null ? updateRoomRequest.getPoint()
-                : oldRoomData.getPoint());
+        oldRoomData.setDeparturePoint(
+            updateRoomRequest.getDeparturePoint() != null ? updateRoomRequest.getDeparturePoint()
+                : oldRoomData.getDeparturePoint());
 
         return oldRoomData;
     }
@@ -111,8 +107,8 @@ public class UpdateRoomService {
     @Transactional
     public LineString updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
         String startCoordinate =
-            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getPoint().getX(),
-                internalUpdateRoomDto.getPoint().getY());
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getDeparturePoint().getX(),
+                internalUpdateRoomDto.getDeparturePoint().getY());
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(
@@ -133,7 +129,7 @@ public class UpdateRoomService {
 
     public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
         return updateRoomRequest.getDestinationId() != null
-            || updateRoomRequest.getPoint() != null;
+            || updateRoomRequest.getDeparturePoint() != null;
     }
 
     void checkManager(Long managerId, Long memberId) {

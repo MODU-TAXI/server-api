@@ -50,27 +50,18 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String roomName = "기본 방제";
-
-    @Nullable
-    @Column(length = 200)
-    private String description;
-
-    @NotNull
-    @Builder.Default
     private RoomStatus roomStatus = RoomStatus.PROCEEDING;
 
     @Nullable
     private int roomTagBitMask;
 
+    @NotNull
+    @Builder.Default
+    private Point departurePoint = new Point(126.678890, 37.513137);
 
     @NotNull
     @Builder.Default
-    private Point point = new Point(126.678890, 37.513137);
-
-    @NotNull
-    @Builder.Default
-    private LocalDateTime departTime = LocalDateTime.now();
+    private LocalDateTime departureTime = LocalDateTime.now();
 
     @NotNull
     @Builder.Default
@@ -79,10 +70,9 @@ public class Room extends BaseTime {
 
     public void update(InternalUpdateRoomDto updateRoomDto) {
         this.destination = updateRoomDto.getDestination();
-        this.description = updateRoomDto.getDescription();
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
-        this.point = updateRoomDto.getPoint();
-        this.departTime = updateRoomDto.getDepartTime();
+        this.departurePoint = updateRoomDto.getDeparturePoint();
+        this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();
         this.duration = updateRoomDto.getDuration();

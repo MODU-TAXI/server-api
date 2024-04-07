@@ -45,8 +45,8 @@ public class RegisterRoomService {
 
         //시작 지점, 목표 지점 설정
         String startCoordinate =
-            NaverMapConverter.coordinateToString(createRoomRequest.getPoint().getX(),
-                createRoomRequest.getPoint().getY());
+            NaverMapConverter.coordinateToString(createRoomRequest.getDeparturePoint().getX(),
+                createRoomRequest.getDeparturePoint().getY());
         String goalCoordinate =
             NaverMapConverter.coordinateToString(destination.getLongitude(),
                 destination.getLatitude());
@@ -58,12 +58,11 @@ public class RegisterRoomService {
 
         long duration = taxiInfo.get("duration").asLong();
 
-        Room room = RoomMapper.toEntity(member, createRoomRequest.getRoomName(), destination,
+        Room room = RoomMapper.toEntity(member, destination,
             expectedCharge, duration,
-            createRoomRequest.getDescription(),
             RoomTagBitMaskConverter.convertRoomTagListToBitMask(
                 createRoomRequest.getRoomTagBitMask()),
-            createRoomRequest.getPoint(), createRoomRequest.getDepartTime()
+            createRoomRequest.getDeparturePoint(), createRoomRequest.getDepartureTime()
         );
 
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));

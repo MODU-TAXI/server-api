@@ -11,20 +11,17 @@ import org.springframework.stereotype.Component;
 public class RoomMapper {
 
     public static Room toEntity(
-        Member member, String roomName, Destination destination, int expectedCharge, long duration,
-        String description, int roomTagBitMask,
-        Point point, LocalDateTime departTime
+        Member member, Destination destination, int expectedCharge, long duration,
+        int roomTagBitMask, Point departurePoint, LocalDateTime departureTime
     ) {
         return Room.builder()
             .destination(destination)
             .roomManager(member)
             .expectedCharge(expectedCharge)
             .duration(duration)
-            .roomName(roomName)
-            .description(description)
             .roomTagBitMask(roomTagBitMask)
-            .departTime(departTime)
-            .point(point)
+            .departureTime(departureTime)
+            .departurePoint(departurePoint)
             .build();
     }
 }

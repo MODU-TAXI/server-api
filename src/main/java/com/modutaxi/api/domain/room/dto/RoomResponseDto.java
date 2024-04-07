@@ -23,13 +23,11 @@ public class RoomResponseDto {
 
         private Long destinationId;
 
-        private String description;
-
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private Point point;
+        private Point departurePoint;
 
-        private LocalDateTime departTime;
+        private LocalDateTime departureTime;
 
         private int wishHeadcount;
 
@@ -43,10 +41,9 @@ public class RoomResponseDto {
             return RoomDetailResponse.builder()
                 .roomId(room.getId())
                 .destinationId(room.getDestination().getId())
-                .description(room.getDescription())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .point(room.getPoint())
-                .departTime(room.getDepartTime())
+                .departurePoint(room.getDeparturePoint())
+                .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())
