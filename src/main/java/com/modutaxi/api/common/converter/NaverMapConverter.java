@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-@Component("commonConverter")
+@Component
 public class NaverMapConverter {
 
     private static final int LONGITUDE = 0;

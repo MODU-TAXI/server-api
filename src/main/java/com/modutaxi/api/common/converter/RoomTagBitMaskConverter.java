@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-@Component("roomConverter")
+@Component
 public class RoomTagBitMaskConverter {
 
     public static int convertRoomTagListToBitMask(List<RoomTagBitMask> roomTagList) {
