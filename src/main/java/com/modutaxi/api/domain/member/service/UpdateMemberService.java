@@ -5,7 +5,6 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.MailResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -37,7 +36,7 @@ public class UpdateMemberService {
         }
         // 지원 이메일 도메인 체크
         if (!mailService.checkMailDomain(receiver)) {
-            throw new BaseException(MailErrorCode.UNSUPPOERTED_DOMAIN);
+            throw new BaseException(MailErrorCode.UNSUPPORTED_DOMAIN);
         }
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, receiver);
