@@ -34,6 +34,8 @@ public class JwtTokenProvider {
     private static final String REFRESH_HEADER = "refreshToken";  // 리프레시 토큰 헤더 key name
     private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 유효기간 1시간
     private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 유효기간 일주일
+    private static final long TEMP_TOKEN_VALID_TIME = 1000 * 30L;  // 임시 유효기간! -> 30초
+    private static final long TEMP_REF_TOKEN_VALID_TIME = 1000 * 60L;  // 임시 유효기간! -> 1분
 
     private final RedisRTKRepositoryImpl redisRTKRepository;
 
@@ -51,7 +53,7 @@ public class JwtTokenProvider {
      */
     public String generateAccessToken(Claims claims) {
         Date now = new Date();
-        Date accessTokenExpirationTime = new Date(now.getTime() + TOKEN_VALID_TIME);
+        Date accessTokenExpirationTime = new Date(now.getTime() + TEMP_TOKEN_VALID_TIME);
 
         return Jwts.builder()
             .setClaims(claims)  // 정보 저장
@@ -66,7 +68,7 @@ public class JwtTokenProvider {
      */
     public String generateRefreshToken(Claims claims) {
         Date now = new Date();
-        Date refreshTokenExpirationTime = new Date(now.getTime() + REF_TOKEN_VALID_TIME);
+        Date refreshTokenExpirationTime = new Date(now.getTime() + TEMP_REF_TOKEN_VALID_TIME);
 
         return Jwts.builder()
             .setClaims(claims)  // 정보 저장
