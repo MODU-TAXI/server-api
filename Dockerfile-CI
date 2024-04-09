@@ -3,7 +3,7 @@ LABEL authors="jaewonLeeKOR"
 
 WORKDIR /app
 
-COPY build/libs/*.jar /app/app.jar
+COPY *.jar /app/app.jar
 
 EXPOSE 8080
 
