@@ -3,7 +3,7 @@ version: '3.8'
 services:
   spring:
     container_name: spring
-    image: ${CONTAINER_REGISTRY}/${GITHUB_ORGANIZATION}/${CONTAINER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    image: ${SPRING_IMAGE}
     environment:
       - SPRING_PROFILES_ACTIVE=dev
     ports:
