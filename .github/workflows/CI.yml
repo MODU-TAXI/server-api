@@ -14,7 +14,7 @@ env:
 
 jobs:
   Build:
-    name: Build Jar File
+    name: Build & Delivery
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,26 +50,6 @@ jobs:
           compression-level: 9
           retention-days: 1
           overwrite: true
-
-      - name: Upload Builded .jar Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifact
-          path: ./build/libs/
-          compression-level: 9
-          retention-days: 1
-          overwrite: true
-
-  Delivery:
-    name: Build Image & Delivery
-    needs: Build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Builded .jar Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifact
-          path: .
 
       - name: lowercase the image tag & repository
         run: |
