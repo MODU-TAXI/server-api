@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 @Getter
@@ -37,5 +39,19 @@ public class Spot extends BaseTime {
                 .address(address)
                 .spotPoint(spotPoint)
                 .build();
+    }
+
+    public void updateSpotInfo(String name, String address, Point point) {
+        this.name = name == null ? this.name : name;
+        this.address = address == null ? this.address : address;
+        if (point != null) {
+            System.out.println(point.getX());
+            System.out.println(point.getY());
+            double newX = point.getX() == 0 ? this.spotPoint.getX() : point.getX();
+            double newY = point.getY() == 0 ? this.spotPoint.getY() : point.getY();
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Coordinate coordinate = new Coordinate(newX, newY);
+            this.spotPoint = geometryFactory.createPoint(coordinate);
+        }
     }
 }

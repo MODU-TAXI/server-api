@@ -18,4 +18,11 @@ public class SpotResponseDto {
         @Schema(example = "1", description = "거점 id")
         private Long id;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateSpotResponse {
+        @Schema(example = "1", description = "거점 id")
+        private Long id;
+    }
 }
