@@ -14,4 +14,10 @@ public class SpotMysqlResponse {
 
         Double getDistance();
     }
+
+    public interface SearchWithRadiusResponseInterface {
+        Long getId();
+
+        Point getSpotpoint();
+    }
 }

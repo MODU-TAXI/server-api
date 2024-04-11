@@ -40,4 +40,29 @@ public class SpotRequestDto {
         @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "현재 위치<br>x: 경도, y: 위도")
         private Point currentPoint;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class GetAreaSpotRequest {
+        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "현재 위치<br>x: 경도, y: 위도")
+        private Point currentPoint;
+
+        @Schema(example = "{\"x\": 124.65464, \"y\": 38.45169}", description = "좌측 상단 위치<br>x: 경도, y: 위도")
+        private Point topLeftPoint;
+        @Schema(example = "{\"x\": 124.65464, \"y\": 36.45169}", description = "좌측 하단 위치<br>x: 경도, y: 위도")
+        private Point bottomLeftPoint;
+        @Schema(example = "{\"x\": 127.65464, \"y\": 36.45169}", description = "우측 하단 위치<br>x: 경도, y: 위도")
+        private Point bottomRightPoint;
+        @Schema(example = "{\"x\": 127.65464, \"y\": 38.45169}", description = "우측 상단 위치<br>x: 경도, y: 위도")
+        private Point topRightPoint;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SearchSpotPointRequest {
+        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "검색 위치<br>x: 경도, y: 위도")
+        private Point searchPoint;
+    }
 }
