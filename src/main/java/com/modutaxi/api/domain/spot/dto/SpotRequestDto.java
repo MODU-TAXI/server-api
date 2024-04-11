@@ -32,4 +32,12 @@ public class SpotRequestDto {
         @Schema(example = "{\"x\": 126.65464, \"y\": 37.45169}", description = "거점 위치<br>x: 경도, y: 위도")
         private Point spotPoint;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CurrentPointRequest {
+        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "현재 위치<br>x: 경도, y: 위도")
+        private Point currentPoint;
+    }
 }
