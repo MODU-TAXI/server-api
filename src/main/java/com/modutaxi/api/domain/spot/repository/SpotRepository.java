@@ -38,4 +38,13 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
             "ST_DISTANCE_SPHERE(:point, s.spotPoint)"
     )
     List<SearchWithRadiusResponseInterface> findNearSpotsInRadius(@Param("point") Point point, @Param("radius") Long radius);
+
+    @Query("SELECT " +
+            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance " +
+            "FROM Spot s " +
+            "ORDER BY " +
+            "ST_DISTANCE_SPHERE(:point, s.spotPoint) " +
+            "LIMIT :num"
+    )
+    List<SpotWithDistanceResponseInterface> findNearSpots(@Param("point") Point point, @Param("num") Long count);
 }

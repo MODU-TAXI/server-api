@@ -46,6 +46,13 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    public static class GetSpotWithDistanceResponses {
+        @Schema(description = "거점 리스트")
+        List<GetSpotWithDistanceResponse> spots;
+    }
+
+    @Getter
+    @AllArgsConstructor
     public static class GetSpotResponse {
         @Schema(example = "1", description = "거점 id")
         private Long id;

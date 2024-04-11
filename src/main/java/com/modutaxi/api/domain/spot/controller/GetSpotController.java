@@ -7,6 +7,7 @@ import com.modutaxi.api.domain.spot.dto.SpotRequestDto.GetAreaSpotRequest;
 import com.modutaxi.api.domain.spot.dto.SpotRequestDto.SearchSpotPointRequest;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotResponses;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponse;
+import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponses;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.SearchWithRadiusResponses;
 import com.modutaxi.api.domain.spot.service.GetSpotService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -132,5 +133,25 @@ public class GetSpotController {
         Coordinate coordinate = new Coordinate(request.getSearchPoint().getX(), request.getSearchPoint().getY());
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getSpotService.getRadiusSpots(point, radius));
+    }
+
+    @PostMapping("/list")
+    @Operation(
+            summary = "지점 근처 거점 리스트 조회",
+            description = "입력으로 받은 지점 근처의 거점을 가까운 순으로 지정한 개수만큼 조회합니다.<br>조회하려는 거점 수와 조회하려는 위치(x:경도, y:위도)를 입력해주세요.<br>거점 id와 거점 이름, 거점 주소, 위치(x:경도, y:위도), 거리를 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSpotWithDistanceResponses.class))),
+    })
+    public ResponseEntity<GetSpotWithDistanceResponses> getNearSpots(
+            @Parameter(description = "조회할 개수<br>기본값: 3개")
+            @RequestParam(value = "count", defaultValue = "3", required = false) Long count,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = SearchSpotPointRequest.class)))
+            @RequestBody SearchSpotPointRequest request
+    ) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate coordinate = new Coordinate(request.getSearchPoint().getX(), request.getSearchPoint().getY());
+        Point point = geometryFactory.createPoint(coordinate);
+        return ResponseEntity.ok(getSpotService.getNearSpots(point, count));
     }
 }
