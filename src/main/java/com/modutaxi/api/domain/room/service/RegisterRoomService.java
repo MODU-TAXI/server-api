@@ -5,6 +5,7 @@ import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
@@ -36,10 +37,9 @@ public class RegisterRoomService {
             throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
         }
 
-        // TODO: 2024/04/03 망고스틴님 거점 조회에러 만들면 넣던가 하겠습니다!
         //거점 찾기
         Spot spot = spotRepository.findById(createRoomRequest.getSpotId())
-            .orElseThrow();
+            .orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND));
 
         //시작 지점, 목표 지점 설정
         String startCoordinate =

@@ -6,6 +6,7 @@ import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
@@ -94,7 +95,7 @@ public class UpdateRoomService {
 
         oldRoomData.setSpot(
             updateRoomRequest.getSpotId() != null ? spotRepository.findById(
-                updateRoomRequest.getSpotId()).orElseThrow() : oldRoomData.getSpot());
+                updateRoomRequest.getSpotId()).orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND)) : oldRoomData.getSpot());
 
         oldRoomData.setDeparturePoint(
             updateRoomRequest.getDeparturePoint() != null ? updateRoomRequest.getDeparturePoint()
