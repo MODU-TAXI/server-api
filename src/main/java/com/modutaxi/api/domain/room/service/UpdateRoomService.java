@@ -7,13 +7,13 @@ import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
-import com.modutaxi.api.domain.destination.repository.DestinationRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
@@ -28,7 +28,7 @@ public class UpdateRoomService {
 
     private final RoomRepository roomRepository;
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
-    private final DestinationRepository destinationRepository;
+    private final SpotRepository spotRepository;
 
     private final GetTaxiInfoService getTaxiInfoService;
 
@@ -92,10 +92,9 @@ public class UpdateRoomService {
             updateRoomRequest.getWishHeadcount() != 0 ? updateRoomRequest.getWishHeadcount()
                 : oldRoomData.getWishHeadcount());
 
-        // TODO: 2024/04/03 망고스틴의 거점에러 추가 시 삽입
-        oldRoomData.setDestination(
-            updateRoomRequest.getDestinationId() != null ? destinationRepository.findById(
-                updateRoomRequest.getDestinationId()).orElseThrow() : oldRoomData.getDestination());
+        oldRoomData.setSpot(
+            updateRoomRequest.getSpotId() != null ? spotRepository.findById(
+                updateRoomRequest.getSpotId()).orElseThrow() : oldRoomData.getSpot());
 
         oldRoomData.setDeparturePoint(
             updateRoomRequest.getDeparturePoint() != null ? updateRoomRequest.getDeparturePoint()
@@ -112,8 +111,8 @@ public class UpdateRoomService {
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(
-                internalUpdateRoomDto.getDestination().getLongitude(),
-                internalUpdateRoomDto.getDestination().getLatitude());
+                internalUpdateRoomDto.getSpot().getSpotPoint().getX(),
+                internalUpdateRoomDto.getSpot().getSpotPoint().getY());
 
         JsonNode jsonNode =
             getTaxiInfoService.getDrivingInfo(startCoordinate, goalCoordinate);
@@ -128,8 +127,8 @@ public class UpdateRoomService {
     }
 
     public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
-        return updateRoomRequest.getDestinationId() != null
-            || updateRoomRequest.getDeparturePoint() != null;
+        return updateRoomRequest.getSpotId() != null
+                || updateRoomRequest.getDeparturePoint() != null;
     }
 
     void checkManager(Long managerId, Long memberId) {

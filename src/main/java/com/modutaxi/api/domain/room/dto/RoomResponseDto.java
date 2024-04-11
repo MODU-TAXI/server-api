@@ -21,7 +21,7 @@ public class RoomResponseDto {
 
         private Long roomId;
 
-        private Long destinationId;
+        private Long spotId;
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
@@ -40,7 +40,7 @@ public class RoomResponseDto {
         public static RoomDetailResponse toDto(Room room, LineString path) {
             return RoomDetailResponse.builder()
                 .roomId(room.getId())
-                .destinationId(room.getDestination().getId())
+                .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
                 .departurePoint(room.getDeparturePoint())
                 .departureTime(room.getDepartureTime())

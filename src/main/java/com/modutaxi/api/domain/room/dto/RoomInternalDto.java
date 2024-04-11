@@ -1,6 +1,6 @@
 package com.modutaxi.api.domain.room.dto;
 
-import com.modutaxi.api.domain.destination.entity.Destination;
+import com.modutaxi.api.domain.spot.entity.Spot;
 import com.modutaxi.api.domain.room.entity.Room;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -15,7 +15,7 @@ public class RoomInternalDto {
     @Builder
     public static class InternalUpdateRoomDto {
 
-        private Destination destination;
+        private Spot spot;
 
         private int roomTagBitMask;
 
@@ -31,7 +31,7 @@ public class RoomInternalDto {
 
         public static InternalUpdateRoomDto toDto(Room room) {
             return InternalUpdateRoomDto.builder()
-                .destination(room.getDestination())
+                .spot(room.getSpot())
                 .roomTagBitMask(room.getRoomTagBitMask())
                 .departurePoint(room.getDeparturePoint())
                 .departureTime(room.getDepartureTime())

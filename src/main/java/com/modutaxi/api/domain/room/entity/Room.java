@@ -1,17 +1,11 @@
 package com.modutaxi.api.domain.room.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.destination.entity.Destination;
+import com.modutaxi.api.domain.spot.entity.Spot;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -32,9 +26,9 @@ public class Room extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "destination_id")
-    private Destination destination;
+    @ManyToOne
+    @JoinColumn(name = "spot_id")
+    private Spot spot;
 
     @OneToOne
     @JoinColumn(name = "member_id")
@@ -69,7 +63,7 @@ public class Room extends BaseTime {
 
 
     public void update(InternalUpdateRoomDto updateRoomDto) {
-        this.destination = updateRoomDto.getDestination();
+        this.spot = updateRoomDto.getSpot();
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
         this.departurePoint = updateRoomDto.getDeparturePoint();
         this.departureTime = updateRoomDto.getDepartureTime();
