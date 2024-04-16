@@ -73,8 +73,8 @@ dependencies {
     // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-    // Point
-    implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
+    // Spatial Data
+    implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
 }
 
 tasks.named('test') {
