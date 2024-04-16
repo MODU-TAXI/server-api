@@ -1,4 +1,4 @@
-name: Develop Profile Deploy
+name: Deploy Develop Profile
 
 on:
   push:
@@ -7,12 +7,13 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  ORGANIZATION: modu-taxi
-  IMAGE_TAG: server-api:${{ github.sha }}
+  REPOSITORY: ${{ github.repository }}
+  IMAGE_TAG: dev:${{ github.sha }}
   GITHUB_ACTOR: ${{ github.actor }}
 
 jobs:
-  deploy:
+  Deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,15 +34,24 @@ jobs:
           username: ${{ env.GITHUB_ACTOR }}
           password: ${{ secrets.TOKEN_GITHUB }}
 
-      - name: Build
-        run: docker build --no-cache -t ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_TAG }} -f Dockerfile-dev .
+      - name: lowercase the image tag & repository
+        run: |
+          echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+          echo "IMAGE_TAG=$(echo $IMAGE_TAG | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
+      - name: Set Spring Image Environment Variable
+        run: |
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-${{ env.IMAGE_TAG }}" >> ${GITHUB_ENV}
+
+      - name: Build Image
+        run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-dev .
 
       - name: Push
-        run: docker push ${{ env.REGISTRY }}/${{ env.ORGANIZATION }}/${{ env.IMAGE_TAG }}
+        run: docker push ${{ env.SPRING_IMAGE }}
 
       - name: Write Docker Image Tag Information to .env File
         run: |
-          echo -e "\nDOCKER_IMAGE_TAG=${{ github.sha }}" >> config/dockerEnv/dev.env
+          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/dockerEnv/dev.env
 
       - name: Copy docker-compose.dev.yml
         uses: appleboy/scp-action@master

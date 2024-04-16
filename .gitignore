@@ -40,3 +40,7 @@ out/
 
 ### application.yml ###
 src/main/resources/*.yml
+
+### act ###
+*.secrets
+artifacts/

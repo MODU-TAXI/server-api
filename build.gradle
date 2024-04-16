@@ -4,6 +4,10 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
+jar {
+   enabled = false
+}
+
 group = 'com.modu-taxi'
 version = '0.0.1-SNAPSHOT'
 
