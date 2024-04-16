@@ -79,6 +79,10 @@ dependencies {
 
     // Spatial Data
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 tasks.named('test') {
