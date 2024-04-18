@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.memberspot.entity;
+package com.modutaxi.api.domain.likedSpot.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.spot.entity.Spot;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
-public class MemberSpot extends BaseTime {
+public class LikedSpot extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,8 +32,8 @@ public class MemberSpot extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    public static MemberSpot toEntity(Spot spot, Member member){
-        return MemberSpot.builder()
+    public static LikedSpot toEntity(Spot spot, Member member){
+        return LikedSpot.builder()
             .spot(spot)
             .member(member)
             .build();

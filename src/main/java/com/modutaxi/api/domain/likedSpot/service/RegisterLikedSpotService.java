@@ -1,10 +1,10 @@
-package com.modutaxi.api.domain.memberspot.service;
+package com.modutaxi.api.domain.likedSpot.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class GetMemberSpotService {
+public class RegisterLikedSpotService {
 
 }

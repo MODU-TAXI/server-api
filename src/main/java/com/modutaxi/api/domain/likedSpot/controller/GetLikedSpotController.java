@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.memberspot.controller;
+package com.modutaxi.api.domain.likedSpot.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member-spots")
-public class GetMemberSpotController {
-
+@RequestMapping("/api/spots/liked")
+public class GetLikedSpotController {
 }
