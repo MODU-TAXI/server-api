@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikedSpotRepository extends JpaRepository<LikedSpot, Long> {
     Boolean existsByMemberAndSpotId(Member member, Long spotId);
+
+    void deleteByMemberAndSpotId(Member memberId, Long spotId);
 }
