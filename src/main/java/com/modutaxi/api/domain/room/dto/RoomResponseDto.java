@@ -51,4 +51,39 @@ public class RoomResponseDto {
                 .build();
         }
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class RoomSimpleResponse {
+
+        private Long roomId;
+
+        private Long spotId;
+
+        private List<RoomTagBitMask> roomTagBitMaskList;
+
+        private Point departurePoint;
+
+        private LocalDateTime departureTime;
+
+        private int wishHeadcount;
+
+        private long duration;
+
+        private int expectedCharge;
+
+        public static RoomSimpleResponse toDto(Room room) {
+            return RoomSimpleResponse.builder()
+                .roomId(room.getId())
+                .spotId(room.getSpot().getId())
+                .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
+                .departurePoint(room.getDeparturePoint())
+                .departureTime(room.getDepartureTime())
+                .wishHeadcount(room.getWishHeadcount())
+                .duration(room.getDuration())
+                .expectedCharge(room.getExpectedCharge())
+                .build();
+        }
+    }
 }
