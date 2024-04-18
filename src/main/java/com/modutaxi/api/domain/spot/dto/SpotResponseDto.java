@@ -42,6 +42,8 @@ public class SpotResponseDto {
         private Point spotPoint;
         @Schema(example = "3204.821669916938", description = "거리, 미터단위")
         private Double distance;
+        @Schema(example = "true", description = "좋아요 여부")
+        private Boolean liked;
     }
 
     @Getter
