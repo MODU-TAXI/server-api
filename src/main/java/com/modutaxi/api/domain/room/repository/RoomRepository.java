@@ -6,6 +6,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
+
     boolean existsRoomByRoomManagerId(Long memberId);
+
     Slice<Room> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

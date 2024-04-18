@@ -36,7 +36,7 @@ public class GetRoomService {
         return RoomDetailResponse.toDto(room, path);
     }
 
-    public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size){
+    public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Slice<Room> roomSlice = roomRepository.findAllByOrderByCreatedAtDesc(pageable);
 
