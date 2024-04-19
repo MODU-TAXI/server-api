@@ -7,6 +7,8 @@ import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.mongodb.client.model.geojson.LineString;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,7 +44,7 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(room.getDeparturePoint())
+                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -78,12 +80,30 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(room.getDeparturePoint())
+                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())
                 .build();
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class SearchWithRadiusResponse {
+        @Schema(example = "2", description = "방 id")
+        private Long id;
+        @Schema(example = "{\"x\": 126.68045, \"y\": 37.46504}", description = "검색 위치<br>x: 경도, y: 위도")
+        private Point departurePoint;
+        @Schema(example = "주안역", description = "거점 이름")
+        private String spotName;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class SearchWithRadiusResponses {
+        @Schema(description = "방 리스트")
+        List<SearchWithRadiusResponse> rooms;
     }
 }

@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 public class RoomInternalDto {
 
@@ -30,10 +32,13 @@ public class RoomInternalDto {
         private long duration;
 
         public static InternalUpdateRoomDto toDto(Room room) {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Coordinate coordinate = new Coordinate(room.getDeparturePoint().getX(), room.getDeparturePoint().getY());
+            Point point = geometryFactory.createPoint(coordinate);
             return InternalUpdateRoomDto.builder()
                 .spot(room.getSpot())
                 .roomTagBitMask(room.getRoomTagBitMask())
-                .departurePoint(room.getDeparturePoint())
+                .departurePoint(point)
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
