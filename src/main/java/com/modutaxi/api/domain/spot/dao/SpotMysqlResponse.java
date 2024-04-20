@@ -20,6 +20,6 @@ public class SpotMysqlResponse {
     public interface SearchWithRadiusResponseInterface {
         Long getId();
 
-        Point getSpotpoint();
+        Point getSpotPoint();
     }
 }

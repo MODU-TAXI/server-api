@@ -30,7 +30,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     List<Spot> findAreaSpotsByPolygon(@Param("polygon") Polygon polygon);
 
     @Query("SELECT " +
-            "s.id AS id, s.spotPoint AS spotpoint " +
+            "s.id AS id, s.spotPoint AS spotPoint " +
             "FROM Spot s " +
             "WHERE " +
             "ST_DISTANCE_SPHERE(:point, s.spotPoint) <= :radius " +
