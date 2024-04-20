@@ -56,7 +56,7 @@ public class RoomRequestDto {
         private Long spotId;
         @Schema(example = "false", description = "마감 임박")
         private Boolean isImminent;
-        @Schema(example = "[\"REGARDLESS_OF_GENDER\", \"STUDENT_CERTIFICATION\"]", description = "모집방 태그")
+        @Schema(example = "[\"ONLY_MAN\", \"STUDENT_CERTIFICATION\"]", description = "모집방 태그")
         private List<RoomTagBitMask> roomTags;
     }
 }
