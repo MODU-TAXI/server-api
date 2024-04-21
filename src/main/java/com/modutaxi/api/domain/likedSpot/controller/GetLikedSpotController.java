@@ -1,8 +1,10 @@
 package com.modutaxi.api.domain.likedSpot.controller;
 
+import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.pagination.PageResponseDto;
 import com.modutaxi.api.domain.likedSpot.dto.LikedSpotResponseDto.LikedSpotListResponse;
 import com.modutaxi.api.domain.likedSpot.service.GetLikedSpotService;
+import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +33,7 @@ public class GetLikedSpotController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "즐겨찾기 거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LikedSpotListResponse.class))),
     })
-    public ResponseEntity<PageResponseDto<List<LikedSpotListResponse>>> getLikedSpotList(@Parameter(description = "조회할 page") @RequestParam int page, @Parameter(description = "조회할 page 단위") @RequestParam int size) {
-        return ResponseEntity.ok(getLikedSpotService.getLikedSpotList(page, size));
+    public ResponseEntity<PageResponseDto<List<LikedSpotListResponse>>> getLikedSpotList(@Parameter(description = "조회할 page") @RequestParam int page, @Parameter(description = "조회할 page 단위") @RequestParam int size, @CurrentMember Member member) {
+        return ResponseEntity.ok(getLikedSpotService.getLikedSpotList(page, size, member));
     }
 }
