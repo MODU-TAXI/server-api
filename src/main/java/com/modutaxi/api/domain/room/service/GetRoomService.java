@@ -68,17 +68,7 @@ public class GetRoomService {
     private Slice<Room> getRoomSlice(Pageable pageable, Long spotId, Integer tagBitMask, Boolean isImminent) {
         if (spotId != null)
             getSpotService.getSpot(spotId);
-        if (isImminent) {
-            LocalDateTime timeNow = LocalDateTime.now();
-            if (spotId == null)
-                return roomRepository.findAllWhereBetweenTimeAndTagBitMaskOrderByCreatedAtDesc(tagBitMask, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack), pageable);
-            else
-                return roomRepository.findAllWhereBetweenTimeAndTagBitMaskAndSpotIdOrderByCreatedAtDesc(spotId, tagBitMask, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack), pageable);
-        } else {
-            if (spotId == null)
-                return roomRepository.findAllWhereTagBitMaskOrderByCreatedAtDesc(tagBitMask, pageable);
-            else
-                return roomRepository.findAllWhereTagBitMaskAndSpotIdOrderByCreatedAtDesc(spotId, tagBitMask, pageable);
-        }
+        LocalDateTime timeNow = LocalDateTime.now();
+        return roomRepository.findAllWhereTagBitMaskOrderByCreatedAtDesc(spotId, tagBitMask, isImminent, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack), pageable);
     }
 }
