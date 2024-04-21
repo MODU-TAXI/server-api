@@ -19,7 +19,9 @@ public class LikedSpotResponseDto {
         private Long spotId;
         @Schema(example = "주안역", description = "거점 이름")
         private String spotName;
-        @Schema(example = "{\"x\": 126.68045, \"y\": 37.46504}", description = "거점 위치<br>x: 경도, y: 위도")
-        private Point spotPoint;
+        @Schema(example = "126.68045", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.46504", description = "위도")
+        private Float latitude;
     }
 }
