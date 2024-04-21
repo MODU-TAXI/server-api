@@ -16,8 +16,8 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     Boolean existsByNameEquals(String name);
 
     @Query("SELECT " +
-            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance " +
-            "FROM Spot s " +
+            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance, (l.id IS NOT NULL) AS liked " +
+            "FROM Spot s LEFT JOIN LikedSpot l ON (s.id = l.spot.id) " +
             "WHERE " +
             "s.id = :id")
     Optional<SpotWithDistanceResponseInterface> findByIdWithDistance(@Param("id") Long id, @Param("point") Point point);
@@ -30,7 +30,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     List<Spot> findAreaSpotsByPolygon(@Param("polygon") Polygon polygon);
 
     @Query("SELECT " +
-            "s.id AS id, s.spotPoint AS spotpoint " +
+            "s.id AS id, s.spotPoint AS spotPoint " +
             "FROM Spot s " +
             "WHERE " +
             "ST_DISTANCE_SPHERE(:point, s.spotPoint) <= :radius " +
@@ -40,8 +40,8 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     List<SearchWithRadiusResponseInterface> findNearSpotsInRadius(@Param("point") Point point, @Param("radius") Long radius);
 
     @Query("SELECT " +
-            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance " +
-            "FROM Spot s " +
+            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance, (l.id IS NOT NULL) AS liked " +
+            "FROM Spot s LEFT JOIN LikedSpot l ON (s.id = l.spot.id) " +
             "ORDER BY " +
             "ST_DISTANCE_SPHERE(:point, s.spotPoint) " +
             "LIMIT :num"

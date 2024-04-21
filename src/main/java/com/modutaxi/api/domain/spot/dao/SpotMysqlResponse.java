@@ -13,11 +13,13 @@ public class SpotMysqlResponse {
         Point getSpotpoint();
 
         Double getDistance();
+
+        Boolean getLiked();
     }
 
     public interface SearchWithRadiusResponseInterface {
         Long getId();
 
-        Point getSpotpoint();
+        Point getSpotPoint();
     }
 }
