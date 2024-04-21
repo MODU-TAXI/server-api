@@ -47,12 +47,4 @@ public class RoomRequestDto {
 
         private int wishHeadcount;
     }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class SearchRoomPointRequest {
-        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "검색 위치<br>x: 경도, y: 위도")
-        private Point searchPoint;
-    }
 }

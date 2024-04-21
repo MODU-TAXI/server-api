@@ -6,6 +6,6 @@ import org.springframework.data.geo.Point;
 
 public class RoomResponseMapper {
     public static SearchWithRadiusResponse toSearchWithRadiusResponse(RoomMysqlResponse.SearchWithRadiusResponseInterface room) {
-        return new SearchWithRadiusResponse(room.getId(), new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()), room.getSpotName());
+        return new SearchWithRadiusResponse(room.getId(), (float) room.getDeparturePoint().getX(), (float)room.getDeparturePoint().getY(), room.getSpotName());
     }
 }
