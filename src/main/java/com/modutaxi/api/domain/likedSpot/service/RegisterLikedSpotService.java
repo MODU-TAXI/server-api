@@ -18,12 +18,9 @@ public class RegisterLikedSpotService {
 
     @Transactional
     public LikedSpotResponse registerLikedSpot(Member member, Long spotId) {
-        if(likedSpotRepository.existsByMemberAndSpotId(member, spotId)) {
+        if(likedSpotRepository.existsByMemberAndSpotId(member, spotId))
             return new LikedSpotResponse(false);
-        }
-        Spot spot = getSpotService.getSpot(spotId);
-        LikedSpot likedSpot = LikedSpot.toEntity(spot, member);
-        likedSpot = likedSpotRepository.save(likedSpot);
+        likedSpotRepository.save(LikedSpot.toEntity(getSpotService.getSpot(spotId), member));
         return new LikedSpotResponse(true);
     }
 }
