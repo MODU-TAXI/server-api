@@ -1,17 +1,18 @@
 package com.modutaxi.api.domain.room.entity;
 
 public enum RoomTagBitMask {
-    ONLY_WOMAN(1),
-    ONLY_MAN(2),
-    REGARDLESS_OF_GENDER(4),
-
-    STUDENT_CERTIFICATION(8);
+    ONLY_WOMAN,
+    ONLY_MAN,
+    MANNER,
+    QUIET,
+    STUDENT_CERTIFICATION
+    ;
 
 
     private int value;
 
-    RoomTagBitMask(int value) {
-        this.value = value;
+    RoomTagBitMask() {
+        this.value = 1 << this.ordinal();
     }
 
     public int getValue() {
