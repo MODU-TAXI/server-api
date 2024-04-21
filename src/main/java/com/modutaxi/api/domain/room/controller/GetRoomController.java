@@ -81,8 +81,8 @@ public class GetRoomController {
     public ResponseEntity<SearchWithRadiusResponses> getRadiusRooms(
             @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m")
             @RequestParam(value = "radius", defaultValue = "500", required = false) Long radius,
-            @RequestParam(value = "longitude", defaultValue = "126.65157", required = false) Float longitude,
-            @RequestParam(value = "latitude", defaultValue = "37.44747", required = false) Float latitude
+            @RequestParam(value = "longitude") Float longitude,
+            @RequestParam(value = "latitude") Float latitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(longitude, latitude);
