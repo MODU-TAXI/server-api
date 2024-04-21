@@ -2,9 +2,9 @@ package com.modutaxi.api.domain.room.controller;
 
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.pagination.PageResponseDto;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.GetSimpleListRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.service.GetRoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,7 +38,7 @@ public class GetRoomController {
 
     @Operation(summary = "경로를 제외한 방 리스트 조회",
             description = "방 리스트를 조회합니다.<br><br>**spotId**(찾으려는 거점 id, 필수 x), **isImminent**(마감 임박 여부), **roomTags**(찾으려는 방 태그, 필수 x)를 함께 보내주세요.<br><br> **roomTag** : 'ONLY_WOMAN', 'ONLY_MAN', 'MANNER', 'QUIET', 'STUDENT_CERTIFICATION'<br><br>**page(0 ~ )** : 페이지 번호<br><br>**size(1 ~ )** : 사이즈")
-    @PostMapping("/list")
+    @GetMapping("/list")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "방 목록 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomSimpleResponse.class))),
             @ApiResponse(responseCode = "400", description = "방 목록 조회 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SpotError.class), examples = {
@@ -61,7 +61,7 @@ public class GetRoomController {
             })),
     })
     public ResponseEntity<PageResponseDto<List<RoomSimpleResponse>>> getRoomSimpleList(
-            @RequestParam int page, @RequestParam int size, @RequestBody(required = false) GetSimpleListRequest body) {
-        return ResponseEntity.ok(getRoomService.getRoomSimpleList(page, size, body.getSpotId(), body.getRoomTags(), body.getIsImminent()));
+            @RequestParam int page, @RequestParam int size, @RequestParam(required = false) Long spotId, @RequestParam(required = false) List<RoomTagBitMask> roomTags, @RequestParam(required = false) Boolean isImminent) {
+        return ResponseEntity.ok(getRoomService.getRoomSimpleList(page, size, spotId, roomTags, isImminent));
     }
 }

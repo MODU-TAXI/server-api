@@ -47,16 +47,4 @@ public class RoomRequestDto {
 
         private int wishHeadcount;
     }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class GetSimpleListRequest {
-        @Schema(example = "1", description = "찾으려는 거점 id")
-        private Long spotId;
-        @Schema(example = "false", description = "마감 임박")
-        private Boolean isImminent;
-        @Schema(example = "[\"ONLY_MAN\", \"STUDENT_CERTIFICATION\"]", description = "모집방 태그")
-        private List<RoomTagBitMask> roomTags;
-    }
 }
