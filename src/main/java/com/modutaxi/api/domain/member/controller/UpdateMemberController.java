@@ -4,7 +4,7 @@ import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.MailResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
@@ -53,7 +53,7 @@ public class UpdateMemberController {
                     "인증메일을 요청한 메일 주소로 인증 메일을 발송합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "메일 발송 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MailResponse.class))),
+            @ApiResponse(responseCode = "200", description = "메일 발송 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CertificationResponse.class))),
             @ApiResponse(responseCode = "400", description = "메일 발송 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MailErrorCode.class), examples = {
                     @ExampleObject(name = "MAIL_001", description = "메일 발송 단계에서 실패했습니다.", value = """
                             {
@@ -96,7 +96,7 @@ public class UpdateMemberController {
             })),
     })
     @PostMapping("/mail/certificate")
-    public ResponseEntity<MailResponse> sendEmailCertificationMail(
+    public ResponseEntity<CertificationResponse> sendEmailCertificationMail(
             @CurrentMember Member member,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = SendMailCertificationRequest.class)))
             @RequestBody SendMailCertificationRequest request
@@ -114,7 +114,7 @@ public class UpdateMemberController {
                     "인증코드를 인증합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "메일 인증 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MailResponse.class))),
+            @ApiResponse(responseCode = "200", description = "메일 인증 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CertificationResponse.class))),
             @ApiResponse(responseCode = "400", description = "메일 인증 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MailErrorCode.class), examples = {
                     @ExampleObject(name = "MAIL_001", description = "메일 발송 단계에서 실패했습니다.", value = """
                             {
@@ -143,7 +143,7 @@ public class UpdateMemberController {
             })),
     })
     @PostMapping("/mail/confirm")
-    public ResponseEntity<MailResponse> confirmEmailCertification(
+    public ResponseEntity<CertificationResponse> confirmEmailCertification(
             @CurrentMember Member member,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = ConfirmMailCertificationReqeust.class)))
             @RequestBody ConfirmMailCertificationReqeust request) {
