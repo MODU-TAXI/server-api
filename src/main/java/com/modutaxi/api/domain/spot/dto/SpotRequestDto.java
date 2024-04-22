@@ -17,8 +17,10 @@ public class SpotRequestDto {
         private String name;
         @Schema(example = "인천광역시 미추홀구 인하로 100", description = "거점 주소")
         private String address;
-        @Schema(example = "{\"x\": 126.65464, \"y\": 37.45169}", description = "거점 위치<br>x: 경도, y: 위도")
-        private Point spotPoint;
+        @Schema(example = "126.65464", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.45169", description = "위도")
+        private Float latitude;
     }
 
     @Getter
@@ -29,16 +31,10 @@ public class SpotRequestDto {
         private String name;
         @Schema(example = "인천광역시 미추홀구 인하로 100", description = "거점 주소")
         private String address;
-        @Schema(example = "{\"x\": 126.65464, \"y\": 37.45169}", description = "거점 위치<br>x: 경도, y: 위도")
-        private Point spotPoint;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class CurrentPointRequest {
-        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "현재 위치<br>x: 경도, y: 위도")
-        private Point currentPoint;
+        @Schema(example = "126.65464", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.45169", description = "위도")
+        private Float latitude;
     }
 
     @Getter
@@ -56,13 +52,5 @@ public class SpotRequestDto {
         private Point bottomRightPoint;
         @Schema(example = "{\"x\": 127.65464, \"y\": 38.45169}", description = "우측 상단 위치<br>x: 경도, y: 위도")
         private Point topRightPoint;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class SearchSpotPointRequest {
-        @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "검색 위치<br>x: 경도, y: 위도")
-        private Point searchPoint;
     }
 }

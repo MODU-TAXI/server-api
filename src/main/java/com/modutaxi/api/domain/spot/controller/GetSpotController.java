@@ -4,7 +4,6 @@ package com.modutaxi.api.domain.spot.controller;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.domain.spot.dto.SpotRequestDto.GetAreaSpotRequest;
-import com.modutaxi.api.domain.spot.dto.SpotRequestDto.SearchSpotPointRequest;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotResponses;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponse;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponses;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.modutaxi.api.domain.spot.dto.SpotRequestDto.CurrentPointRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,10 +36,10 @@ import static com.modutaxi.api.domain.spot.dto.SpotRequestDto.CurrentPointReques
 public class GetSpotController {
     private final GetSpotService getSpotService;
 
-    @PostMapping("/{id}")
+    @GetMapping("/{id}")
     @Operation(
             summary = "특정 거점 조회",
-            description = "거점 데이터를 조회합니다.<br>조회하려는 거점의 id와 사용자 기기의 현재 위치(x:경도, y:위도)를 입력해주세요.<br>거점까지의 거리(m)를 계산하여 함께 반환합니다."
+            description = "거점 데이터를 조회합니다.<br>조회하려는 거점의 id와 사용자 기기의 경도(longitude), 위도(latitude)를 입력해주세요.<br>거점까지의 거리(m)를 계산하여 함께 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSpotWithDistanceResponse.class))),
@@ -58,11 +56,13 @@ public class GetSpotController {
     public ResponseEntity<GetSpotWithDistanceResponse> getSpot(
             @Parameter(description = "거점 id")
             @PathVariable(value = "id") Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = CurrentPointRequest.class)), description = "현재 위치")
-            @RequestBody CurrentPointRequest request
+            @Parameter(description = "경도")
+            @RequestParam(value = "longitude") Float longitude,
+            @Parameter(description = "위도")
+            @RequestParam(value = "latitude") Float latitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(request.getCurrentPoint().getX(), request.getCurrentPoint().getY());
+        Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getSpotService.getSpot(id, point));
     }
@@ -115,10 +115,10 @@ public class GetSpotController {
         return ResponseEntity.ok(getSpotService.getAreaSpots(polygon));
     }
 
-    @PostMapping("/map")
+    @GetMapping("/map")
     @Operation(
             summary = "원형 영역 내 거점 조회",
-            description = "조회 위치 요청 반경의 원형 내 거점을 조회합니다.<br>조회하려는 구역의 반경 크기와 조회하려는 위치(x:경도, y:위도)를 입력해주세요.<br>거점 id와 위치(x:경도, y:위도)를 반환합니다."
+            description = "조회 위치 요청 반경의 원형 내 거점을 조회합니다.<br>조회하려는 구역의 반경 크기와 조회하려는 위치의 경도(longitude), 위도(latitude)를 입력해주세요.<br>거점 id와 위치의 경도(longitude), 위도(latitude)를 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchWithRadiusResponses.class))),
@@ -126,19 +126,21 @@ public class GetSpotController {
     public ResponseEntity<SearchWithRadiusResponses> getRadiusSpots(
             @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m")
             @RequestParam(value = "radius", defaultValue = "500", required = false) Long radius,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = SearchSpotPointRequest.class)))
-            @RequestBody SearchSpotPointRequest request
+            @Parameter(description = "경도")
+            @RequestParam(value = "longitude") Float longitude,
+            @Parameter(description = "위도")
+            @RequestParam(value = "latitude") Float latitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(request.getSearchPoint().getX(), request.getSearchPoint().getY());
+        Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getSpotService.getRadiusSpots(point, radius));
     }
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     @Operation(
             summary = "지점 근처 거점 리스트 조회",
-            description = "입력으로 받은 지점 근처의 거점을 가까운 순으로 지정한 개수만큼 조회합니다.<br>조회하려는 거점 수와 조회하려는 위치(x:경도, y:위도)를 입력해주세요.<br>거점 id와 거점 이름, 거점 주소, 위치(x:경도, y:위도), 거리를 반환합니다."
+            description = "입력으로 받은 지점 근처의 거점을 가까운 순으로 지정한 개수만큼 조회합니다.<br>조회하려는 거점 수와 조회하려는 위치의 경도(longitude), 위도(latitude)를 입력해주세요.<br>거점 id와 거점 이름, 거점 주소, 위치의 경도(longitude), 위도(latitude), 거리를 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSpotWithDistanceResponses.class))),
@@ -146,11 +148,13 @@ public class GetSpotController {
     public ResponseEntity<GetSpotWithDistanceResponses> getNearSpots(
             @Parameter(description = "조회할 개수<br>기본값: 3개")
             @RequestParam(value = "count", defaultValue = "3", required = false) Long count,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = SearchSpotPointRequest.class)))
-            @RequestBody SearchSpotPointRequest request
+            @Parameter(description = "경도")
+            @RequestParam(value = "longitude") Float longitude,
+            @Parameter(description = "위도")
+            @RequestParam(value = "latitude") Float latitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(request.getSearchPoint().getX(), request.getSearchPoint().getY());
+        Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getSpotService.getNearSpots(point, count));
     }

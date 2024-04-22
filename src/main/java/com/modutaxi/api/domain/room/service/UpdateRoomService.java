@@ -21,6 +21,9 @@ import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -97,9 +100,12 @@ public class UpdateRoomService {
             updateRoomRequest.getSpotId() != null ? spotRepository.findById(
                 updateRoomRequest.getSpotId()).orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND)) : oldRoomData.getSpot());
 
-        oldRoomData.setDeparturePoint(
-            updateRoomRequest.getDeparturePoint() != null ? updateRoomRequest.getDeparturePoint()
-                : oldRoomData.getDeparturePoint());
+        if(updateRoomRequest.getDeparturePoint() != null)  {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Coordinate coordinate = new Coordinate(updateRoomRequest.getDeparturePoint().getX(), updateRoomRequest.getDeparturePoint().getY());
+            Point updatedPoint = geometryFactory.createPoint(coordinate);
+            oldRoomData.setDeparturePoint(updatedPoint);
+        }
 
         return oldRoomData;
     }
