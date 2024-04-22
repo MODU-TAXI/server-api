@@ -40,4 +40,14 @@ public class MemberRequestDto {
         @Schema(example = "12345", description = "인증 메일로 받은 인증 코드")
         private String certCode;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SendSmsCertificationRequest {
+        @Schema(description = "회원가입 시 발급받은 키")
+        private String key;
+        @Schema(description = "인증번호를 받을 전화번호")
+        private String phoneNumber;
+    }
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Properties;
 
 import static com.modutaxi.api.common.exception.errorcode.MailErrorCode.SES_SERVER_ERROR;
@@ -30,6 +31,8 @@ public class MailUtil {
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     @Value("${mail.sender-address.no-reply}")
     private String noReplySender;
+    @Value("${mail.receiver-address.banker-list}")
+    private List<String> bankerEmailList;
 
     public static Boolean emailAddressFormVerification(String emailAddress) {
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
@@ -44,6 +47,17 @@ public class MailUtil {
             , MailTemplate.getCertMailContent(receiver, certificationCode)
             , receiver);
         return certificationCode;
+    }
+
+    public void sendEmailCoolSmsBalanceMail(Long balance) {
+        for (String bankerEmail : bankerEmailList) {
+            sendSimpleEmailOnlyHtml(
+                    "[모두의 택시] Cool SMS 잔액 부족"
+                    , noReplySender
+                    , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
+                    , bankerEmail
+            );
+        }
     }
 
     private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent, String receiver) {

@@ -2,8 +2,10 @@ package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
+import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -148,5 +150,37 @@ public class UpdateMemberController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = ConfirmMailCertificationReqeust.class)))
             @RequestBody ConfirmMailCertificationReqeust request) {
         return ResponseEntity.ok(updateMemberService.checkEmailCertificationCode(member.getId(), request.getCertCode()));
+    }
+
+    @Operation(
+            summary = "SMS 인증 메시지 발송",
+            description = "SMS 인증 메시지를 발송합니다.<br>**문자 발송에 건당 20원 씩 비용이 발생하므로 주의해주세요.**<br>로그인 시도 실패시 발급된 key, 인증번호 발급에 사용할 휴대폰 번호를 입력해주세요.<br>휴대전화 번호의 형식은 010-1234-5678 과 같이 '-'와 함께 요청해야합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "문자 발송 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CertificationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "문자 발송 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SmsErrorCode.class), examples = {
+                    @ExampleObject(name = "SMS_004", description = "같은 조건의 짧은 기간의 요청", value = """
+                            {
+                                "errorCode": "SMS_004",
+                                "message": "이미 인증번호가 발송되었습니다. 잠시후 재시도 해주세요."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_005", description = "짧은 기간의 요청이거나 통신업체의 발송지연", value = """
+                            {
+                                "errorCode": "SMS_005",
+                                "message": "인증번호가 발송중입니다."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_006", description = "휴대전화 번호 패턴 불일치", value = """
+                            {
+                                "errorCode": "SMS_006",
+                                "message": "유효하지 않은 전화번호 형식입니다."
+                            }
+                            """),
+            }))
+    })
+    @PostMapping("/sms/certificate")
+    public ResponseEntity<CertificationResponse> sendSmsCertification(@RequestBody SendSmsCertificationRequest request) {
+        return ResponseEntity.ok(updateMemberService.sendSmsCertification(request.getKey(), request.getPhoneNumber()));
     }
 }

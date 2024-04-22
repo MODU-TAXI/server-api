@@ -10,6 +10,7 @@ import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.sms.service.SmsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class UpdateMemberService {
     private final MemberRepository memberRepository;
     private final MailService mailService;
     private final MailUtil mailUtil;
+    private final SmsService smsService;
 
     public TokenResponse refreshAccessToken(Long memberId) {
         return jwtTokenProvider.generateToken(memberId);
@@ -59,5 +61,9 @@ public class UpdateMemberService {
         if (member.isEmpty()) return;
         if (member.get().getId() == memberId) throw new BaseException(MailErrorCode.ALREADY_CERTIFIED_EMAIL);
         throw new BaseException(MailErrorCode.USED_EMAIL);
+    }
+
+    public CertificationResponse sendSmsCertification(String signupKey, String phoneNumber) {
+        return new CertificationResponse(smsService.sendCertificationCode(signupKey, phoneNumber));
     }
 }
