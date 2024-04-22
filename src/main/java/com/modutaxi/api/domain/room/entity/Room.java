@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @AllArgsConstructor
@@ -51,7 +51,7 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private Point departurePoint = new Point(126.678890, 37.513137);
+    private Point departurePoint = null;
 
     @NotNull
     @Builder.Default
