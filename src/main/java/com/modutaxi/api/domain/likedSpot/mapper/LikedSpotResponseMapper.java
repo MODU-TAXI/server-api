@@ -6,6 +6,6 @@ import org.springframework.data.geo.Point;
 
 public class LikedSpotResponseMapper {
     public static LikedSpotListResponse toDto(LikedSpotResponseInterface dao) {
-        return new LikedSpotListResponse(dao.getSpotId(), dao.getSpotName(), new Point(dao.getSpotpoint().getX(), dao.getSpotpoint().getY()));
+        return new LikedSpotListResponse(dao.getSpotId(), dao.getSpotName(), (float)dao.getSpotpoint().getX(), (float)dao.getSpotpoint().getY());
     }
 }
