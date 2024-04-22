@@ -5,7 +5,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.MailResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
@@ -29,7 +29,7 @@ public class UpdateMemberService {
         return jwtTokenProvider.generateToken(memberId);
     }
 
-    public MailResponse sendEmailCertificationMail(Long memberId, String receiver) {
+    public CertificationResponse sendEmailCertificationMail(Long memberId, String receiver) {
         // 이메일 형식 체크
         if (!mailUtil.emailAddressFormVerification(receiver)) {
             throw new BaseException(MailErrorCode.INVALID_EMAIL_FORM);
@@ -41,17 +41,17 @@ public class UpdateMemberService {
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, receiver);
         // 이메일 발송
-        return new MailResponse(mailService.sendEmailCertificationMail(memberId, receiver));
+        return new CertificationResponse(mailService.sendEmailCertificationMail(memberId, receiver));
     }
 
     @Transactional
-    public MailResponse checkEmailCertificationCode(Long memberId, String certificationCode) {
+    public CertificationResponse checkEmailCertificationCode(Long memberId, String certificationCode) {
         String email = mailService.checkEmailCertificationCode(memberId, certificationCode);
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, email);
         Member member = memberRepository.findByIdAndStatusTrue(memberId).get();
         member.certificateEmail(email);
-        return new MailResponse(true);
+        return new CertificationResponse(true);
     }
 
     private void getNotCertificatedMember(Long memberId, String email) {
