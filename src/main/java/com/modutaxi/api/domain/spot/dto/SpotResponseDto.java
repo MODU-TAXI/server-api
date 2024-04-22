@@ -38,8 +38,10 @@ public class SpotResponseDto {
         private String name;
         @Schema(example = "인천 미추홀구 주안로 95-19", description = "거점 주소")
         private String address;
-        @Schema(example = "{\"x\": 126.68045, \"y\": 37.46504}", description = "거점 위치<br>x: 경도, y: 위도")
-        private Point spotPoint;
+        @Schema(example = "126.68045", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.46504", description = "위도")
+        private Float latitude;
         @Schema(example = "3204.821669916938", description = "거리, 미터단위")
         private Double distance;
         @Schema(example = "true", description = "좋아요 여부")
@@ -78,8 +80,10 @@ public class SpotResponseDto {
     public static class SearchWithRadiusResponse {
         @Schema(example = "2", description = "거점 id")
         private Long id;
-        @Schema(example = "{\"x\": 126.68045, \"y\": 37.46504}", description = "검색 위치<br>x: 경도, y: 위도")
-        private Point spotPoint;
+        @Schema(example = "126.68045", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.46504", description = "위도")
+        private Float latitude;
     }
 
     @Getter
