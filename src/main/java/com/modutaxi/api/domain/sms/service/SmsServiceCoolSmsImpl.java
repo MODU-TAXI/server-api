@@ -119,4 +119,28 @@ public class SmsServiceCoolSmsImpl implements SmsService {
             log.warn("[COOL SMS] 남은 요금을 확인할 수 없습니다.");
         }
     }
+
+    public Boolean checkSmsCertificationCode(String signupKey, String phoneNumber, String certificationCode) {
+        phoneNumber = checkPhoneNumberPattern(phoneNumber);
+        checkCertificationCodePattern(certificationCode);
+        SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
+        if (smsCertCodeEntity == null) {
+            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_EXPIRED);
+        }
+        if (!smsCertCodeEntity.getPhoneNumber().equals(phoneNumber)) {
+            throw new BaseException(SmsErrorCode.PHONE_NUMBER_NOT_MATCH);
+        }
+        if (!smsCertCodeEntity.getCertificationCode().equals(certificationCode)) {
+            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_NOT_MATCH);
+        }
+        redisSmsCertificationCodeRepository.findAndDeleteById(signupKey);
+        return true;
+    }
+
+    private void checkCertificationCodePattern(String certificationCode) {
+        String REGEXP_ONLY_NUM = String.format("([0-9]{%d})+$", certCodeLength);
+        if (!certificationCode.matches(REGEXP_ONLY_NUM)) {
+            throw new BaseException(SmsErrorCode.INVALID_CERTIFICATION_CODE_PATTERN);
+        }
+    }
 }

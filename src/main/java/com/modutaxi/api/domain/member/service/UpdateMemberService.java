@@ -66,4 +66,8 @@ public class UpdateMemberService {
     public CertificationResponse sendSmsCertification(String signupKey, String phoneNumber) {
         return new CertificationResponse(smsService.sendCertificationCode(signupKey, phoneNumber));
     }
+
+    public CertificationResponse checkSmsCertificationCode(String signupKey, String phoneNumber, String certificationCode) {
+        return new CertificationResponse(smsService.checkSmsCertificationCode(signupKey, phoneNumber, certificationCode));
+    }
 }

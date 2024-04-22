@@ -4,6 +4,7 @@ import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
@@ -182,5 +183,49 @@ public class UpdateMemberController {
     @PostMapping("/sms/certificate")
     public ResponseEntity<CertificationResponse> sendSmsCertification(@RequestBody SendSmsCertificationRequest request) {
         return ResponseEntity.ok(updateMemberService.sendSmsCertification(request.getKey(), request.getPhoneNumber()));
+    }
+
+    @Operation(
+            summary = "SMS 인증 확인",
+            description = "수신한 SMS 인증 코드를 인증합니다.<br>로그인 시도 실패시 발급된 key, 인증번호 발급에 사용한 휴대폰 번호, 인증번호를 입력해주세요.<br>휴대전화 번호의 형식은 010-1234-5678 과 같이 '-'와 함께 요청해야하며, 인증번호는 6자리 숫자입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "문자 인증 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CertificationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "문자 인증 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SmsErrorCode.class), examples = {
+                    @ExampleObject(name = "SMS_001", description = "로그인 시도 실패시 발급된 key로의 인증번호 미발급 또는 인증번호 만료", value = """
+                            {
+                                "errorCode": "SMS_001",
+                                "message": "인증번호가 만료되었습니다."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_002", description = "인증 수신 휴대전화 번호와 인증 번호화 함께 보낸 휴대전화 번호의 불일치", value = """
+                            {
+                                "errorCode": "SMS_002",
+                                "message": "인증번호를 요청한 번호와 일치하지 않습니다."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_003", description = "인증번호 불일치", value = """
+                            {
+                                "errorCode": "SMS_003",
+                                "message": "인증번호가 일치하지 않습니다."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_006", description = "휴대전화 번호 패턴 불일치", value = """
+                            {
+                                "errorCode": "SMS_006",
+                                "message": "유효하지 않은 전화번호 형식입니다."
+                            }
+                            """),
+                    @ExampleObject(name = "SMS_007", description = "인증번호 패턴 불일치", value = """
+                            {
+                                "errorCode": "SMS_007",
+                                "message": "유효하지 않은 인증코드 형식입니다."
+                            }
+                            """),
+            }))
+    })
+    @PostMapping("/sms/confirm")
+    public ResponseEntity<CertificationResponse> confirmSmsCertification(@RequestBody ConfirmSmsCertificationReqeust request) {
+        return ResponseEntity.ok(updateMemberService.checkSmsCertificationCode(request.getKey(), request.getPhoneNumber(), request.getCertificationCode()));
     }
 }

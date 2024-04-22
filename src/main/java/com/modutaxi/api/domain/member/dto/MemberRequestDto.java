@@ -50,4 +50,16 @@ public class MemberRequestDto {
         @Schema(description = "인증번호를 받을 전화번호")
         private String phoneNumber;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConfirmSmsCertificationReqeust {
+        @Schema(description = "회원가입 시 발급받은 키")
+        private String key;
+        @Schema(description = "인증번호를 받은 전화번호")
+        private String phoneNumber;
+        @Schema(description = "인증번호")
+        private String certificationCode;
+    }
 }

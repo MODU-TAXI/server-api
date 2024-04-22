@@ -40,4 +40,9 @@ public class RedisSmsCertificationCodeRepositoryImpl extends BaseRedisRepository
     public SmsCertCodeEntity findById(String signupKey) {
         return valueOperations.get(generateGlobalKey(signupKey));
     }
+
+    @Override
+    public SmsCertCodeEntity findAndDeleteById(String signupKey) {
+        return valueOperations.getAndDelete(generateGlobalKey(signupKey));
+    }
 }
