@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.mail.service;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.util.cert.CertificationCodeUtil;
 import com.modutaxi.api.domain.mail.vo.MailTemplate;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
@@ -36,22 +37,13 @@ public class MailUtil {
     }
 
     public String sendEmailCertificationHtmlMail(String receiver) {
-        String certificationCode = generateCertificationCode();
+        String certificationCode = CertificationCodeUtil.generateCertificationCode(5);
         sendSimpleEmailOnlyHtml(
             "[모두의 택시] 인증코드를 안내해드립니다."
             , noReplySender
             , MailTemplate.getCertMailContent(receiver, certificationCode)
             , receiver);
         return certificationCode;
-    }
-
-    private String generateCertificationCode() {
-        final String candidateChars = "1234567890";
-        String code = "";
-        for (int i = 0; i < 5; i++) {
-            code += candidateChars.charAt((int) (Math.random() * candidateChars.length()));
-        }
-        return code;
     }
 
     private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent, String receiver) {
