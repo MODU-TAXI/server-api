@@ -58,11 +58,11 @@ public class RegisterSpotController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = CreateSpotRequest.class)))
             @RequestBody CreateSpotRequest request
     ) {
-        if (request.getSpotPoint().getX() < -180 || request.getSpotPoint().getX() > 180 || request.getSpotPoint().getY() < -90 || request.getSpotPoint().getY() > 90) {
+        if (request.getLongitude() < -180 || request.getLongitude() > 180 || request.getLatitude() < -90 || request.getLatitude() > 90) {
             throw new BaseException(SpotError.SPOT_COORDINATE_INVALID);
         }
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(request.getSpotPoint().getX(), request.getSpotPoint().getY());
+        Coordinate coordinate = new Coordinate(request.getLongitude(), request.getLatitude());
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(new CreateSpotResponse(registerSpotService.registerDestination(request.getName(), request.getAddress(), point)));
     }

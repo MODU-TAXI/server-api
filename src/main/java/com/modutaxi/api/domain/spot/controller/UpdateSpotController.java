@@ -46,7 +46,7 @@ public class UpdateSpotController {
     @PatchMapping("/{id}")
     @Operation(
             summary = "특정 거점 수정",
-            description = "특정 id의 거점을 수정합니다."
+            description = "특정 id의 거점을 수정합니다.<br>이름, 주소, 좌표를 수정할 수 있습니다.<br>좌표를 수정하려면 위도와 경도 모두 입력해주세요."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "거점 등록 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UpdateSpotResponse.class))),
@@ -80,13 +80,13 @@ public class UpdateSpotController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = UpdateSpotRequest.class)))
             @RequestBody UpdateSpotRequest request
     ) {
-        if (request.getSpotPoint().getX() < -180 || request.getSpotPoint().getX() > 180 || request.getSpotPoint().getY() < -90 || request.getSpotPoint().getY() > 90) {
-            throw new BaseException(SpotError.SPOT_COORDINATE_INVALID);
-        }
         Point point = null;
-        if (request.getSpotPoint() != null) {
+        if (request.getLongitude() != null && request.getLatitude() != null) {
+            if (request.getLongitude() < -180 || request.getLongitude() > 180 || request.getLatitude() < -90 || request.getLatitude() > 90) {
+                throw new BaseException(SpotError.SPOT_COORDINATE_INVALID);
+            }
             GeometryFactory geometryFactory = new GeometryFactory();
-            Coordinate coordinate = new Coordinate(request.getSpotPoint().getX(), request.getSpotPoint().getY());
+            Coordinate coordinate = new Coordinate(request.getLongitude(), request.getLatitude());
             point = geometryFactory.createPoint(coordinate);
         }
         return ResponseEntity.ok(new UpdateSpotResponse(updateSpotService.updateSpot(id, request.getName(), request.getAddress(), point)));
