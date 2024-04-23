@@ -22,9 +22,6 @@ import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -53,8 +50,8 @@ public class RegisterRoomService {
 
         //시작 지점, 목표 지점 설정
         String startCoordinate =
-            NaverMapConverter.coordinateToString(createRoomRequest.getLongitude(),
-                createRoomRequest.getLatitude());
+            NaverMapConverter.coordinateToString(createRoomRequest.getDepartureLongitude(),
+                createRoomRequest.getDepartureLatitude());
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(spot.getSpotPoint().getX(),
@@ -67,18 +64,12 @@ public class RegisterRoomService {
 
         long duration = taxiInfo.get("duration").asLong();
 
-        GeometryFactory geometryFactory = new GeometryFactory();
-
-        Coordinate coordinate
-            = new Coordinate(createRoomRequest.getLongitude(), createRoomRequest.getLatitude());
-
-        Point point = geometryFactory.createPoint(coordinate);
-
         Room room = RoomMapper.toEntity(member, spot,
             expectedCharge, duration,
             convertRoomTagListToBitMask(
                 createRoomRequest.getRoomTagBitMask()),
-            point, createRoomRequest.getDepartureTime()
+            createRoomRequest.getDepartureLongitude(), createRoomRequest.getDepartureLatitude(),
+            createRoomRequest.getDepartureTime()
         );
 
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
@@ -102,8 +93,8 @@ public class RegisterRoomService {
             throw new BaseException(RoomErrorCode.DEPARTURE_BEFORE_CURRENT);
         }
 
-        Float longitude = createRoomRequest.getLongitude();
-        Float latitude = createRoomRequest.getLatitude();
+        Float longitude = createRoomRequest.getDepartureLongitude();
+        Float latitude = createRoomRequest.getDepartureLatitude();
         if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE
             || longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
             throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);

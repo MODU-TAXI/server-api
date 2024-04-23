@@ -27,10 +27,11 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        @Schema(example = "126.68045", description = "경도")
-        private Float longitude;
-        @Schema(example = "37.46504", description = "위도")
-        private Float latitude;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
 
         private LocalDateTime departureTime;
 
@@ -47,8 +48,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .longitude((float) room.getDeparturePoint().getX())
-                .latitude((float) room.getDeparturePoint().getY())
+                .departureLongitude((float) room.getDeparturePoint().getX())
+                .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -69,10 +70,11 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        @Schema(example = "126.68045", description = "경도")
-        private Float longitude;
-        @Schema(example = "37.46504", description = "위도")
-        private Float latitude;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
 
         private LocalDateTime departureTime;
 
@@ -87,8 +89,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .longitude((float) room.getDeparturePoint().getX())
-                .latitude((float) room.getDeparturePoint().getY())
+                .departureLongitude((float) room.getDeparturePoint().getX())
+                .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -103,10 +105,10 @@ public class RoomResponseDto {
 
         @Schema(example = "2", description = "방 id")
         private Long id;
-        @Schema(example = "126.68045", description = "경도")
-        private Float longitude;
-        @Schema(example = "37.46504", description = "위도")
-        private Float latitude;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
         @Schema(example = "주안역", description = "거점 이름")
         private String spotName;
     }

@@ -22,9 +22,9 @@ public class RoomInternalDto {
 
         private int roomTagBitMask;
 
-        private Float longitude;
+        private Float departureLongitude;
 
-        private Float latitude;
+        private Float departureLatitude;
 
         private LocalDateTime departureTime;
 
@@ -38,8 +38,8 @@ public class RoomInternalDto {
             return InternalUpdateRoomDto.builder()
                 .spot(room.getSpot())
                 .roomTagBitMask(room.getRoomTagBitMask())
-                .longitude((float) room.getDeparturePoint().getX())
-                .latitude((float) room.getDeparturePoint().getY())
+                .departureLongitude((float) room.getDeparturePoint().getX())
+                .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())

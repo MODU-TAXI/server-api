@@ -69,7 +69,7 @@ public class Room extends BaseTime {
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate
-            = new Coordinate(updateRoomDto.getLongitude(), updateRoomDto.getLatitude());
+            = new Coordinate(updateRoomDto.getDepartureLongitude(), updateRoomDto.getDepartureLatitude());
         this.departurePoint = geometryFactory.createPoint(coordinate);
         this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
