@@ -10,9 +10,11 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
@@ -20,10 +22,8 @@ import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -33,8 +33,11 @@ public class UpdateRoomService {
     private final RoomRepository roomRepository;
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final SpotRepository spotRepository;
-
     private final GetTaxiInfoService getTaxiInfoService;
+    private static final float MIN_LATITUDE = 33;
+    private static final float MAX_LATITUDE = 40;
+    private static final float MIN_LONGITUDE = 124;
+    private static final float MAX_LONGITUDE = 132;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -76,9 +79,20 @@ public class UpdateRoomService {
         taxiInfoMongoRepository.delete(taxiInfo);
     }
 
+    private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {
+
+        Float longitude = createRoomRequest.getDepartureLongitude();
+        Float latitude = createRoomRequest.getDepartureLatitude();
+        if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE
+            || longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
+            throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);
+        }
+    }
+
     public InternalUpdateRoomDto validateAndReturnNewDto(InternalUpdateRoomDto oldRoomData,
         UpdateRoomRequest updateRoomRequest) {
 
+        // 태그 업데이트 및 예외처리
         oldRoomData.setRoomTagBitMask(
             RoomTagBitMaskConverter.convertRoomTagListToBitMask(
                 updateRoomRequest.getRoomTagBitMask()) != 0
@@ -87,27 +101,51 @@ public class UpdateRoomService {
                 : oldRoomData.getRoomTagBitMask()
         );
 
+        if (oldRoomData.getRoomTagBitMask() == RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue()) {
+            throw new BaseException(RoomErrorCode.BOTH_GENDER);
+        }
+
+        // 출발시간 업데이트 및 예외처리
         oldRoomData.setDepartureTime(
             updateRoomRequest.getDepartureTime() != null ? updateRoomRequest.getDepartureTime()
                 : oldRoomData.getDepartureTime());
 
+        if (oldRoomData.getDepartureTime().isBefore(LocalDateTime.now())) {
+            throw new BaseException(RoomErrorCode.DEPARTURE_BEFORE_CURRENT);
+        }
+
+        // 인원수 업데이트
         oldRoomData.setWishHeadcount(
             updateRoomRequest.getWishHeadcount() != 0 ? updateRoomRequest.getWishHeadcount()
                 : oldRoomData.getWishHeadcount());
 
+        // 목적지 업데이트
         oldRoomData.setSpot(
             updateRoomRequest.getSpotId() != null ? spotRepository.findById(
                     updateRoomRequest.getSpotId())
                 .orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND))
                 : oldRoomData.getSpot());
 
-        oldRoomData.setLongitude(
-            updateRoomRequest.getLongitude() != null ? updateRoomRequest.getLongitude()
-                : oldRoomData.getLongitude());
+        // 출발지 업데이트 및 예외처리
+        // 위도, 경도 중에서 값이 하나만 들어왔을 때 예외처리
+        if((updateRoomRequest.getDepartureLatitude() != null && updateRoomRequest.getDepartureLongitude() == null)
+        || (updateRoomRequest.getDepartureLatitude() == null && updateRoomRequest.getDepartureLongitude() != null)){
+            throw new BaseException(RoomErrorCode.POINT_IS_NOT_INDEPENDENT);
+        }
+        oldRoomData.setDepartureLongitude(
+            updateRoomRequest.getDepartureLongitude() != null ? updateRoomRequest.getDepartureLongitude()
+                : oldRoomData.getDepartureLongitude());
 
-        oldRoomData.setLatitude(
-            updateRoomRequest.getLatitude() != null ? updateRoomRequest.getLatitude()
-                : oldRoomData.getLatitude());
+        oldRoomData.setDepartureLatitude(
+            updateRoomRequest.getDepartureLatitude() != null ? updateRoomRequest.getDepartureLatitude()
+                : oldRoomData.getDepartureLatitude());
+
+        Float longitude = oldRoomData.getDepartureLongitude();
+        Float latitude = oldRoomData.getDepartureLatitude();
+        if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE
+            || longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
+            throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);
+        }
 
         return oldRoomData;
     }
@@ -115,8 +153,8 @@ public class UpdateRoomService {
     @Transactional
     public LineString updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
         String startCoordinate =
-            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getLongitude(),
-                internalUpdateRoomDto.getLatitude());
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getDepartureLongitude(),
+                internalUpdateRoomDto.getDepartureLatitude());
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(
@@ -135,12 +173,12 @@ public class UpdateRoomService {
         return path;
     }
 
-    public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
+    private boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
         return updateRoomRequest.getSpotId() != null
-            || updateRoomRequest.getLongitude() != null || updateRoomRequest.getLatitude() != null;
+            || updateRoomRequest.getDepartureLongitude() != null || updateRoomRequest.getDepartureLatitude() != null;
     }
 
-    void checkManager(Long managerId, Long memberId) {
+    private void checkManager(Long managerId, Long memberId) {
         if (!managerId.equals(memberId)) {
             throw new BaseException(RoomErrorCode.NOT_ROOM_MANAGER);
         }
