@@ -1,9 +1,11 @@
 package com.modutaxi.api.domain.sms.service;
 
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.common.util.cert.CertificationCodeUtil;
 import com.modutaxi.api.domain.mail.service.MailService;
+import com.modutaxi.api.domain.member.repository.RedisSnsIdRepository;
 import com.modutaxi.api.domain.sms.dao.SmsCertCodeEntity;
 import com.modutaxi.api.domain.sms.repository.RedisSmsCertificationCodeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ public class SmsServiceCoolSmsImpl implements SmsService {
     private final DefaultMessageService messageService;
     private final String sender;
     private final MailService mailService;
+    private final RedisSnsIdRepository redisSnsIdRepository;
     private final RedisSmsCertificationCodeRepository redisSmsCertificationCodeRepository;
     private final Integer certSmsRestrictionSeconds;
     private final Integer certCodeLength;
@@ -36,6 +39,7 @@ public class SmsServiceCoolSmsImpl implements SmsService {
     public SmsServiceCoolSmsImpl(
             MailService mailService,
             RedisSmsCertificationCodeRepository redisSmsCertificationCodeRepository,
+            RedisSnsIdRepository redisSnsIdRepository,
             @Value("${api.cool-sms.api-key}") String apiKey,
             @Value("${api.cool-sms.api-secret}") String apiSecretKey,
             @Value("${api.cool-sms.checkBalanceThreshold}") Integer checkBalanceThreshold,
@@ -47,12 +51,14 @@ public class SmsServiceCoolSmsImpl implements SmsService {
         this.sender = sender;
         this.mailService = mailService;
         this.redisSmsCertificationCodeRepository = redisSmsCertificationCodeRepository;
+        this.redisSnsIdRepository = redisSnsIdRepository;
         this.checkBalanceThreshold = checkBalanceThreshold;
         this.certSmsRestrictionSeconds = certSmsRestrictionSeconds;
         this.certCodeLength = certCodeLength;
     }
 
     public Boolean sendCertificationCode(String signupKey, String phoneNumber) {
+        checkSignupKey(signupKey);
         phoneNumber = checkPhoneNumberPattern(phoneNumber);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
         if (smsCertCodeEntity != null) {
@@ -67,6 +73,12 @@ public class SmsServiceCoolSmsImpl implements SmsService {
         redisSmsCertificationCodeRepository.save(signupKey, phoneNumber, certificationCode, messageId);
         checkBalance();
         return true;
+    }
+
+    private void checkSignupKey(String signupKey) {
+        if (redisSnsIdRepository.findByKey(signupKey) == null) {
+            throw new BaseException(AuthErrorCode.INVALID_SNS_ID_KEY);
+        }
     }
 
     private String checkPhoneNumberPattern(String phoneNumber) {
@@ -121,6 +133,7 @@ public class SmsServiceCoolSmsImpl implements SmsService {
     }
 
     public Boolean checkSmsCertificationCode(String signupKey, String phoneNumber, String certificationCode) {
+        checkSignupKey(signupKey);
         phoneNumber = checkPhoneNumberPattern(phoneNumber);
         checkCertificationCodePattern(certificationCode);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
