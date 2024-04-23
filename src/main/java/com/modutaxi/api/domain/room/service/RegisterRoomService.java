@@ -34,6 +34,11 @@ public class RegisterRoomService {
     private final GetTaxiInfoService getTaxiInfoService;
     private final RegisterTaxiInfoService registerTaxiInfoService;
 
+    private static final float MIN_LATITUDE = 33;
+    private static final float MAX_LATITUDE = 40;
+    private static final float MIN_LONGITUDE = 124;
+    private static final float MAX_LONGITUDE = 132;
+
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
 
@@ -72,7 +77,7 @@ public class RegisterRoomService {
         return RoomDetailResponse.toDto(room, path);
     }
 
-    private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest){
+    private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {
         if (roomRepository.existsRoomByRoomManagerId(member.getId())) {
             throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
         }
@@ -82,13 +87,14 @@ public class RegisterRoomService {
             throw new BaseException(RoomErrorCode.BOTH_GENDER);
         }
 
-        if(createRoomRequest.getDepartureTime().isBefore(LocalDateTime.now())){
+        if (createRoomRequest.getDepartureTime().isBefore(LocalDateTime.now())) {
             throw new BaseException(RoomErrorCode.DEPARTURE_BEFORE_CURRENT);
         }
 
         Float longitude = (float) createRoomRequest.getDeparturePoint().getX();
-        Float latitude= (float) createRoomRequest.getDeparturePoint().getY();
-        if(latitude < 33 || latitude > 40 || longitude <124 || longitude > 132){
+        Float latitude = (float) createRoomRequest.getDeparturePoint().getY();
+        if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE
+            || longitude < MIN_LONGITUDE || longitude > MAX_LONGITUDE) {
             throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);
         }
     }
