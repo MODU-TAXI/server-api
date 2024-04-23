@@ -1,8 +1,9 @@
 package com.modutaxi.api.domain.room.service;
 
+import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertRoomTagListToBitMask;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
-import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
@@ -10,6 +11,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.spot.entity.Spot;
@@ -18,6 +20,7 @@ import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.modutaxi.api.domain.taxiinfo.service.RegisterTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +36,8 @@ public class RegisterRoomService {
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
-        if (roomRepository.existsRoomByRoomManagerId(member.getId())) {
-            throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
-        }
+
+        createRoomRequestValidator(member, createRoomRequest);
 
         //거점 찾기
         Spot spot = spotRepository.findById(createRoomRequest.getSpotId())
@@ -58,7 +60,7 @@ public class RegisterRoomService {
 
         Room room = RoomMapper.toEntity(member, spot,
             expectedCharge, duration,
-            RoomTagBitMaskConverter.convertRoomTagListToBitMask(
+            convertRoomTagListToBitMask(
                 createRoomRequest.getRoomTagBitMask()),
             createRoomRequest.getDeparturePoint(), createRoomRequest.getDepartureTime()
         );
@@ -68,5 +70,26 @@ public class RegisterRoomService {
         roomRepository.save(room);
         registerTaxiInfoService.savePath(room.getId(), path);
         return RoomDetailResponse.toDto(room, path);
+    }
+
+    private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest){
+        if (roomRepository.existsRoomByRoomManagerId(member.getId())) {
+            throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
+        }
+
+        if (convertRoomTagListToBitMask(createRoomRequest.getRoomTagBitMask())
+            == RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue()) {
+            throw new BaseException(RoomErrorCode.BOTH_GENDER);
+        }
+
+        if(createRoomRequest.getDepartureTime().isBefore(LocalDateTime.now())){
+            throw new BaseException(RoomErrorCode.DEPARTURE_BEFORE_CURRENT);
+        }
+
+        Float longitude = (float) createRoomRequest.getDeparturePoint().getX();
+        Float latitude= (float) createRoomRequest.getDeparturePoint().getY();
+        if(latitude < 33 || latitude > 40 || longitude <124 || longitude > 132){
+            throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);
+        }
     }
 }
