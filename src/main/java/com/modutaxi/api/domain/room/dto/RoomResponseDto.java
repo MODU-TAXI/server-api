@@ -27,7 +27,10 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private Point departurePoint;
+        @Schema(example = "126.68045", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.46504", description = "위도")
+        private Float latitude;
 
         private LocalDateTime departureTime;
 
@@ -44,7 +47,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
+                .longitude((float) room.getDeparturePoint().getX())
+                .latitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -65,7 +69,10 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private Point departurePoint;
+        @Schema(example = "126.68045", description = "경도")
+        private Float longitude;
+        @Schema(example = "37.46504", description = "위도")
+        private Float latitude;
 
         private LocalDateTime departureTime;
 
@@ -80,7 +87,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
+                .longitude((float) room.getDeparturePoint().getX())
+                .latitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -92,6 +100,7 @@ public class RoomResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponse {
+
         @Schema(example = "2", description = "방 id")
         private Long id;
         @Schema(example = "126.68045", description = "경도")
@@ -105,6 +114,7 @@ public class RoomResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponses {
+
         @Schema(description = "방 리스트")
         List<SearchWithRadiusResponse> rooms;
     }

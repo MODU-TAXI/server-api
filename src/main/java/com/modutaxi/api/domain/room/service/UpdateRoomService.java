@@ -53,7 +53,6 @@ public class UpdateRoomService {
         InternalUpdateRoomDto newRoomData = validateAndReturnNewDto(oldRoomData, updateRoomRequest);
 
         //TaxiInfo db 업데이트
-        // TODO: 2024/04/05 JPA와 달리 모든 과정이 끝난 후 db에 반영되는 이슈가 있기에 임시 변수 추가
         LineString path = taxiInfo.getPath();
         if (shouldUpdateTaxiInfo(updateRoomRequest)) {
             path = updateTaxiInfo(roomId, newRoomData);
@@ -98,14 +97,17 @@ public class UpdateRoomService {
 
         oldRoomData.setSpot(
             updateRoomRequest.getSpotId() != null ? spotRepository.findById(
-                updateRoomRequest.getSpotId()).orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND)) : oldRoomData.getSpot());
+                    updateRoomRequest.getSpotId())
+                .orElseThrow(() -> new BaseException(SpotError.SPOT_ID_NOT_FOUND))
+                : oldRoomData.getSpot());
 
-        if(updateRoomRequest.getDeparturePoint() != null)  {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            Coordinate coordinate = new Coordinate(updateRoomRequest.getDeparturePoint().getX(), updateRoomRequest.getDeparturePoint().getY());
-            Point updatedPoint = geometryFactory.createPoint(coordinate);
-            oldRoomData.setDeparturePoint(updatedPoint);
-        }
+        oldRoomData.setLongitude(
+            updateRoomRequest.getLongitude() != null ? updateRoomRequest.getLongitude()
+                : oldRoomData.getLongitude());
+
+        oldRoomData.setLatitude(
+            updateRoomRequest.getLatitude() != null ? updateRoomRequest.getLatitude()
+                : oldRoomData.getLatitude());
 
         return oldRoomData;
     }
@@ -113,8 +115,8 @@ public class UpdateRoomService {
     @Transactional
     public LineString updateTaxiInfo(Long roomId, InternalUpdateRoomDto internalUpdateRoomDto) {
         String startCoordinate =
-            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getDeparturePoint().getX(),
-                internalUpdateRoomDto.getDeparturePoint().getY());
+            NaverMapConverter.coordinateToString(internalUpdateRoomDto.getLongitude(),
+                internalUpdateRoomDto.getLatitude());
 
         String goalCoordinate =
             NaverMapConverter.coordinateToString(
@@ -135,7 +137,7 @@ public class UpdateRoomService {
 
     public boolean shouldUpdateTaxiInfo(UpdateRoomRequest updateRoomRequest) {
         return updateRoomRequest.getSpotId() != null
-                || updateRoomRequest.getDeparturePoint() != null;
+            || updateRoomRequest.getLongitude() != null || updateRoomRequest.getLatitude() != null;
     }
 
     void checkManager(Long managerId, Long memberId) {

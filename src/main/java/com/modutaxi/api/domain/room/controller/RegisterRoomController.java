@@ -30,7 +30,8 @@ public class RegisterRoomController {
     @Operation(summary = "모집방 생성",
         description = "**RoomTag Enum 종류**\n\n**RoomTagBitMask**: "
             + "ONLY\\_WOMAN, MANNER, STUDENT\\_CERTIFICATION"
-            + "\n\n\n**departurePoint(X:경도, Y:위도)**\n\n**예시: departurePoint(126.678890, 37.513137)**")
+            + "\n\n\n**longitude**: 126.65464\n\n\n"
+            + "**latitude**: 37.45169")
     @PostMapping
     public ResponseEntity<RoomDetailResponse> createRoom(
         @CurrentMember Member member,

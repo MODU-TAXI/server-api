@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 @Getter
@@ -65,7 +67,10 @@ public class Room extends BaseTime {
     public void update(InternalUpdateRoomDto updateRoomDto) {
         this.spot = updateRoomDto.getSpot();
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
-        this.departurePoint = updateRoomDto.getDeparturePoint();
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Coordinate coordinate
+            = new Coordinate(updateRoomDto.getLongitude(), updateRoomDto.getLatitude());
+        this.departurePoint = geometryFactory.createPoint(coordinate);
         this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();

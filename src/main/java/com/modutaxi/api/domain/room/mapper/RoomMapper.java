@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.springframework.data.geo.Point;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,7 +19,7 @@ public class RoomMapper {
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(departurePoint.getX(), departurePoint.getY());
-        org.locationtech.jts.geom.Point point = geometryFactory.createPoint(coordinate);
+        Point point = geometryFactory.createPoint(coordinate);
         return Room.builder()
             .spot(spot)
             .roomManager(member)

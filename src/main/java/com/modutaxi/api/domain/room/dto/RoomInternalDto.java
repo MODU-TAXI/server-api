@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.room.dto;
 
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.modutaxi.api.domain.room.entity.Room;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,9 @@ public class RoomInternalDto {
 
         private int roomTagBitMask;
 
-        private Point departurePoint;
+        private Float longitude;
+
+        private Float latitude;
 
         private LocalDateTime departureTime;
 
@@ -32,13 +35,11 @@ public class RoomInternalDto {
         private long duration;
 
         public static InternalUpdateRoomDto toDto(Room room) {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            Coordinate coordinate = new Coordinate(room.getDeparturePoint().getX(), room.getDeparturePoint().getY());
-            Point point = geometryFactory.createPoint(coordinate);
             return InternalUpdateRoomDto.builder()
                 .spot(room.getSpot())
                 .roomTagBitMask(room.getRoomTagBitMask())
-                .departurePoint(point)
+                .longitude((float) room.getDeparturePoint().getX())
+                .latitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())

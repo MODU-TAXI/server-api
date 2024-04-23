@@ -22,7 +22,11 @@ public class RoomRequestDto {
 
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private Point departurePoint;
+        @Schema(example = "126.65464", description = "경도")
+        private Float longitude;
+
+        @Schema(example = "37.45169", description = "위도")
+        private Float latitude;
 
         private LocalDateTime departureTime;
 
@@ -37,7 +41,11 @@ public class RoomRequestDto {
 
         private List<RoomTagBitMask> roomTagBitMask;
 
-        private Point departurePoint;
+        @Schema(example = "126.65464", description = "경도")
+        private Float longitude;
+
+        @Schema(example = "37.45169", description = "위도")
+        private Float latitude;
 
         private LocalDateTime departureTime;
 
