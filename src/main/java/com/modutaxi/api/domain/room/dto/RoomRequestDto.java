@@ -20,8 +20,6 @@ public class RoomRequestDto {
 
         private Long spotId;
 
-        private String description;
-
         private List<RoomTagBitMask> roomTagBitMask;
 
         private Point departurePoint;
@@ -36,8 +34,6 @@ public class RoomRequestDto {
     public static class UpdateRoomRequest {
 
         private Long spotId;
-
-        private String description;
 
         private List<RoomTagBitMask> roomTagBitMask;
 
