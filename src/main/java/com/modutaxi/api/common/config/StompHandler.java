@@ -70,23 +70,23 @@ public class StompHandler implements ChannelInterceptor {
             String roomId =
                 destination.lastIndexOf('/') == -1 ? null
                     : destination.substring(destination.lastIndexOf("/") + 1);
-            System.out.println("roomId = " + roomId);
+//            System.out.println("roomId = " + roomId);
 
             if (roomId == null) {
                 throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
             }
 
 
-            System.out.println("userCount = " + chatRoomRepository.getUserCount(roomId));
+            // TODO: 4/25/24 인원수 제한 보류
 //            if (chatRoomRepository.getUserCount(roomId) >= 4) {
 //                throw new BaseException(ChatErrorCode.FULL_CHAT_ROOM);
 //            }
-            System.out.println("Enter possible");
+//            System.out.println("Enter possible");
 
 
             // 채팅방 연관관계 설정
             chatRoomRepository.setUserEnterInfo(sessionId, roomId);
-            System.out.println("userEnter setting clear");
+//            System.out.println("userEnter setting clear");
 
             // 채팅방의 인원수를 +1
             chatRoomRepository.plusUserCount(roomId);
@@ -98,9 +98,10 @@ public class StompHandler implements ChannelInterceptor {
             String roomId = chatRoomRepository.findById(sessionId);
 
             chatRoomRepository.minusUserCount(roomId);
-            System.out.println("count : " + chatRoomRepository.getUserCount(roomId));
+//            System.out.println("count : " + chatRoomRepository.getUserCount(roomId));
+
             String memberId = chatRoomRepository.findById(sessionId);
-            // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
+            // 클라이언트 퇴장 메시지 발송한다.
             ChatMessage chatMessage = new ChatMessage(Long.valueOf(roomId), MessageType.LEAVE, "",
                 memberId);
 
