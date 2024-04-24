@@ -59,11 +59,12 @@ public class RedisConfig {
     // pub/sub 메시지 처리를 위한 Listener 등록
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
+        RedisConnectionFactory connectionFactory,
         MessageListenerAdapter messageListenerAdapter,
         ChannelTopic channelTopic
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory());
+        container.setConnectionFactory(connectionFactory);
         container.addMessageListener(messageListenerAdapter, channelTopic);
         return container;
     }
@@ -71,11 +72,11 @@ public class RedisConfig {
 
     @Bean
     public MessageListenerAdapter messageListenerAdapter(RedisSubscriber subscriber) {
-        return new MessageListenerAdapter(subscriber, "onMessage");
+        return new MessageListenerAdapter(subscriber, "sendMessage");
     }
 
     @Bean
     public ChannelTopic channelTopic() {
-        return new ChannelTopic("/sub/chat");
+        return new ChannelTopic("/sub/chat/");
     }
 }

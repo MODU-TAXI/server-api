@@ -1,45 +1,81 @@
 package com.modutaxi.api.domain.chat.repository;
 
+import com.amazonaws.services.cloudformation.model.StackInstance;
+import com.modutaxi.api.common.config.redis.BaseRedisRepository;
 import com.modutaxi.api.domain.chat.service.RedisSubscriber;
 import com.modutaxi.api.domain.chatroom.ChatRoom;
+import com.modutaxi.api.domain.member.repository.RedisRTKRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.PartialUpdate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class ChatRoomRepository {
+public class ChatRoomRepository extends BaseRedisRepository implements Serializable {
 
-    private final RedisMessageListenerContainer redisMessageListenerContainer;
+    // Redis CacheKeys
+    private static final String CHAT_ROOMS = "CHAT_ROOM"; // 채팅룸 저장
+    public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
+    private static final String USER_COUNT = "USER_COUNT"; // 유저 수
 
-    private HashOperations<String, String, ChatRoom> operationHashChatRoom;
-    private Map<String, ChannelTopic> topics;
+    private final RedisTemplate<String, String> redisTemplate;
+    private ValueOperations<String, String> valueOperations;
+    private HashOperations<String, String, String> hashOperations;
+
+
 
     @PostConstruct
-    private void init(){
-        topics = new HashMap<>();
-        setOperationHashChatRoom(operationHashChatRoom);
+    protected void init() {
+        classInstance = ChatRoomRepository.class;
+        valueOperations = redisTemplate.opsForValue();
+        hashOperations = redisTemplate.opsForHash();
     }
 
-    public void setOperationHashChatRoom(
-        HashOperations<String, String, ChatRoom> operationHashChatRoom) {
-        this.operationHashChatRoom = operationHashChatRoom;
-    }
-    public void enterChatRoom(RedisSubscriber redisSubscriber, Long roomId){
-        ChannelTopic topic = topics.get(String.valueOf(roomId));
-        if(topic == null){
-            topic = new ChannelTopic("/sub/chat/" + roomId);
-            topics.put(String.valueOf(roomId), topic);
+    public String findById(String sessionId) {
+        System.out.println("sessionId = " + sessionId);
+        if (sessionId == null) {
+            return null;
         }
-        redisMessageListenerContainer.addMessageListener(redisSubscriber, topic);
+        return (String) valueOperations.get(ENTER_INFO + ":"+ sessionId);
     }
 
-    public void leaveChatRoom(RedisSubscriber redisSubscriber){
-        redisMessageListenerContainer.removeMessageListener(redisSubscriber);
+
+
+    public void setUserEnterInfo(String sessionId, String roomId){
+        hashOperations.put(ENTER_INFO, sessionId, roomId);
+//        valueOperations.set(sessionId, roomId);
+    }
+
+    public void removeUserEnterInfo(String sessionId, String roomId){
+//        valueOperations.(sessionId, roomId);
+    }
+
+
+    // 채팅방 유저수 조회
+    public long getUserCount(String roomId) {
+        return Long.valueOf(Optional.ofNullable(valueOperations.get(USER_COUNT + "_" + roomId)).orElse("0"));
+    }
+
+    // 채팅방에 입장한 유저수 +1
+    public long plusUserCount(String roomId) {
+        return Optional.ofNullable(valueOperations.increment(USER_COUNT + "_" + roomId)).orElse(0L);
+    }
+
+    // 채팅방에 입장한 유저수 -1
+    public long minusUserCount(String roomId) {
+        return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId)).filter(count -> count > 0).orElse(0L);
     }
 }
