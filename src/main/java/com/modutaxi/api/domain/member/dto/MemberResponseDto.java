@@ -15,8 +15,8 @@ public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
-    public static class MailResponse {
-        @Schema(example = "true", description = "메일 API 성공 여부")
+    public static class CertificationResponse {
+        @Schema(example = "true", description = "API 성공 여부")
         private Boolean isConfirm;
     }
 

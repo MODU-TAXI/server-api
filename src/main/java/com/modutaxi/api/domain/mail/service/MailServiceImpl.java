@@ -50,4 +50,9 @@ public class MailServiceImpl implements MailService {
         redisMailCertCodeRepository.deleteById(memberId);
         return certCodeEntity.getEmailAddress();
     }
+
+    @Override
+    public void sendCoolSmsBalanceMessage(Long balance) {
+        mailUtil.sendEmailCoolSmsBalanceMail(balance);
+    }
 }
