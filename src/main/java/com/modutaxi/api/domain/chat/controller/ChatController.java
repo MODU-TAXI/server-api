@@ -21,6 +21,8 @@ public class ChatController {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
+
+    // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
     public void sendMessage(ChatMessage message, @Header("token") String token){
         System.out.println("왔니?");
@@ -32,10 +34,8 @@ public class ChatController {
         System.out.println("content = " + message.getContent());
         System.out.println("type = " + message.getType());
 
-
-//        // 로그인 회원 정보로 대화명 설정
-//        message.setSender(member.getName());
-//        // Websocket에 발행된 메시지를 redis로 발행(publish)
+        // TODO: 4/25/24 sender 이름 설정 -> 유저 카운트의 enum 고정값으로 설정하면 될 듯
+        // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);
     }
 }

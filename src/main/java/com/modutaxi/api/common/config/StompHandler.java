@@ -91,6 +91,8 @@ public class StompHandler implements ChannelInterceptor {
             // 채팅방의 인원수를 +1
             chatRoomRepository.plusUserCount(roomId);
             System.out.println("userCount = " + chatRoomRepository.getUserCount(roomId));
+
+            chatService.sendChatMessage(new ChatMessage(Long.valueOf(roomId),MessageType.JOIN,"",sessionId));
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
