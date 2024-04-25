@@ -55,7 +55,7 @@ jobs:
 
       - name: Write Docker Image Tag Information to .env File
         run: |
-          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/env/dev.env
+          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/dockerEnv/dev.env
 
       - name: Copy docker-compose.yml
         uses: appleboy/scp-action@master
@@ -64,7 +64,7 @@ jobs:
           port: ${{ secrets.TEST_SERVER_SSH_PORT }}
           username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
           key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
-          source: "docker-compose.testserver.yml, config/env/dev.env"
+          source: "docker-compose.testserver.yml, config/dockerEnv/dev.env"
           target: /home/ec2-user
 
       - name: Deploy
@@ -80,5 +80,5 @@ jobs:
             sudo docker container stop spring
             sudo docker container rm spring
             sudo docker image rm ${{ env.SPRING_IMAGE }}
-            sudo docker-compose --env-file=config/env/dev.env -f docker-compose.testserver.yml -p backend up -d
+            sudo docker-compose --env-file=config/dockerEnv/dev.env -f docker-compose.testserver.yml -p backend up -d
             sudo docker image prune -af
