@@ -1,0 +1,84 @@
+name: Test Server Deploy
+
+on:
+  push:
+    tags:
+      - 't-**'
+
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+  GITHUB_ACTOR: ${{ github.actor }}
+
+jobs:
+  testServerDeploy:
+    name: Deploy to TestServer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          submodules: recursive
+
+      - name: Git Submodule Update
+        run: |
+          git submodule update --remote --recursive
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_ACTOR }}
+          password: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: lowercase the image tag & repository
+        run: |
+          echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
+      - name: Get Version
+        run: echo "VERSION=$(git tag --points-at)" >> ${GITHUB_ENV}
+
+      - name: Set Spring Image Environment Variable
+        run: |
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-testserver:${{ env.VERSION }}" >> ${GITHUB_ENV}
+
+      - name: Write Version
+        run: |
+          echo -e "\nserver-version: ${{ env.VERSION }}" >> config/application-testserver.yml
+
+      - name: Build Image
+        run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-dev .
+
+      - name: Push
+        run: docker push ${{ env.SPRING_IMAGE }}
+
+      - name: Write Docker Image Tag Information to .env File
+        run: |
+          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/env/dev.env
+
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TEST_SERVER_SSH_HOST }}
+          port: ${{ secrets.TEST_SERVER_SSH_PORT }}
+          username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
+          key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
+          source: "docker-compose.testserver.yml, config/env/dev.env"
+          target: /home/ec2-user
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.TEST_SERVER_SSH_HOST }}
+          port: ${{ secrets.TEST_SERVER_SSH_PORT }}
+          username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
+          key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ec2-user 
+            sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
+            sudo docker container stop spring
+            sudo docker container rm spring
+            sudo docker image rm ${{ env.SPRING_IMAGE }}
+            sudo docker-compose --env-file=config/env/dev.env -f docker-compose.testserver.yml -p backend up -d
+            sudo docker image prune -af
