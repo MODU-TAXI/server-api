@@ -24,9 +24,10 @@ public class ChatController {
 
     // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
-    public void sendMessage(ChatMessage message, @Header("token") String token){
+    public void sendMessage(ChatMessage message){
+        // TODO: 4/25/24 apic 테스트를 위해 헤더를 ChatMessage 객체에 받음. @Header("token") String token 파라미터로 추가해야함
         System.out.println("왔니?");
-        String memberId = jwtTokenProvider.getMemberIdByAccessToken(token);
+        String memberId = jwtTokenProvider.getMemberIdByAccessToken(message.getToken());
         Member member = memberRepository.findByIdAndStatusTrue(Long.valueOf(memberId)).orElseThrow();
         System.out.println("member = " + member.getId());
         System.out.println("sender = " + message.getSender());

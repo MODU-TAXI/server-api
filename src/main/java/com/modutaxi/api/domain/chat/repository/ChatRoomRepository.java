@@ -56,11 +56,10 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
 
     public void setUserEnterInfo(String sessionId, String roomId){
         hashOperations.put(ENTER_INFO, sessionId, roomId);
-//        valueOperations.set(sessionId, roomId);
     }
 
-    public void removeUserEnterInfo(String sessionId, String roomId){
-//        valueOperations.(sessionId, roomId);
+    public void removeUserEnterInfo(String sessionId){
+        hashOperations.delete(ENTER_INFO,sessionId);
     }
 
 

@@ -8,6 +8,7 @@ import com.modutaxi.api.domain.chat.MessageType;
 import com.modutaxi.api.domain.chat.dto.ChatMessage;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.chat.service.ChatService;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
@@ -59,7 +60,6 @@ public class StompHandler implements ChannelInterceptor {
             else System.out.println("토큰 검증 성공!!!");
             //검증 끝
 
-
         }
 
         else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
@@ -70,12 +70,13 @@ public class StompHandler implements ChannelInterceptor {
             String roomId =
                 destination.lastIndexOf('/') == -1 ? null
                     : destination.substring(destination.lastIndexOf("/") + 1);
+
+
 //            System.out.println("roomId = " + roomId);
 
             if (roomId == null) {
                 throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
             }
-
 
             // TODO: 4/25/24 인원수 제한 보류
 //            if (chatRoomRepository.getUserCount(roomId) >= 4) {
@@ -88,11 +89,11 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomRepository.setUserEnterInfo(sessionId, roomId);
 //            System.out.println("userEnter setting clear");
 
-            // 채팅방의 인원수를 +1
+            // 채팅방의 인원수 +1
             chatRoomRepository.plusUserCount(roomId);
             System.out.println("userCount = " + chatRoomRepository.getUserCount(roomId));
 
-            chatService.sendChatMessage(new ChatMessage(Long.valueOf(roomId),MessageType.JOIN,"",sessionId));
+            chatService.sendChatMessage(new ChatMessage(Long.valueOf(roomId),MessageType.JOIN,"",sessionId,""));
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
@@ -105,12 +106,12 @@ public class StompHandler implements ChannelInterceptor {
             String memberId = chatRoomRepository.findById(sessionId);
             // 클라이언트 퇴장 메시지 발송한다.
             ChatMessage chatMessage = new ChatMessage(Long.valueOf(roomId), MessageType.LEAVE, "",
-                memberId);
+                memberId, "");
 
             chatService.sendChatMessage(chatMessage);
 
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제
-            chatRoomRepository.removeUserEnterInfo(sessionId, roomId);
+            chatRoomRepository.removeUserEnterInfo(sessionId);
         }
 
         System.out.println("memssage = " + message);
