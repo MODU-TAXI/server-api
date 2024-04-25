@@ -42,7 +42,7 @@ public class GetRoomController {
     }
 
     @Operation(summary = "경로를 제외한 방 리스트 조회",
-            description = "방 리스트를 조회합니다.<br><br>**spotId**(찾으려는 거점 id, 필수 x), **isImminent**(마감 임박 여부), **roomTags**(찾으려는 방 태그, 필수 x)를 함께 보내주세요.<br><br> **roomTag** : 'ONLY_WOMAN', 'ONLY_MAN', 'MANNER', 'QUIET', 'STUDENT_CERTIFICATION'<br><br>**page(0 ~ )** : 페이지 번호<br><br>**size(1 ~ )** : 사이즈")
+            description = "방 리스트를 조회합니다.<br><br>**spotId**(찾으려는 거점 id, 필수 x), **isImminent**(마감 임박 여부), **roomTags**(찾으려는 방 태그, 필수 x)를 함께 보내주세요.<br><br> **roomTag** : 'ONLY_WOMAN', 'MANNER', 'STUDENT_CERTIFICATION'<br><br>**page(0 ~ )** : 페이지 번호<br><br>**size(1 ~ )** : 사이즈")
     @GetMapping("/list")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "방 목록 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomSimpleResponse.class))),
