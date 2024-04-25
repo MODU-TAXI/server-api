@@ -79,6 +79,9 @@ dependencies {
 
     // Spatial Data
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
+
+    //Cool SMS
+    implementation 'net.nurigo:sdk:4.2.7'
 }
 
 tasks.named('test') {
