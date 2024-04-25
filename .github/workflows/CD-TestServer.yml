@@ -65,7 +65,7 @@ jobs:
           username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
           key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
           source: "docker-compose.testserver.yml, config/dockerEnv/dev.env"
-          target: /home/ec2-user
+          target: /home/ubuntu
 
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -75,7 +75,7 @@ jobs:
           username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
           key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ec2-user 
+            cd /home/ubuntu
             sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
             sudo docker container stop spring
             sudo docker container rm spring
