@@ -27,7 +27,11 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private Point departurePoint;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
 
         private LocalDateTime departureTime;
 
@@ -44,7 +48,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
+                .departureLongitude((float) room.getDeparturePoint().getX())
+                .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -65,7 +70,11 @@ public class RoomResponseDto {
 
         private List<RoomTagBitMask> roomTagBitMaskList;
 
-        private Point departurePoint;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
 
         private LocalDateTime departureTime;
 
@@ -80,7 +89,8 @@ public class RoomResponseDto {
                 .roomId(room.getId())
                 .spotId(room.getSpot().getId())
                 .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departurePoint(new Point(room.getDeparturePoint().getX(), room.getDeparturePoint().getY()))
+                .departureLongitude((float) room.getDeparturePoint().getX())
+                .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
                 .wishHeadcount(room.getWishHeadcount())
                 .duration(room.getDuration())
@@ -92,12 +102,13 @@ public class RoomResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponse {
+
         @Schema(example = "2", description = "방 id")
         private Long id;
-        @Schema(example = "126.68045", description = "경도")
-        private Float longitude;
-        @Schema(example = "37.46504", description = "위도")
-        private Float latitude;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
         @Schema(example = "주안역", description = "거점 이름")
         private String spotName;
     }
@@ -105,6 +116,7 @@ public class RoomResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponses {
+
         @Schema(description = "방 리스트")
         List<SearchWithRadiusResponse> rooms;
     }
