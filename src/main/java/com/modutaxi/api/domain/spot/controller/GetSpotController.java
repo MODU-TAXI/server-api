@@ -149,16 +149,26 @@ public class GetSpotController {
             @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = GetSpotWithDistanceResponses.class))),
     })
     public ResponseEntity<GetSpotWithDistanceResponses> getNearSpots(
-            @Parameter(description = "조회할 개수<br>기본값: 3개")
-            @RequestParam(value = "count", defaultValue = "3", required = false) Long count,
-            @Parameter(description = "경도")
-            @RequestParam(value = "longitude") Float longitude,
-            @Parameter(description = "위도")
-            @RequestParam(value = "latitude") Float latitude
+            @CurrentMember Member member,
+            @Parameter(description = "조회할 page")
+            @RequestParam(value = "page") int page,
+            @Parameter(description = "조회할 page 단위")
+            @RequestParam(value = "size") int size,
+            @Parameter(description = "현재 경도")
+            @RequestParam(value = "currentLongitude") Float currentLongitude,
+            @Parameter(description = "현재 위도")
+            @RequestParam(value = "currentLatitude") Float currentLatitude,
+            @Parameter(description = "검색 기준 경도")
+            @RequestParam(value = "searchLongitude") Float searchLongitude,
+            @Parameter(description = "검색 기준 위도")
+            @RequestParam(value = "searchLatitude") Float searchLatitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(longitude, latitude);
-        Point point = geometryFactory.createPoint(coordinate);
-        return ResponseEntity.ok(getSpotService.getNearSpots(point, count));
+        Coordinate currentCoordinate = new Coordinate(currentLongitude, currentLatitude);
+        Point currentPoint = geometryFactory.createPoint(currentCoordinate);
+
+        Coordinate searchCoordinate = new Coordinate(searchLongitude, searchLatitude);
+        Point searchPoint = geometryFactory.createPoint(searchCoordinate);
+        return ResponseEntity.ok(getSpotService.getNearSpots(member, currentPoint, searchPoint, page, size));
     }
 }

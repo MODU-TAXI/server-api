@@ -49,8 +49,9 @@ public class GetSpotService {
         return new SearchWithRadiusResponses(spotList);
     }
 
-    public GetSpotWithDistanceResponses getNearSpots(Point point, Long count) {
-        List<SpotWithDistanceResponseInterface> spots = spotRepository.findNearSpots(point, count);
+    public GetSpotWithDistanceResponses getNearSpots(Member member, Point currentPoint, Point searchPoint, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<SpotWithDistanceResponseInterface> spots = spotRepository.findNearSpots(member, currentPoint, searchPoint, pageable);
         List<GetSpotWithDistanceResponse> spotList = spots.stream().map(SpotResponseMapper::toSpotWithDistanceResponse).toList();
         return new GetSpotWithDistanceResponses(spotList);
     }
