@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.spot.service;
 
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.spot.dao.SpotMysqlResponse.SearchWithRadiusResponseInterface;
 import com.modutaxi.api.domain.spot.dao.SpotMysqlResponse.SpotWithDistanceResponseInterface;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.*;
@@ -10,6 +11,8 @@ import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,8 +30,8 @@ public class GetSpotService {
         );
     }
 
-    public GetSpotWithDistanceResponse getSpot(Long id, Point point) {
-        SpotWithDistanceResponseInterface spot = spotRepository.findByIdWithDistance(id, point).orElseThrow(
+    public GetSpotWithDistanceResponse getSpot(Member member, Long id, Point point) {
+        SpotWithDistanceResponseInterface spot = spotRepository.findByIdWithDistance(member, id, point).orElseThrow(
                 () -> new BaseException(SPOT_ID_NOT_FOUND)
         );
         return SpotResponseMapper.toSpotWithDistanceResponse(spot);

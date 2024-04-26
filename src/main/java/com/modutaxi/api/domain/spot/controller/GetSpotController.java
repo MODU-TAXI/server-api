@@ -1,8 +1,10 @@
 package com.modutaxi.api.domain.spot.controller;
 
 
+import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.spot.dto.SpotRequestDto.GetAreaSpotRequest;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotResponses;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponse;
@@ -54,6 +56,7 @@ public class GetSpotController {
             })),
     })
     public ResponseEntity<GetSpotWithDistanceResponse> getSpot(
+            @CurrentMember Member member,
             @Parameter(description = "거점 id")
             @PathVariable(value = "id") Long id,
             @Parameter(description = "경도")
@@ -64,7 +67,7 @@ public class GetSpotController {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
-        return ResponseEntity.ok(getSpotService.getSpot(id, point));
+        return ResponseEntity.ok(getSpotService.getSpot(member, id, point));
     }
 
     @Hidden
