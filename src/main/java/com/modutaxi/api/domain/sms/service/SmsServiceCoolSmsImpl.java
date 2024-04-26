@@ -59,18 +59,28 @@ public class SmsServiceCoolSmsImpl implements SmsService {
 
     public Boolean sendCertificationCode(String signupKey, String phoneNumber) {
         checkSignupKey(signupKey);
+        log.info("signupKey" + signupKey);
         phoneNumber = checkPhoneNumberPattern(phoneNumber);
+        log.info("phoneNumber" + phoneNumber);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
+        log.info("smsCertCodeEntity" + smsCertCodeEntity);
         if (smsCertCodeEntity != null) {
             getPrevMessage(phoneNumber, smsCertCodeEntity.getMessageId());
+            log.info("smsCertCodeEntity.getPhoneNumber().equals(phoneNumber)" + smsCertCodeEntity.getPhoneNumber().equals(phoneNumber));
+            log.info("smsCertCodeEntity.getCreatedAt()" + smsCertCodeEntity.getCreatedAt());
+            log.info("smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds)" + smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds));
+            log.info("smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds).isAfter(LocalDateTime.now())" + smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds).isAfter(LocalDateTime.now()));
             if (smsCertCodeEntity.getPhoneNumber().equals(phoneNumber) &&
                     smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds).isAfter(LocalDateTime.now())) {
+                log.warn("CERTIFICATION_CODE_ALREADY_SENT");
                 throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
             }
         }
         String certificationCode = CertificationCodeUtil.generateCertificationCode(certCodeLength);
+        log.info("certificationCode" + certificationCode);
         String messageId = sendOne(phoneNumber, String.format("[모두의택시] 인증번호는 [%s]입니다.", certificationCode));
         redisSmsCertificationCodeRepository.save(signupKey, phoneNumber, certificationCode, messageId);
+        log.info("messageId" + messageId);
         checkBalance();
         return true;
     }
@@ -100,12 +110,14 @@ public class SmsServiceCoolSmsImpl implements SmsService {
         request.getStartDate();
         MessageListResponse response = messageService.getMessageList(request);
         String status = response.getMessageList().get(messageId).getStatus();
+        log.info("status" + status);
         if (status.equals("PENDING")) {
+            log.info("PENDING");
             throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_SENDING);
         } else if (status.equals("SENDING")) {
-            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
+            log.info("SENDING");
         } else if (status.equals("COMPLETE")) {
-            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
+            log.info("COMPLETE");
         } else if (status.equals("FAILED")) {
             log.warn("[COOL SMS] 메세지 발송에 실패하여 재시도 합니다.");
         }

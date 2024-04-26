@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import lombok.ToString;
 
 @Getter
 @AllArgsConstructor
+@ToString
 public class SmsCertCodeEntity {
     private String certificationCode;
     private String phoneNumber;
