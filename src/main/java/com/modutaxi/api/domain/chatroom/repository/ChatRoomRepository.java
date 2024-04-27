@@ -1,25 +1,15 @@
-package com.modutaxi.api.domain.chat.repository;
+package com.modutaxi.api.domain.chatroom.repository;
 
-import com.amazonaws.services.cloudformation.model.StackInstance;
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
-import com.modutaxi.api.domain.chat.service.RedisSubscriber;
-import com.modutaxi.api.domain.chatroom.ChatRoom;
-import com.modutaxi.api.domain.member.repository.RedisRTKRepository;
+import com.modutaxi.api.domain.chatroom.ChatInfo;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.PartialUpdate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -32,8 +22,11 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     private static final String USER_COUNT = "USER_COUNT"; // 유저 수
 
     private final RedisTemplate<String, String> redisTemplate;
+
+    private final RedisTemplate<String, ChatInfo> chatInfoRedisTemplate;
     private ValueOperations<String, String> valueOperations;
     private HashOperations<String, String, String> hashOperations;
+    private HashOperations<String, String, ChatInfo> chatInfoHashOperations;
 
 
 
@@ -42,24 +35,35 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
         classInstance = ChatRoomRepository.class;
         valueOperations = redisTemplate.opsForValue();
         hashOperations = redisTemplate.opsForHash();
+        chatInfoHashOperations = chatInfoRedisTemplate.opsForHash();
     }
 
-    public String findById(String sessionId) {
-        System.out.println("sessionId = " + sessionId);
+    // 멤버와 룸의 매핑.
+    public ChatInfo findChatInfoByMemberId(String memberId) {
+        if (memberId == null) {
+            return null;
+        }
+        return (ChatInfo) chatInfoHashOperations.get(ENTER_INFO, memberId);
+    }
+
+    public String findMemberBySessionId(String sessionId) {
         if (sessionId == null) {
             return null;
         }
-        return (String) valueOperations.get(ENTER_INFO + ":"+ sessionId);
+        return (String) hashOperations.get(ENTER_INFO, sessionId);
     }
 
-
-
-    public void setUserEnterInfo(String sessionId, String roomId){
-        hashOperations.put(ENTER_INFO, sessionId, roomId);
+    public void setUserEnterInfo(String memberId, ChatInfo chatInfo){
+        chatInfoHashOperations.put(ENTER_INFO, memberId, chatInfo);
     }
 
-    public void removeUserEnterInfo(String sessionId){
+    public void setUserInfo(String sessionId, String memberId){
+        hashOperations.put(ENTER_INFO, sessionId, memberId);
+    }
+
+    public void removeUserEnterInfo(String sessionId,String memberId){
         hashOperations.delete(ENTER_INFO,sessionId);
+        hashOperations.delete(ENTER_INFO,memberId);
     }
 
 

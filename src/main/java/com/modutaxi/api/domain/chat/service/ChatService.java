@@ -2,8 +2,6 @@ package com.modutaxi.api.domain.chat.service;
 
 import com.modutaxi.api.domain.chat.MessageType;
 import com.modutaxi.api.domain.chat.dto.ChatMessage;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
-import com.modutaxi.api.domain.chatroom.ChatRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
