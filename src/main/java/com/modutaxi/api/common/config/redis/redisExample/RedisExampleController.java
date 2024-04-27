@@ -1,5 +1,6 @@
 package com.modutaxi.api.common.config.redis.redisExample;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/redis")
 public class RedisExampleController {
     private final RedisExampleRepository redisExampleRepository;
+    @Hidden
     @GetMapping("/save/{key}/{value}")
     public String save(@PathVariable("key") String key, @PathVariable("value") String value) {
         RedisExampleDomain redisExampleDomain = new RedisExampleDomain();
@@ -20,6 +22,7 @@ public class RedisExampleController {
         return res;
     }
 
+    @Hidden
     @GetMapping("/get/{key}")
     public RedisExampleDomain get(@PathVariable("key") String key) {
         RedisExampleDomain res = redisExampleRepository.findById(key);
