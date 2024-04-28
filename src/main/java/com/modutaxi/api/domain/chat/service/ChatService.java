@@ -20,10 +20,8 @@ public class ChatService {
 
         if (chatMessage.getType().equals(MessageType.JOIN)) {
             chatMessage.setContent(chatMessage.getSender() + "님이 들어왔습니다.");
-            chatMessage.setSender("[알리미]");
         } else if (chatMessage.getType().equals(MessageType.LEAVE)) {
             chatMessage.setContent(chatMessage.getSender() + "님이 나갔습니다.");
-            chatMessage.setSender("[알리미]");
         }
         System.out.println("어디로갈까요? = " + channelTopic.getTopic() + chatMessage.getRoomId() );
 

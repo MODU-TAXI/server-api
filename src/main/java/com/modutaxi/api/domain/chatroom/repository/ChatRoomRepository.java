@@ -61,8 +61,11 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
         hashOperations.put(ENTER_INFO, sessionId, memberId);
     }
 
-    public void removeUserEnterInfo(String sessionId,String memberId){
+    public void removeUserBySessionIdEnterInfo(String sessionId){
         hashOperations.delete(ENTER_INFO,sessionId);
+    }
+
+    public void removeUserByMemberIdEnterInfo(String memberId){
         hashOperations.delete(ENTER_INFO,memberId);
     }
 
@@ -73,12 +76,12 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     }
 
     // 채팅방에 입장한 유저수 +1
-    public long plusUserCount(String roomId) {
-        return Optional.ofNullable(valueOperations.increment(USER_COUNT + "_" + roomId)).orElse(0L);
+    public long plusUserCount(String roomId, int count) {
+        return Optional.ofNullable(valueOperations.increment(USER_COUNT + "_" + roomId, count)).orElse(0L);
     }
 
     // 채팅방에 입장한 유저수 -1
-    public long minusUserCount(String roomId) {
-        return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId)).filter(count -> count > 0).orElse(0L);
+    public long minusUserCount(String roomId, int count) {
+        return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId, count)).orElse(0L);
     }
 }
