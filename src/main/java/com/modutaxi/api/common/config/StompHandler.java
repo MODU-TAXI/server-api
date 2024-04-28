@@ -82,7 +82,8 @@ public class StompHandler implements ChannelInterceptor {
 
 
             if(chatRoomRepository.findChatInfoByMemberId(memberId) != null){
-                System.out.println("이미 연결되어있잖아~ = ");
+                System.out.println("이미 연결되어있잖아~ 쉐끼야");
+                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
 //                chatRoomRepository.removeUserEnterInfo(sessionId);
             }
 
