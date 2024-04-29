@@ -1,6 +1,7 @@
 package com.modutaxi.api.common.s3;
 
 import com.modutaxi.api.common.s3.dto.S3Result;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,12 +20,14 @@ public class S3Controller {
 
     private final S3Service s3Service;
 
+    @Hidden
     @PostMapping
     public ResponseEntity<S3Result> uploadFile(@RequestPart(value = "file") MultipartFile file) {
         S3Result result = s3Service.uploadFile(file);
         return ResponseEntity.ok(result);
     }
 
+    @Hidden
     @DeleteMapping
     public ResponseEntity<String> deleteFile(@RequestParam String fileName) {
         s3Service.deleteFile(fileName);
