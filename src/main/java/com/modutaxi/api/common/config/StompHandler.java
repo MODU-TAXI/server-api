@@ -79,6 +79,7 @@ public class StompHandler implements ChannelInterceptor {
                 System.out.println("이미 연결되어있잖아~ 쉐끼야");
 //                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
                 chatRoomRepository.removeUserBySessionIdEnterInfo(sessionId);
+
                 chatRoomRepository.setUserInfo(sessionId, memberId);
             }
 
@@ -97,7 +98,7 @@ public class StompHandler implements ChannelInterceptor {
             System.out.println("Enter possible");
 
 
-            // 채팅방의 인원수 +1
+            // 채팅방의 인원수 체크
             chatRoomRepository.plusUserCount(roomId, count);
             System.out.println("userCount = " + chatRoomRepository.getUserCount(roomId));
 
@@ -110,8 +111,9 @@ public class StompHandler implements ChannelInterceptor {
             String memberId = chatRoomRepository.findMemberBySessionId(sessionId);
             ChatInfo chatInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
             int count = ChatNickName.valueOf(chatInfo.getNickname()).getValue();
+            System.out.println("count = " + count);
             chatRoomRepository.minusUserCount(chatInfo.getRoomId(), count);
-//            System.out.println("count : " + chatRoomRepository.getUserCount(roomId));
+
 
             // 클라이언트 퇴장 메시지 발송한다.
             ChatMessage chatMessage = new ChatMessage(Long.valueOf(chatInfo.getRoomId()), MessageType.LEAVE, "",
@@ -120,11 +122,9 @@ public class StompHandler implements ChannelInterceptor {
 
             chatService.sendChatMessage(chatMessage);
 
-            System.out.println("왜안돼??????"+memberId);
             // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제
             chatRoomRepository.removeUserBySessionIdEnterInfo(sessionId);
             chatRoomRepository.removeUserByMemberIdEnterInfo(memberId);
-
         }
 
         return message;

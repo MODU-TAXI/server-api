@@ -66,7 +66,7 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     }
 
     public void removeUserByMemberIdEnterInfo(String memberId){
-        hashOperations.delete(ENTER_INFO,memberId);
+        chatInfoHashOperations.delete(ENTER_INFO,memberId);
     }
 
 
