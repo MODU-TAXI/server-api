@@ -4,11 +4,12 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
-import com.modutaxi.api.domain.chat.MessageType;
-import com.modutaxi.api.domain.chat.dto.ChatMessage;
-import com.modutaxi.api.domain.chatroom.ChatInfo;
-import com.modutaxi.api.domain.chatroom.ChatNickName;
-import com.modutaxi.api.domain.chatroom.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
+import com.modutaxi.api.domain.chat.ChatNickName;
+import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class StompHandler implements ChannelInterceptor {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
+    private final ChatMessageService chatMessageService;
 
 
 
@@ -54,7 +56,6 @@ public class StompHandler implements ChannelInterceptor {
             //임시로 세션아이디와 멤버아이디를 매핑.
             //이렇게 해야 다시 SUB으로 갈 때 구독을 할 수 있음.
             chatRoomRepository.setUserInfo(sessionId, memberId);
-
         }
 
         //구독 요청
@@ -66,65 +67,47 @@ public class StompHandler implements ChannelInterceptor {
                 destination.lastIndexOf('/') == -1 ? null
                     : destination.substring(destination.lastIndexOf("/") + 1);
 
+            String memberId = chatRoomRepository.findMemberBySessionId(sessionId);
+
+            ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
+
             //roomId가 안들어왔으면 컷
             if (roomId == null) {
                 throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
             }
 
-            //memberId 가져오기
-            String memberId = chatRoomRepository.findMemberBySessionId(sessionId);
-
-
-            if(chatRoomRepository.findChatInfoByMemberId(memberId) != null){
-                System.out.println("이미 연결되어있잖아~ 쉐끼야");
-//                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
-                chatRoomRepository.removeUserBySessionIdEnterInfo(sessionId);
-
-                chatRoomRepository.setUserInfo(sessionId, memberId);
+            //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 컷
+            //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
+            if (chatRoomMappingInfo != null && !roomId.equals(chatRoomMappingInfo.getRoomId())) {
+                System.out.println("어딜 또 들어가려 해~ 들어가있는 방 들어가~");
+                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
             }
 
-            String nickName = setNickName(roomId);
-            System.out.println("nickName = " + nickName);
+
+            String nickName = chatRoomMappingInfo != null ? chatRoomMappingInfo.getNickname() : setNickName(roomId);
             int count = ChatNickName.valueOf(nickName).getValue();
-
-            ChatInfo chatInfo = new ChatInfo(roomId, nickName);
-
-            // 채팅방 연관관계 설정
-            chatRoomRepository.setUserEnterInfo(memberId, chatInfo);
 
             if (chatRoomRepository.getUserCount(roomId) >= 15) {
                 throw new BaseException(ChatErrorCode.FULL_CHAT_ROOM);
             }
-            System.out.println("Enter possible");
 
+            chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
+            chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
 
             // 채팅방의 인원수 체크
             chatRoomRepository.plusUserCount(roomId, count);
-            System.out.println("userCount = " + chatRoomRepository.getUserCount(roomId));
 
-            chatService.sendChatMessage(new ChatMessage(Long.valueOf(roomId),MessageType.JOIN,"",
-                    chatInfo.getNickname(),""));
+
+            chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
+                    chatRoomMappingInfo.getNickname(),""));
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = (String) accessor.getSessionId();
-            String memberId = chatRoomRepository.findMemberBySessionId(sessionId);
-            ChatInfo chatInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
-            int count = ChatNickName.valueOf(chatInfo.getNickname()).getValue();
-            System.out.println("count = " + count);
-            chatRoomRepository.minusUserCount(chatInfo.getRoomId(), count);
-
-
-            // 클라이언트 퇴장 메시지 발송한다.
-            ChatMessage chatMessage = new ChatMessage(Long.valueOf(chatInfo.getRoomId()), MessageType.LEAVE, "",
-                chatInfo.getNickname(), "");
-
-
-            chatService.sendChatMessage(chatMessage);
-
-            // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제
+            // 세션에 대한 정보 삭제
             chatRoomRepository.removeUserBySessionIdEnterInfo(sessionId);
-            chatRoomRepository.removeUserByMemberIdEnterInfo(memberId);
+            //웹소켓은 끊기면 걍 끊긴거다~
+            //대신 방 정보 매핑 삭제는 따로 API 호출을 해주어야 하는 것~
         }
 
         return message;
