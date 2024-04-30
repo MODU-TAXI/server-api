@@ -1,6 +1,6 @@
-package com.modutaxi.api.domain.chat.dto;
+package com.modutaxi.api.domain.chatmessage.dto;
 
-import com.modutaxi.api.domain.chat.MessageType;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatMessage {
+public class ChatMessageRequestDto {
     private Long roomId;
     private MessageType type;
     private String content;

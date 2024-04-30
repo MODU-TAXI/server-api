@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.chat;
+package com.modutaxi.api.domain.chatmessage.entity;
 
 public enum MessageType {
     JOIN,
