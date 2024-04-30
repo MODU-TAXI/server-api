@@ -49,32 +49,17 @@ public class JwtTokenProvider {
     }
 
     /**
-     * memberId가 적힌 클레임을 넘겨 받아 AccessToken 생성
+     * memberId가 적힌 클레임을 넘겨 받아 Token 생성
      */
-    public String generateAccessToken(Claims claims) {
+    public String generateToken(Claims claims, Long duration, String secretKey) {
         Date now = new Date();
-        Date accessTokenExpirationTime = new Date(now.getTime() + TOKEN_VALID_TIME);
+        Date accessTokenExpirationTime = new Date(now.getTime() + duration);
 
         return Jwts.builder()
                 .setClaims(claims)  // 정보 저장
                 .setIssuedAt(now)   // 토큰 발행 시간 정보
-                .setExpiration(accessTokenExpirationTime)   // 리프레시 토큰 만료 시간 설정
-                .signWith(SignatureAlgorithm.HS256, jwtSecretKey)   // 전자 서명
-                .compact();
-    }
-
-    /**
-     * memberId가 적힌 클레임을 넘겨 받아 RefreshToken 생성
-     */
-    public String generateRefreshToken(Claims claims) {
-        Date now = new Date();
-        Date refreshTokenExpirationTime = new Date(now.getTime() + REF_TOKEN_VALID_TIME);
-
-        return Jwts.builder()
-                .setClaims(claims)  // 정보 저장
-                .setIssuedAt(now)   // 토큰 발행 시간 정보
-                .setExpiration(refreshTokenExpirationTime)  // 리프레시 토큰 만료 시간 설정
-                .signWith(SignatureAlgorithm.HS256, refreshSecretKey)   // 전자 서명
+                .setExpiration(accessTokenExpirationTime)   // 토큰 만료 시간 설정
+                .signWith(SignatureAlgorithm.HS256, secretKey)   // 전자 서명
                 .compact();
     }
 
@@ -85,8 +70,8 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims();
         claims.put("memberId", memberId);
 
-        String accessToken = generateAccessToken(claims);
-        String refreshToken = generateRefreshToken(claims);
+        String accessToken = generateToken(claims, TOKEN_VALID_TIME, jwtSecretKey);
+        String refreshToken = generateToken(claims, REF_TOKEN_VALID_TIME, refreshSecretKey);
 
         // 레디스에 저장
         redisRTKRepository.save(memberId, refreshToken, REF_TOKEN_VALID_TIME);
@@ -98,7 +83,7 @@ public class JwtTokenProvider {
      * AccessToken으로 사용자 정보 인증하고 Authentication 객체를 반환하는 함수
      */
     public Authentication getAccessAuthentication(String token) {
-        return getAuthentication(getMemberIdByAccessToken(token));
+        return getAuthentication(getMemberIdByToken(token, jwtSecretKey));
     }
 
     /**
@@ -106,7 +91,7 @@ public class JwtTokenProvider {
      */
     public Authentication getRefreshAuthentication(String token) {
         // refreshToken 에서 memberId 빼내서 redis 검색
-        String memberId = getMemberIdByRefreshToken(token);
+        String memberId = getMemberIdByToken(token, refreshSecretKey);
         String refreshToken = redisRTKRepository.findAndDeleteById(memberId);
         if (refreshToken == null || !Objects.equals(token, refreshToken)) { // 검색 실패
             throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
@@ -170,22 +155,12 @@ public class JwtTokenProvider {
     }
 
     /**
-     * AccessToken 에서 memberId를 추출하는 함수
+     * Token 에서 memberId를 추출하는 함수
      *
      * @return memberId (String)
      */
-    public String getMemberIdByAccessToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).
-                getBody().get("memberId").toString();
-    }
-
-    /**
-     * AccessToken 에서 memberId를 추출하는 함수
-     *
-     * @return memberId (String)
-     */
-    public String getMemberIdByRefreshToken(String token) {
-        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).
+    public String getMemberIdByToken(String token, String secretKey) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).
                 getBody().get("memberId").toString();
     }
 
@@ -211,7 +186,7 @@ public class JwtTokenProvider {
      * 로그아웃 처리
      */
     public void logout(String token) {
-        String memberId = getMemberIdByAccessToken(token);
+        String memberId = getMemberIdByToken(token, jwtSecretKey);
         // ATK 블랙 리스트 처리
         setBlackList(token);
         // RTK 레디스에서 제거
@@ -242,6 +217,9 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
     }
 
+    /**
+     * ATK 가 블랙리스트에 있는지 확인 후 boolean 반환
+     */
     private boolean validateBlacklist(String token) {
         return redisATKRepository.existsById(token);
     }
