@@ -1,9 +1,8 @@
-package com.modutaxi.api.domain.chatroom.repository;
+package com.modutaxi.api.domain.chat.repository;
 
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
-import com.modutaxi.api.domain.chatroom.ChatInfo;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 import java.io.Serializable;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +22,10 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private final RedisTemplate<String, ChatInfo> chatInfoRedisTemplate;
+    private final RedisTemplate<String, ChatRoomMappingInfo> chatInfoRedisTemplate;
     private ValueOperations<String, String> valueOperations;
     private HashOperations<String, String, String> hashOperations;
-    private HashOperations<String, String, ChatInfo> chatInfoHashOperations;
+    private HashOperations<String, String, ChatRoomMappingInfo> chatInfoHashOperations;
 
 
 
@@ -39,11 +38,11 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     }
 
     // 멤버와 룸의 매핑.
-    public ChatInfo findChatInfoByMemberId(String memberId) {
+    public ChatRoomMappingInfo findChatInfoByMemberId(String memberId) {
         if (memberId == null) {
             return null;
         }
-        return (ChatInfo) chatInfoHashOperations.get(ENTER_INFO, memberId);
+        return (ChatRoomMappingInfo) chatInfoHashOperations.get(ENTER_INFO, memberId);
     }
 
     public String findMemberBySessionId(String sessionId) {
@@ -53,8 +52,8 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
         return (String) hashOperations.get(ENTER_INFO, sessionId);
     }
 
-    public void setUserEnterInfo(String memberId, ChatInfo chatInfo){
-        chatInfoHashOperations.put(ENTER_INFO, memberId, chatInfo);
+    public void setUserEnterInfo(String memberId, ChatRoomMappingInfo chatRoomMappingInfo){
+        chatInfoHashOperations.put(ENTER_INFO, memberId, chatRoomMappingInfo);
     }
 
     public void setUserInfo(String sessionId, String memberId){

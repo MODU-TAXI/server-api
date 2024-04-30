@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.chatroom;
+package com.modutaxi.api.domain.chat;
 
 public enum ChatNickName {
     MASTER,

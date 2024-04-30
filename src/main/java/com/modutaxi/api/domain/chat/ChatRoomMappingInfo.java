@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.chatroom;
+package com.modutaxi.api.domain.chat;
 
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatInfo implements Serializable {
+public class ChatRoomMappingInfo implements Serializable {
     private String roomId;
     private String nickname;
 }
