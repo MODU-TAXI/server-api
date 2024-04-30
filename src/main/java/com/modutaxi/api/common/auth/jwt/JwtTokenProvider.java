@@ -18,26 +18,23 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    @Value("${jwt.jwt-key}")
-    private String jwtSecretKey;
-    @Value("${jwt.refresh-key}")
-    private String refreshSecretKey;
-
-    private final PrincipalDetailsService principalDetailsService;
     private static final String AUTHORIZATION_HEADER = "Authorization"; // 액세스 토큰 헤더 key name
     private static final String REFRESH_HEADER = "refreshToken";  // 리프레시 토큰 헤더 key name
     private static final long TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 유효기간 1시간
     private static final long REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 유효기간 일주일
-    private static final long TEMP_TOKEN_VALID_TIME = 1000 * 60L * 60L;  // 임시 유효기간! -> 1시
-    private static final long TEMP_REF_TOKEN_VALID_TIME = 1000 * 60L * 60L * 24L * 7L;  // 임시 유효기간! > 일주일
 
+    private final PrincipalDetailsService principalDetailsService;
     private final RedisRTKRepositoryImpl redisRTKRepository;
+
+    @Value("${jwt.key.access-token}")
+    private String jwtSecretKey;
+    @Value("${jwt.key.refresh-token}")
+    private String refreshSecretKey;
 
     /**
      * 의존성 주입 후 (호출 없어도) 오직 1번만 초기화 수행
@@ -53,45 +50,43 @@ public class JwtTokenProvider {
      */
     public String generateAccessToken(Claims claims) {
         Date now = new Date();
-        Date accessTokenExpirationTime = new Date(now.getTime() + TEMP_TOKEN_VALID_TIME);
+        Date accessTokenExpirationTime = new Date(now.getTime() + TOKEN_VALID_TIME);
 
         return Jwts.builder()
-            .setClaims(claims)  // 정보 저장
-            .setIssuedAt(now)   // 토큰 발행 시간 정보
-            .setExpiration(accessTokenExpirationTime)   // 리프레시 토큰 만료 시간 설정
-            .signWith(SignatureAlgorithm.HS256, jwtSecretKey)   // 전자 서명
-            .compact();
+                .setClaims(claims)  // 정보 저장
+                .setIssuedAt(now)   // 토큰 발행 시간 정보
+                .setExpiration(accessTokenExpirationTime)   // 리프레시 토큰 만료 시간 설정
+                .signWith(SignatureAlgorithm.HS256, jwtSecretKey)   // 전자 서명
+                .compact();
     }
 
     /**
-     * random UUID가 적힌 클레임을 넘겨 받아 RefreshToken 생성
+     * memberId가 적힌 클레임을 넘겨 받아 RefreshToken 생성
      */
     public String generateRefreshToken(Claims claims) {
         Date now = new Date();
-        Date refreshTokenExpirationTime = new Date(now.getTime() + TEMP_REF_TOKEN_VALID_TIME);
+        Date refreshTokenExpirationTime = new Date(now.getTime() + REF_TOKEN_VALID_TIME);
 
         return Jwts.builder()
-            .setClaims(claims)  // 정보 저장
-            .setIssuedAt(now)   // 토큰 발행 시간 정보
-            .setExpiration(refreshTokenExpirationTime)  // 리프레시 토큰 만료 시간 설정
-            .signWith(SignatureAlgorithm.HS256, refreshSecretKey)   // 전자 서명
-            .compact();
+                .setClaims(claims)  // 정보 저장
+                .setIssuedAt(now)   // 토큰 발행 시간 정보
+                .setExpiration(refreshTokenExpirationTime)  // 리프레시 토큰 만료 시간 설정
+                .signWith(SignatureAlgorithm.HS256, refreshSecretKey)   // 전자 서명
+                .compact();
     }
 
     /**
      * memberId로 AccessToken, RefreshToken 생성 후 리턴
      */
     public TokenResponse generateToken(Long memberId) {
-        // ATK에는 memberId를 담음
-        Claims atkClaims = Jwts.claims();
-        atkClaims.put("memberId", memberId);
-        // RTK에는 random UUID를 담음
-        Claims rtkClaims = Jwts.claims();
-        rtkClaims.put("memberId", UUID.randomUUID());
+        Claims claims = Jwts.claims();
+        claims.put("memberId", memberId);
 
-        String accessToken = generateAccessToken(atkClaims);
-        String refreshToken = generateRefreshToken(rtkClaims);
-        redisRTKRepository.save(refreshToken, memberId); // 레디스에 저장
+        String accessToken = generateAccessToken(claims);
+        String refreshToken = generateRefreshToken(claims);
+
+        // 레디스에 저장
+        redisRTKRepository.save(memberId, refreshToken, REF_TOKEN_VALID_TIME);
 
         return new TokenResponse(accessToken, refreshToken);
     }
@@ -107,14 +102,18 @@ public class JwtTokenProvider {
      * RefreshToken으로 사용자 정보 인증하고 Authentication 객체를 반환하는 함수
      */
     public Authentication getRefreshAuthentication(String token) {
-        String memberId = redisRTKRepository.findAndDeleteById(token);
-        if(memberId == null) {
+        // refreshToken 에서 memberId 빼내서 redis 검색
+        String memberId = getMemberIdByRefreshToken(token);
+        String refreshToken = redisRTKRepository.findAndDeleteById(memberId);
+        if (refreshToken == null) { // 검색 실패
             throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
-        } return getAuthentication(memberId);
+        }
+        return getAuthentication(memberId);
     }
 
     /**
      * 추출한 memberId로 사용자 정보를 인증하고 Authentication 객체를 반환하는 함수
+     *
      * @param memberId (String)
      * @return 권한과 사용자 정보를 담은 Authentication 객체
      */
@@ -122,9 +121,9 @@ public class JwtTokenProvider {
         try {
             // 헤더에서 추출한 memberId를 실제 DB에서 조회하여 사용자 정보 확인
             PrincipalDetails principalDetails
-                = principalDetailsService.loadUserByUsername(memberId);
+                    = principalDetailsService.loadUserByUsername(memberId);
             return new UsernamePasswordAuthenticationToken(principalDetails,
-                "", principalDetails.getAuthorities());
+                    "", principalDetails.getAuthorities());
         } catch (UsernameNotFoundException exception) {
             throw new BaseException(AuthErrorCode.UNSUPPORTED_JWT);
         }
@@ -170,7 +169,17 @@ public class JwtTokenProvider {
      */
     public String getMemberIdByAccessToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).
-            getBody().get("memberId").toString();
+                getBody().get("memberId").toString();
+    }
+
+    /**
+     * AccessToken 에서 memberId를 추출하는 함수
+     *
+     * @return memberId (String)
+     */
+    public String getMemberIdByRefreshToken(String token) {
+        return Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(token).
+                getBody().get("memberId").toString();
     }
 
     /**
