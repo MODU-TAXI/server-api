@@ -73,20 +73,24 @@ public class GetRoomController {
     @GetMapping("/map")
     @Operation(
             summary = "원형 영역 내 방 조회",
-            description = "조회 위치 요청 반경의 원형 내 방을 조회합니다.<br>조회하려는 구역의 반경 크기와 조회하려는 longitude(경도), latitude(위도)를 입력해주세요.<br>방 id와 longitude:경도, latitude:위도, 거점명을 반환합니다."
+            description = "조회 위치 요청 반경의 원형 내 방을 조회합니다.<br>조회하려는 구역의 반경 크기와 조회하려는 longitude(경도), latitude(위도)를 입력해주세요. 특정 거점을 목적지로 하는 방을 조회하려면 spotId을 함께 보내주세요.<br>방 id와 longitude:경도, latitude:위도, 거점명을 반환합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchWithRadiusResponses.class))),
     })
     public ResponseEntity<SearchWithRadiusResponses> getRadiusRooms(
+            @Parameter(description = "거점 id")
+            @RequestParam(value = "spotId", required = false) Long spotId,
             @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m")
             @RequestParam(value = "radius", defaultValue = "500", required = false) Long radius,
+            @Parameter(description = "경도")
             @RequestParam(value = "longitude") Float longitude,
+            @Parameter(description = "위도")
             @RequestParam(value = "latitude") Float latitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(longitude, latitude);
         Point point = geometryFactory.createPoint(coordinate);
-        return ResponseEntity.ok(getRoomService.getRadiusRooms(point, radius));
+        return ResponseEntity.ok(getRoomService.getRadiusRooms(spotId, point, radius));
     }
 }

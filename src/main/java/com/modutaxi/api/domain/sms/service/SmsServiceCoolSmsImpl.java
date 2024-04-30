@@ -103,9 +103,8 @@ public class SmsServiceCoolSmsImpl implements SmsService {
         if (status.equals("PENDING")) {
             throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_SENDING);
         } else if (status.equals("SENDING")) {
-            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
+            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_SENDING);
         } else if (status.equals("COMPLETE")) {
-            throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
         } else if (status.equals("FAILED")) {
             log.warn("[COOL SMS] 메세지 발송에 실패하여 재시도 합니다.");
         }
