@@ -5,6 +5,7 @@ import com.modutaxi.api.common.auth.PrincipalDetailsService;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.repository.RedisATKRepositoryImpl;
 import com.modutaxi.api.domain.member.repository.RedisRTKRepositoryImpl;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 import java.util.Date;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -30,10 +32,11 @@ public class JwtTokenProvider {
 
     private final PrincipalDetailsService principalDetailsService;
     private final RedisRTKRepositoryImpl redisRTKRepository;
+    private final RedisATKRepositoryImpl redisATKRepository;
 
-    @Value("${jwt.key.access-token}")
+    @Value("${jwt.jwt-key}")
     private String jwtSecretKey;
-    @Value("${jwt.key.refresh-token}")
+    @Value("${jwt.refresh-key}")
     private String refreshSecretKey;
 
     /**
@@ -105,7 +108,7 @@ public class JwtTokenProvider {
         // refreshToken 에서 memberId 빼내서 redis 검색
         String memberId = getMemberIdByRefreshToken(token);
         String refreshToken = redisRTKRepository.findAndDeleteById(memberId);
-        if (refreshToken == null) { // 검색 실패
+        if (refreshToken == null || !Objects.equals(token, refreshToken)) { // 검색 실패
             throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
         }
         return getAuthentication(memberId);
@@ -152,6 +155,9 @@ public class JwtTokenProvider {
     public void validateToken(String key, String token) {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+            if (validateBlacklist(token)) {
+                throw new BaseException(AuthErrorCode.LOGOUT_JWT);
+            }
         } catch (SecurityException | MalformedJwtException e) {
             throw new BaseException(AuthErrorCode.INVALID_JWT);
         } catch (ExpiredJwtException e) {
@@ -165,6 +171,7 @@ public class JwtTokenProvider {
 
     /**
      * AccessToken 에서 memberId를 추출하는 함수
+     *
      * @return memberId (String)
      */
     public String getMemberIdByAccessToken(String token) {
@@ -184,6 +191,7 @@ public class JwtTokenProvider {
 
     /**
      * 헤더에서 AUTHORIZATION_HEADER key의 value에 해당하는 AccessToken을 추출
+     *
      * @return AccessToken (String)
      */
     public String resolveAccessToken(HttpServletRequest request) {
@@ -192,10 +200,49 @@ public class JwtTokenProvider {
 
     /**
      * 헤더에서 REFRESH_HEADER key의 value에 해당하는 RefreshToken을 추출
+     *
      * @return RefreshToken (String)
      */
     public String resolveRefreshToken(HttpServletRequest request) {
         return request.getHeader(REFRESH_HEADER);
     }
 
+    /**
+     * 로그아웃 처리
+     */
+    public void logout(String token) {
+        String memberId = getMemberIdByAccessToken(token);
+        // ATK 블랙 리스트 처리
+        setBlackList(token);
+        // RTK 레디스에서 제거
+        redisRTKRepository.findAndDeleteById(memberId);
+    }
+
+    /**
+     * 해당 token의 남은 시간을 유효 시간으로, 블랙리스트에 토큰 저장
+     */
+    private void setBlackList(String token) {
+        Long expiration = getExpiration(token);
+        redisATKRepository.save(token, expiration);
+    }
+
+    /**
+     * 해당 token 의 남은 유효 시간을 반환
+     */
+    private Long getExpiration(String token) {
+        Date expiredDate = extractClaims(jwtSecretKey, token).getExpiration();
+        long now = new Date().getTime();    // 현재 시간
+        return (expiredDate.getTime() - now);
+    }
+
+    /**
+     * key, token 을 이용하여 Claims 추출
+     */
+    private Claims extractClaims(String key, String token) {
+        return Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
+    }
+
+    private boolean validateBlacklist(String token) {
+        return redisATKRepository.existsById(token);
+    }
 }
