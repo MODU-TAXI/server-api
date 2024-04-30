@@ -55,14 +55,18 @@ public class ChatController {
         return ResponseEntity.ok(chatService.chatRoomEnterPossible(member, roomId));
     }
 
+    @Operation(summary = "채팅 정보")
+    @GetMapping("/chat-info")
+    public ResponseEntity<Long> getChatRoomMappingInfo(@CurrentMember Member member){
+        return ResponseEntity.ok(chatService.getChatRoomInfo(member));
+    }
 
-    /**
-     * 채팅방 매핑정보 삭제 -> 해당 로직은 퇴장 시 이뤄짐.
-     */
     @Operation(summary = "채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
-    @DeleteMapping("/chat")
+    @DeleteMapping("/chat-info")
     public ResponseEntity<String> deleteChatRoomInfo(@CurrentMember Member member) {
         return ResponseEntity.ok(chatService.deleteChatRoomInfo(member));
     }
+
+
 
 }

@@ -67,7 +67,14 @@ public class ChatService {
             return "인원 꽉 찼슈";
         }
 
-
         return "참가가능";
+    }
+
+    public Long getChatRoomInfo(Member member){
+        ChatRoomMappingInfo chatInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+        if(chatInfo == null){
+            return -1L;
+        }
+        return Long.valueOf(chatInfo.getRoomId());
     }
 }
