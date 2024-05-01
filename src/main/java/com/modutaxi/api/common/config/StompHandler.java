@@ -91,11 +91,12 @@ public class StompHandler implements ChannelInterceptor {
                 throw new BaseException(ChatErrorCode.FULL_CHAT_ROOM);
             }
 
-            chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
-            chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
-
-            // 채팅방의 인원수 체크
-            chatRoomRepository.plusUserCount(roomId, count);
+            if(chatRoomMappingInfo == null){
+                chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
+                chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
+                // 채팅방의 인원수 체크
+                chatRoomRepository.plusUserCount(roomId, count);
+            }
 
 
             chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",

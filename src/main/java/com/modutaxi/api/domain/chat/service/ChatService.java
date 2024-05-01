@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.chat.service;
 
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -38,8 +39,11 @@ public class ChatService {
 
     public String deleteChatRoomInfo(Member member){
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
-        int count = ChatNickName.valueOf(chatRoomMappingInfo.getNickname()).getValue();
+        if(chatRoomMappingInfo == null){
+            throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
+        }
 
+        int count = ChatNickName.valueOf(chatRoomMappingInfo.getNickname()).getValue();
         // 클라이언트 퇴장 메시지 발송한다.
         ChatMessageRequestDto chatMessageRequestDto = new ChatMessageRequestDto(Long.valueOf(
                 chatRoomMappingInfo.getRoomId()), MessageType.LEAVE, "",
@@ -49,8 +53,6 @@ public class ChatService {
 
         chatRoomRepository.removeUserByMemberIdEnterInfo(member.getId().toString());
         chatRoomRepository.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
-
-
 
         return "매핑 정보가 삭제 되었습니다.";
     }
