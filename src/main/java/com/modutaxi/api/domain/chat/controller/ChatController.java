@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.chat.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
 import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
@@ -57,11 +58,11 @@ public class ChatController {
 
     @Operation(summary = "채팅 정보")
     @GetMapping("/chat-info")
-    public ResponseEntity<Long> getChatRoomMappingInfo(@CurrentMember Member member){
+    public ResponseEntity<ChatMappingResponse> getChatRoomMappingInfo(@CurrentMember Member member){
         return ResponseEntity.ok(chatService.getChatRoomInfo(member));
     }
 
-    @Operation(summary = "채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
+    @Operation(summary = "퇴장!! 채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
     @DeleteMapping("/chat-info")
     public ResponseEntity<String> deleteChatRoomInfo(@CurrentMember Member member) {
         return ResponseEntity.ok(chatService.deleteChatRoomInfo(member));

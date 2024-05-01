@@ -1,4 +1,4 @@
-package com.modutaxi.api.common.config;
+package com.modutaxi.api.common.config.websocket;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
@@ -13,6 +13,7 @@ import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -20,15 +21,15 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ChatRoomRepository chatRoomRepository;
-    private final MemberRepository memberRepository;
     private final ChatService chatService;
-    private final ChatMessageService chatMessageService;
+//    private final StompErrorHandler stompErrorHandler;
 
 
 
@@ -36,7 +37,6 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
         System.out.println("---------------------------------------");
         System.out.println("Command: " + accessor.getCommand());
         System.out.println("Destination: " + accessor.getDestination());
@@ -79,7 +79,6 @@ public class StompHandler implements ChannelInterceptor {
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 컷
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
             if (chatRoomMappingInfo != null && !roomId.equals(chatRoomMappingInfo.getRoomId())) {
-                System.out.println("어딜 또 들어가려 해~ 들어가있는 방 들어가~");
                 throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
             }
 
@@ -96,10 +95,8 @@ public class StompHandler implements ChannelInterceptor {
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
                 chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
-                        chatRoomMappingInfo.getNickname(),""));
+                        chatRoomMappingInfo.getNickname(),memberId));
             }
-
-
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {

@@ -1,8 +1,11 @@
 package com.modutaxi.api.domain.chat.service;
 
+import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
@@ -23,6 +26,7 @@ public class ChatService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final RoomRepository roomRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     /**
      * 채팅방에 메시지 발송할 수 있도록
      */
@@ -33,8 +37,11 @@ public class ChatService {
         } else if (chatMessageRequestDto.getType().equals(MessageType.LEAVE)) {
             chatMessageRequestDto.setContent(chatMessageRequestDto.getSender() + "님이 나갔습니다.");
         }
+        String memberId = chatMessageRequestDto.getType().equals(MessageType.LEAVE) ? chatMessageRequestDto.getToken()
+                : jwtTokenProvider.getMemberIdByAccessToken(chatMessageRequestDto.getToken());;
 
-        redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessageRequestDto);
+        redisTemplate.convertAndSend(channelTopic.getTopic(),
+                ChatMessageResponseDto.requestDtoToResponseDto(chatMessageRequestDto, memberId));
     }
 
     public String deleteChatRoomInfo(Member member){
@@ -47,7 +54,7 @@ public class ChatService {
         // 클라이언트 퇴장 메시지 발송한다.
         ChatMessageRequestDto chatMessageRequestDto = new ChatMessageRequestDto(Long.valueOf(
                 chatRoomMappingInfo.getRoomId()), MessageType.LEAVE, "",
-                chatRoomMappingInfo.getNickname(), "");
+                chatRoomMappingInfo.getNickname(), member.getId().toString());
 
         sendChatMessage(chatMessageRequestDto);
 
@@ -72,11 +79,11 @@ public class ChatService {
         return "참가가능";
     }
 
-    public Long getChatRoomInfo(Member member){
+    public ChatMappingResponse getChatRoomInfo(Member member){
         ChatRoomMappingInfo chatInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
         if(chatInfo == null){
-            return -1L;
+            return new ChatMappingResponse("null",member.getId().toString());
         }
-        return Long.valueOf(chatInfo.getRoomId());
+        return new ChatMappingResponse(chatInfo.getRoomId(),member.getId().toString());
     }
 }

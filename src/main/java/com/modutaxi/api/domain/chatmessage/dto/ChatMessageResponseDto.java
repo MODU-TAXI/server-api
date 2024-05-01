@@ -14,13 +14,24 @@ public class ChatMessageResponseDto {
     private MessageType messageType;
     private String content;
     private String sender;
+    private String memberId;
 
-    public static ChatMessageResponseDto toDto(ChatMessage chatMessage) {
+    public static ChatMessageResponseDto entityToDto(ChatMessage chatMessage) {
         return ChatMessageResponseDto.builder()
                 .roomId(chatMessage.getRoom().getId())
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sender(chatMessage.getSender())
+                .build();
+    }
+
+    public static ChatMessageResponseDto requestDtoToResponseDto(ChatMessageRequestDto chatMessageRequestDto, String memberId) {
+        return ChatMessageResponseDto.builder()
+                .roomId(chatMessageRequestDto.getRoomId())
+                .messageType(chatMessageRequestDto.getType())
+                .content(chatMessageRequestDto.getContent())
+                .sender(chatMessageRequestDto.getSender())
+                .memberId(memberId)
                 .build();
     }
 }

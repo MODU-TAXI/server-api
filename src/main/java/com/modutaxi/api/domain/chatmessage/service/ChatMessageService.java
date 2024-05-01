@@ -15,7 +15,7 @@ public class ChatMessageService {
     public List<ChatMessageResponseDto> chatMessageResponseDtoList(Member member, Long roomId){
         List<ChatMessage> chatMessageList = chatMessageRepository.findAllByRoomIdOrderByCreatedAtAsc(roomId);
         return chatMessageList.stream()
-                .map(ChatMessageResponseDto::toDto)
+                .map(ChatMessageResponseDto::entityToDto)
                 .toList();
     }
 

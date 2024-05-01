@@ -1,4 +1,4 @@
-package com.modutaxi.api.common.config;
+package com.modutaxi.api.common.config.websocket;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -13,11 +13,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompHandler stompHandler;
+//    private final StompErrorHandler stompErrorHandler;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
         registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*");
+//        registry.setErrorHandler(stompErrorHandler);
     }
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
