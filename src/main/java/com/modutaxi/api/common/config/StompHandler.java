@@ -83,7 +83,6 @@ public class StompHandler implements ChannelInterceptor {
                 throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
             }
 
-
             String nickName = chatRoomMappingInfo != null ? chatRoomMappingInfo.getNickname() : setNickName(roomId);
             int count = ChatNickName.valueOf(nickName).getValue();
 
@@ -96,11 +95,11 @@ public class StompHandler implements ChannelInterceptor {
                 chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
+                chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
+                        chatRoomMappingInfo.getNickname(),""));
             }
 
 
-            chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
-                    chatRoomMappingInfo.getNickname(),""));
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
