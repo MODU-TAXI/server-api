@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.chatmessage.dto;
 
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class ChatMessageResponseDto {
     private String content;
     private String sender;
     private String memberId;
+    private LocalDateTime dateTime;
 
     public static ChatMessageResponseDto entityToDto(ChatMessage chatMessage) {
         return ChatMessageResponseDto.builder()
@@ -32,6 +34,7 @@ public class ChatMessageResponseDto {
                 .content(chatMessageRequestDto.getContent())
                 .sender(chatMessageRequestDto.getSender())
                 .memberId(memberId)
+                .dateTime(LocalDateTime.now())
                 .build();
     }
 }
