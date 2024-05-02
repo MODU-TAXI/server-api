@@ -4,6 +4,7 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
+import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
@@ -12,6 +13,8 @@ import com.modutaxi.api.domain.chat.ChatNickName;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -29,6 +32,7 @@ public class StompHandler implements ChannelInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
+    private final RoomRepository roomRepository;
 //    private final StompErrorHandler stompErrorHandler;
 
 
@@ -75,6 +79,10 @@ public class StompHandler implements ChannelInterceptor {
             if (roomId == null) {
                 throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
             }
+
+            //없는 방 연결하려 할 때 예외
+            Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
+                    () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 컷
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
