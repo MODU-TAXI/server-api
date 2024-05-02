@@ -5,7 +5,7 @@ plugins {
 }
 
 jar {
-   enabled = false
+    enabled = false
 }
 
 group = 'com.modu-taxi'
@@ -82,6 +82,9 @@ dependencies {
 
     //Cool SMS
     implementation 'net.nurigo:sdk:4.2.7'
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
