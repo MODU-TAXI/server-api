@@ -24,6 +24,8 @@ public class ChatMessageResponseDto {
                 .messageType(chatMessage.getMessageType())
                 .content(chatMessage.getContent())
                 .sender(chatMessage.getSender())
+                .memberId(chatMessage.getMemberId())
+                .dateTime(chatMessage.getDateTime())
                 .build();
     }
 
@@ -34,7 +36,7 @@ public class ChatMessageResponseDto {
                 .content(chatMessageRequestDto.getContent())
                 .sender(chatMessageRequestDto.getSender())
                 .memberId(chatMessageRequestDto.getMemberId())
-                .dateTime(LocalDateTime.now())
+                .dateTime(chatMessageRequestDto.getDateTime())
                 .build();
     }
 }

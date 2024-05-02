@@ -1,6 +1,5 @@
 package com.modutaxi.api.domain.chat.service;
 
-import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
@@ -14,6 +13,7 @@ import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -26,7 +26,6 @@ public class ChatService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final RoomRepository roomRepository;
-    private final JwtTokenProvider jwtTokenProvider;
     /**
      * 채팅방에 메시지 발송할 수 있도록
      */
@@ -61,7 +60,7 @@ public class ChatService {
         // 클라이언트 퇴장 메시지 발송한다.
         ChatMessageRequestDto chatMessageRequestDto = new ChatMessageRequestDto(Long.valueOf(
                 chatRoomMappingInfo.getRoomId()), MessageType.LEAVE, "",
-                chatRoomMappingInfo.getNickname(), member.getId().toString());
+                chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now());
 
         sendChatMessage(chatMessageRequestDto);
 

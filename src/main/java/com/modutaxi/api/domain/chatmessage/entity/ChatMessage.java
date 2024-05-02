@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PersistenceUnit;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +38,8 @@ public class ChatMessage extends BaseTime {
 
     private String memberId;
 
+    private LocalDateTime dateTime;
+
     public static ChatMessage toEntity(ChatMessageRequestDto messageRequestDto, Room room){
         return ChatMessage.builder()
                 .room(room)
@@ -44,6 +47,7 @@ public class ChatMessage extends BaseTime {
                 .content(messageRequestDto.getContent())
                 .sender(messageRequestDto.getSender())
                 .memberId(messageRequestDto.getMemberId())
+                .dateTime(messageRequestDto.getDateTime())
                 .build();
     }
 }

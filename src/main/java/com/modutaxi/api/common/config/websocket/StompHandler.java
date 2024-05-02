@@ -15,6 +15,7 @@ import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -103,7 +104,7 @@ public class StompHandler implements ChannelInterceptor {
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
                 chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
-                        chatRoomMappingInfo.getNickname(),memberId));
+                        chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now()));
             }
         }
 
