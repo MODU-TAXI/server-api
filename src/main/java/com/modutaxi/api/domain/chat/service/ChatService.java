@@ -37,17 +37,24 @@ public class ChatService {
         } else if (chatMessageRequestDto.getType().equals(MessageType.LEAVE)) {
             chatMessageRequestDto.setContent(chatMessageRequestDto.getSender() + "님이 나갔습니다.");
         }
-        String memberId = chatMessageRequestDto.getType().equals(MessageType.LEAVE) ? chatMessageRequestDto.getToken()
-                : jwtTokenProvider.getMemberIdByAccessToken(chatMessageRequestDto.getToken());;
 
         redisTemplate.convertAndSend(channelTopic.getTopic(),
-                ChatMessageResponseDto.requestDtoToResponseDto(chatMessageRequestDto, memberId));
+                ChatMessageResponseDto.requestDtoToResponseDto(chatMessageRequestDto));
     }
 
     public String deleteChatRoomInfo(Member member){
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+
         if(chatRoomMappingInfo == null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
+        }
+
+        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow(
+                () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
+        );
+
+        if(room.getRoomManager().equals(member)){
+            throw new BaseException(RoomErrorCode.JUST_DELETE);
         }
 
         int count = ChatNickName.valueOf(chatRoomMappingInfo.getNickname()).getValue();

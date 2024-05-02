@@ -27,13 +27,13 @@ public class ChatMessageResponseDto {
                 .build();
     }
 
-    public static ChatMessageResponseDto requestDtoToResponseDto(ChatMessageRequestDto chatMessageRequestDto, String memberId) {
+    public static ChatMessageResponseDto requestDtoToResponseDto(ChatMessageRequestDto chatMessageRequestDto) {
         return ChatMessageResponseDto.builder()
                 .roomId(chatMessageRequestDto.getRoomId())
                 .messageType(chatMessageRequestDto.getType())
                 .content(chatMessageRequestDto.getContent())
                 .sender(chatMessageRequestDto.getSender())
-                .memberId(memberId)
+                .memberId(chatMessageRequestDto.getMemberId())
                 .dateTime(LocalDateTime.now())
                 .build();
     }

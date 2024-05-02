@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,15 +36,19 @@ public class ChatController {
 
     // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
-    public void sendMessage(ChatMessageRequestDto message) {
-        // TODO: apic 테스트를 위해 헤더를 ChatMessageRequestDto 객체에 받음. @Header("token") String token 파라미터로 추가해야함
-        String memberId = jwtTokenProvider.getMemberIdByAccessToken(message.getToken());
+    public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
+
+        String memberId = jwtTokenProvider.getMemberIdByAccessToken(token);
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
+
         //닉네임 설정
         message.setSender(chatRoomMappingInfo.getNickname());
+        message.setMemberId(memberId);
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);
+
+        // TODO: 5/2/24 roomId를 그냥 간접적인 저장으로 해도 될 것 같음. 여기서 RDS 갔다오면 당연히 느릴 수 밖에 없음.
         Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow();
 
         //메세지 리퍼지토리에 저장

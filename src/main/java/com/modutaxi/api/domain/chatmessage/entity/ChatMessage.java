@@ -35,12 +35,15 @@ public class ChatMessage extends BaseTime {
 
     private String sender;
 
+    private String memberId;
+
     public static ChatMessage toEntity(ChatMessageRequestDto messageRequestDto, Room room){
         return ChatMessage.builder()
                 .room(room)
                 .messageType(messageRequestDto.getType())
                 .content(messageRequestDto.getContent())
                 .sender(messageRequestDto.getSender())
+                .memberId(messageRequestDto.getMemberId())
                 .build();
     }
 }
