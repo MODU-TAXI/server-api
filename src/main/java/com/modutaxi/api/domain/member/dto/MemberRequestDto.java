@@ -16,6 +16,7 @@ public class MemberRequestDto {
         private String name;
         private Gender gender;
         private String phoneNumber;
+        private String fcmToken;
     }
 
     @Getter
@@ -23,6 +24,7 @@ public class MemberRequestDto {
     @NoArgsConstructor
     public static class LoginRequest {
         private String accessToken;
+        private String fcmToken;
     }
 
     @Getter

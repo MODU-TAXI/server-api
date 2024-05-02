@@ -35,7 +35,8 @@ public class RegisterMemberController {
                 signUpRequest.getKey(),
                 signUpRequest.getName(),
                 signUpRequest.getGender(),
-                signUpRequest.getPhoneNumber()));
+                signUpRequest.getPhoneNumber(),
+                signUpRequest.getFcmToken()));
     }
 
     /**
@@ -48,7 +49,9 @@ public class RegisterMemberController {
             @PathVariable(name = "type") SocialLoginType type,
             @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
-                type, loginRequest.getAccessToken()));
+                type,
+                loginRequest.getAccessToken(),
+                loginRequest.getFcmToken()));
     }
 
     /**
