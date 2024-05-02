@@ -15,6 +15,7 @@ public enum SmsErrorCode implements ErrorCode {
     CERTIFICATION_CODE_SENDING("SMS_005", "인증번호가 발송중입니다.", HttpStatus.BAD_REQUEST),
     INVALID_PHONE_NUMBER_PATTERN("SMS_006", "유효하지 않은 전화번호 형식입니다.", HttpStatus.BAD_REQUEST),
     INVALID_CERTIFICATION_CODE_PATTERN("SMS_007", "유효하지 않은 인증코드 형식입니다.", HttpStatus.BAD_REQUEST),
+    SMS_AGENCY_ERROR("SMS_008", "SMS 발송에 실패했습니다. 잠시후 재시도 해주세요.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String errorCode;
