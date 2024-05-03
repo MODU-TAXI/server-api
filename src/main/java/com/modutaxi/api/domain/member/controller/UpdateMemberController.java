@@ -8,7 +8,7 @@ import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificati
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,9 +40,9 @@ public class UpdateMemberController {
                     "key: refreshToken, value: ${refreshToken}."
     )
     @PatchMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshLogin(
+    public ResponseEntity<RefreshTokenResponse> refreshLogin(
             @CurrentMember Member member) {
-        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member.getId()),
+        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member),
                 HttpStatus.OK);
     }
 
