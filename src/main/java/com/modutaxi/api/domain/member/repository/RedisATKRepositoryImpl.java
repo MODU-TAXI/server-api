@@ -12,7 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
-public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Serializable, RedisRTKRepository {
+public class RedisATKRepositoryImpl extends BaseRedisRepository implements Serializable, RedisATKRepository {
+
+    public static final String REASON = "LOGOUT";
 
     private final RedisTemplate<String, String> redisTemplate;
     private ValueOperations<String, String> valueOperations;
@@ -24,13 +26,14 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
     }
 
     @Override
-    public void save(Long memberId, String refreshToken, Long duration) {
-        String key = generateGlobalKey(memberId.toString());
-        valueOperations.set(key, refreshToken, duration, TimeUnit.MILLISECONDS);
+    public void save(String accessToken, Long duration) {
+        String key = generateGlobalKey(accessToken);
+        valueOperations.set(key, REASON, duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public String findAndDeleteById(String memberId) {
-        return valueOperations.getAndDelete(generateGlobalKey(memberId));
+    public boolean existsById(String accessToken) {
+        return (valueOperations.get(generateGlobalKey(accessToken)) != null);
     }
+
 }

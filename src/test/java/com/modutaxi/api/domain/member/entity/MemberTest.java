@@ -1,10 +1,9 @@
 package com.modutaxi.api.domain.member.entity;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MemberTest {
 
@@ -24,20 +23,4 @@ class MemberTest {
         assertEquals(member.getGender(), Gender.FEMALE);
     }
 
-    @Test
-    @DisplayName("refreshToken이 바뀌는지 테스트")
-    void changeRefreshToken() {
-        // given
-        Member member = Member.builder()
-                .snsId("123456")
-                .name("지수")
-                .gender(Gender.FEMALE)
-                .build();
-
-        // when
-        member.changeRefreshToken("new token");
-
-        // then
-        assertEquals(member.getRefreshToken(), "new token");
-    }
 }
