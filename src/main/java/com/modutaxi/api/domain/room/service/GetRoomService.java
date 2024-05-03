@@ -64,8 +64,8 @@ public class GetRoomService {
             roomSimpleResponseList);
     }
 
-    public SearchWithRadiusResponses getRadiusRooms(Point searchPoint, Long radius) {
-        List<SearchWithRadiusResponseInterface> rooms = roomRepository.findNearRoomsInRadius(searchPoint, radius);
+    public SearchWithRadiusResponses getRadiusRooms(Long spotId, Point searchPoint, Long radius) {
+        List<SearchWithRadiusResponseInterface> rooms = roomRepository.findNearRoomsInRadius(spotId, searchPoint, radius);
         List<SearchWithRadiusResponse> roomList = rooms.stream().map(RoomResponseMapper::toSearchWithRadiusResponse).toList();
         return new SearchWithRadiusResponses(roomList);
     }

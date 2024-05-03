@@ -52,10 +52,21 @@ public class MailUtil {
     public void sendEmailCoolSmsBalanceMail(Long balance) {
         for (String bankerEmail : bankerEmailList) {
             sendSimpleEmailOnlyHtml(
-                    "[모두의 택시] Cool SMS 잔액 부족"
-                    , noReplySender
-                    , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
-                    , bankerEmail
+                "[모두의 택시] Cool SMS 잔액 부족"
+                , noReplySender
+                , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
+                , bankerEmail
+            );
+        }
+    }
+
+    public void sendAligoRemainSmsMail(String smsCnt) {
+        for (String bankerEmail : bankerEmailList) {
+            sendSimpleEmailOnlyHtml(
+                "[모두의 택시] Aligo 잔액 부족"
+                , noReplySender
+                , String.format("Aligo의 남은 SMS 개수가 %s개 입니다. 요금을 충전하세요.", smsCnt)
+                , bankerEmail
             );
         }
     }
