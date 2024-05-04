@@ -29,11 +29,7 @@ public class UpdateRoomController {
     /**
      * [Patch] 방 정보 수정
      */
-    @Operation(summary = "모집방 업데이트",
-        description = "**RoomTag Enum 종류**\n\n**RoomTagBitMask**: "
-            + "ONLY\\_WOMAN, MANNER, STUDENT\\_CERTIFICATION"
-            + "\n\n\n**longitude**: 126.65464\n\n\n"
-            + "**latitude**: 37.45169")
+    @Operation(summary = "모집방 업데이트", description = "모집방의 데이터를 업데이트합니다.<br>수정할 데이터가 있다면, 목적지 거점의 id, 방 태그, 출발지의 경도, 위도, 출발 시각, 출발지 이름, 목표 인원수를 입력 해주세요.<br>방 태그 : **ONLY_WOMAN**, **MANNER**, **STUDENT_CERTIFICATION**")
     @PatchMapping("/{id}")
     public ResponseEntity<RoomDetailResponse> updateRoom(
         @CurrentMember Member member,
@@ -45,7 +41,7 @@ public class UpdateRoomController {
     /**
      * [Delete] 방 삭제
      */
-    @Operation(summary = "모집방 삭제")
+    @Operation(summary = "모집방 삭제", description = "삭제할 모집방의 id를 입력해주세요.")
     @DeleteMapping("/{id}")
     public ResponseEntity<DeleteRoomResponse> deleteRoom(
         @CurrentMember Member member,
