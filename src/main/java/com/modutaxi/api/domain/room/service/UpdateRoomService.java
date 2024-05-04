@@ -15,6 +15,7 @@ import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
+import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
@@ -25,6 +26,8 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 
 @RequiredArgsConstructor
 @Service
@@ -63,7 +66,7 @@ public class UpdateRoomService {
 
         room.update(newRoomData);
 
-        return RoomDetailResponse.toDto(room, path);
+        return RoomMapper.toDto(room, path);
     }
 
     @Transactional
@@ -147,6 +150,13 @@ public class UpdateRoomService {
             throw new BaseException(RoomErrorCode.DEPARTURE_EXCEED_RANGE);
         }
 
+        // 출발지 이름 업데이트
+        oldRoomData.setDepartureName(
+            updateRoomRequest.getDepartureName() != null
+                ? updateRoomRequest.getDepartureName()
+                : oldRoomData.getDepartureName()
+        );
+
         return oldRoomData;
     }
 
@@ -167,7 +177,7 @@ public class UpdateRoomService {
         LineString path = NaverMapConverter.jsonNodeToLineString(jsonNode.get("path"));
 
         internalUpdateRoomDto.setExpectedCharge(jsonNode.get("taxiFare").asInt());
-        internalUpdateRoomDto.setDuration(jsonNode.get("duration").asLong());
+        internalUpdateRoomDto.setDurationMinutes(jsonNode.get("duration").asLong() / MILLIS_PER_MINUTE);
 
         taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
         return path;

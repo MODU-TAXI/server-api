@@ -12,6 +12,7 @@ import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponses;
 import com.modutaxi.api.domain.room.entity.Room;
 
+import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.mapper.RoomResponseMapper;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
@@ -50,14 +51,14 @@ public class GetRoomService {
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
-        return RoomDetailResponse.toDto(room, path);
+        return RoomMapper.toDto(room, path);
     }
 
     public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size, Long spotId, List<RoomTagBitMask> tags, Boolean isImminent) {
         Pageable pageable = PageRequest.of(page, size);
         Slice<Room> roomSlice = getRoomSlice(pageable, spotId, checkTags(tags), isImminent);
         List<RoomSimpleResponse> roomSimpleResponseList = roomSlice.stream()
-            .map(RoomSimpleResponse::toDto)
+            .map(RoomMapper::toDto)
             .collect(Collectors.toList());
 
         return new PageResponseDto<>(pageable.getPageNumber(), roomSlice.hasNext(),
