@@ -14,8 +14,9 @@ public enum RoomErrorCode implements ErrorCode {
     BOTH_GENDER("ROOM_004", "성별 제한이 둘 다 설정되어 있습니다.", HttpStatus.CONFLICT),
     DEPARTURE_BEFORE_CURRENT("ROOM_005", "출발 시간은 현재 시간보다 이전일 수 없습니다.", HttpStatus.BAD_REQUEST),
     DEPARTURE_EXCEED_RANGE("ROOM_006", "출발 위치는 대한민국을 벗어날 수 없습니다.", HttpStatus.BAD_REQUEST),
-    POINT_IS_NOT_INDEPENDENT("ROOM_006", "위도와 경도는 한 묶음", HttpStatus.CONFLICT),
-    JUST_DELETE("ROOM_007", "룸 매니저는 퇴장이 안됩니다~ 삭제만 가능", HttpStatus.BAD_REQUEST),
+    POINT_IS_NOT_INDEPENDENT("ROOM_007", "위도와 경도는 한 묶음", HttpStatus.CONFLICT),
+    JUST_DELETE("ROOM_008", "룸 매니저는 퇴장이 안됩니다~ 삭제만 가능", HttpStatus.BAD_REQUEST),
+    ALREADY_IN_ROOM("ROOM_009", "이미 방에 참가하고 있습니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String errorCode;
