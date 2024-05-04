@@ -1,7 +1,8 @@
 package com.modutaxi.api.domain.chatmessage.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.ChatMessageResponseList;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,15 +24,15 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
     @Operation(summary = "오갔던 채팅 전부 조회")
-    @GetMapping("/chat-messages/{roomId}")
-    public ResponseEntity<List<ChatMessageResponseDto>> getChatMessage(@CurrentMember Member member,
-            @PathVariable Long roomId) {
+    @GetMapping("/api/chats/rooms/{roomId}/messages")
+    public ResponseEntity<ChatMessageResponseList> getChatMessage(@CurrentMember Member member,
+                                                                  @PathVariable Long roomId) {
         return ResponseEntity.ok(chatMessageService.chatMessageResponseDtoList(member, roomId));
     }
 
     @Operation(summary = "오갔던 채팅 메세지 전부 삭제")
-    @DeleteMapping("/chat-messages/{roomId}")
-    public ResponseEntity<String> deleteChatMessage(@PathVariable Long roomId){
+    @DeleteMapping("/api/chats/rooms/{roomId}/messages")
+    public ResponseEntity<DeleteResponse> deleteChatMessage(@PathVariable Long roomId){
         return ResponseEntity.ok(chatMessageService.deleteChatMessage(roomId));
     }
 

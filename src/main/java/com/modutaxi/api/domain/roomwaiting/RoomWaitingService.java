@@ -6,14 +6,17 @@ import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.MemberRoomInResponse;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.RoomWaitingResponse;
+import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +25,8 @@ import org.springframework.stereotype.Service;
 public class RoomWaitingService {
     private final RoomRepository roomRepository;
     private final ChatRoomRepository chatRoomRepository;
-    public String applyForParticipate(Member member, String roomId){
+    private final GetMemberService getMemberService;
+    public ApplyResponse applyForParticipate(Member member, String roomId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
@@ -46,10 +50,10 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
         chatRoomRepository.addToWaitingList(roomId, member.getId().toString());
-        return "신청 완료";
+        return new ApplyResponse(true);
     }
 
-    public String acceptForParticipate(Member member, String roomId, String memberId){
+    public ApplyResponse acceptForParticipate(Member member, String roomId, String memberId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
@@ -85,28 +89,36 @@ public class RoomWaitingService {
         //채팅방에 저장
         chatRoomRepository.addRoomInMemberList(roomId, memberId);
 
-        return "수락 완료";
+        return new ApplyResponse(true);
     }
 
     // TODO: 5/2/24 귀찮으니 코드 재사용
-    public List<MemberRoomInResponse> getParticipateInRoom(Long roomId){
+    public MemberRoomInResponseList getParticipateInRoom(Long roomId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         Set<String> memberIdSet = chatRoomRepository.findRoomInList(roomId.toString());
 
-        return memberIdSet.stream()
+        List<Long> memberIdList = new ArrayList<>(memberIdSet).stream().map(Long::valueOf).toList();
+        List<Member> waitingUserList = getMemberService.getMemberList(memberIdList);
+
+        return new MemberRoomInResponseList(
+            waitingUserList.stream()
                 .map(MemberRoomInResponse::toDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
-    public List<RoomWaitingResponse> getWaitingList(Long roomId){
+    public RoomWaitingResponseList getWaitingList(Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         Set<String> memberIdSet = chatRoomRepository.findWaitingList(roomId.toString());
 
-        return memberIdSet.stream()
+        List<Long> memberIdList = new ArrayList<>(memberIdSet).stream().map(Long::valueOf).toList();
+        List<Member> waitingUserList = getMemberService.getMemberList(memberIdList);
+
+        return new RoomWaitingResponseList(
+            waitingUserList.stream()
                 .map(RoomWaitingResponse::toDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 }

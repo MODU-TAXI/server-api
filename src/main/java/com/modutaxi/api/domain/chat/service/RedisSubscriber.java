@@ -2,8 +2,7 @@ package com.modutaxi.api.domain.chat.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,10 @@ public class RedisSubscriber {
 
     public void sendMessage(String publishMessage) {
         try {
-            ChatMessageResponseDto chatMessageResponseDto;
-            chatMessageResponseDto = objectMapper.readValue(publishMessage, ChatMessageResponseDto.class);
-            messageSendingOperations.convertAndSend("/sub/chat/" + chatMessageResponseDto.getRoomId(),
-                    chatMessageResponseDto);
+            ChatMessageResponse chatMessageResponse;
+            chatMessageResponse = objectMapper.readValue(publishMessage, ChatMessageResponse.class);
+            messageSendingOperations.convertAndSend("/sub/chat/" + chatMessageResponse.getRoomId(),
+                    chatMessageResponse);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("실패해쪙");
         }

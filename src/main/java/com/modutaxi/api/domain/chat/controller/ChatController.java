@@ -3,6 +3,8 @@ package com.modutaxi.api.domain.chat.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
 import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
@@ -56,20 +58,20 @@ public class ChatController {
     }
 
     @Operation(summary = "해당 모집방에 참여 가능한 지")
-    @GetMapping("/chat/{roomId}")
-    public ResponseEntity<String> chatRoomEnterPossible(@CurrentMember Member member, @PathVariable Long roomId){
+    @GetMapping("/api/rooms/{roomId}/enterable")
+    public ResponseEntity<EnterableResponse> chatRoomEnterPossible(@CurrentMember Member member, @PathVariable Long roomId){
         return ResponseEntity.ok(chatService.chatRoomEnterPossible(member, roomId));
     }
 
     @Operation(summary = "채팅 정보")
-    @GetMapping("/chat-info")
+    @GetMapping("/api/chats/info")
     public ResponseEntity<ChatMappingResponse> getChatRoomMappingInfo(@CurrentMember Member member){
         return ResponseEntity.ok(chatService.getChatRoomInfo(member));
     }
 
     @Operation(summary = "퇴장!! 채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
-    @DeleteMapping("/chat-info")
-    public ResponseEntity<String> deleteChatRoomInfo(@CurrentMember Member member) {
+    @DeleteMapping("/api/chats/info")
+    public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
         return ResponseEntity.ok(chatService.deleteChatRoomInfo(member));
     }
 

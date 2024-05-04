@@ -4,12 +4,14 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.ChatNickName;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
@@ -38,10 +40,10 @@ public class ChatService {
         }
 
         redisTemplate.convertAndSend(channelTopic.getTopic(),
-                ChatMessageResponseDto.requestDtoToResponseDto(chatMessageRequestDto));
+            ChatMessageMapper.toDto(chatMessageRequestDto));
     }
 
-    public String deleteChatRoomInfo(Member member){
+    public DeleteResponse deleteChatRoomInfo(Member member){
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
 
         if(chatRoomMappingInfo == null){
@@ -67,22 +69,22 @@ public class ChatService {
         chatRoomRepository.removeUserByMemberIdEnterInfo(member.getId().toString());
         chatRoomRepository.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
 
-        return "매핑 정보가 삭제 되었습니다.";
+        return new DeleteResponse(true);
     }
 
-    public String chatRoomEnterPossible(Member member, Long roomId){
+    public EnterableResponse chatRoomEnterPossible(Member member, Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BaseException(
                 RoomErrorCode.EMPTY_ROOM));
 
         if(chatRoomRepository.findChatInfoByMemberId(member.getId().toString()) != null){
-            return "이미 방 참가해있잖아.";
+            throw new BaseException(RoomErrorCode.ALREADY_IN_ROOM);
         }
 
         if(chatRoomRepository.getUserCount(roomId.toString()) >= 15){
-            return "인원 꽉 찼슈";
+            return new EnterableResponse(false);
         }
 
-        return "참가가능";
+        return new EnterableResponse(true);
     }
 
     public ChatMappingResponse getChatRoomInfo(Member member){
