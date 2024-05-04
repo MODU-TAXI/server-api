@@ -25,6 +25,12 @@ public class RoomResponseDto {
 
         private Long spotId;
 
+        private long managerId;
+
+        private String managerName;
+
+        private double score;
+
         private List<RoomTagBitMask> roomTagBitMaskList;
 
         @Schema(example = "126.65464", description = "출발지 경도")
@@ -55,6 +61,9 @@ public class RoomResponseDto {
                 .duration(room.getDuration())
                 .expectedCharge(room.getExpectedCharge())
                 .path(path)
+                .managerId(room.getRoomManager().getId())
+                .managerName(room.getRoomManager().getName())
+                .score(room.getRoomManager().getScore())
                 .build();
         }
     }
