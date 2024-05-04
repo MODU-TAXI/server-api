@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.room.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.*;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.UpdateRoomService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,11 +47,10 @@ public class UpdateRoomController {
      */
     @Operation(summary = "모집방 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteRoom(
+    public ResponseEntity<DeleteRoomResponse> deleteRoom(
         @CurrentMember Member member,
         @PathVariable Long id
     ) {
-        updateRoomService.deleteRoom(member, id);
-        return ResponseEntity.ok("삭제 되었습니다.");
+        return ResponseEntity.ok(updateRoomService.deleteRoom(member, id));
     }
 }

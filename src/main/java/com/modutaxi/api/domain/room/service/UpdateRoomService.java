@@ -12,6 +12,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -70,7 +71,7 @@ public class UpdateRoomService {
     }
 
     @Transactional
-    public void deleteRoom(Member member, Long roomId) {
+    public DeleteRoomResponse deleteRoom(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
@@ -80,6 +81,7 @@ public class UpdateRoomService {
 
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
+        return new DeleteRoomResponse(true);
     }
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {

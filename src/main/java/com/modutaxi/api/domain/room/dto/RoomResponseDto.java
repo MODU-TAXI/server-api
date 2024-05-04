@@ -102,4 +102,11 @@ public class RoomResponseDto {
         @Schema(description = "방 리스트")
         List<SearchWithRadiusResponse> rooms;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteRoomResponse {
+        @Schema(example = "true", description = "수행완료 여부")
+        private Boolean isDeleted;
+    }
 }
