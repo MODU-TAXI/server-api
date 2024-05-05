@@ -27,9 +27,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "r.id AS id, r.departurePoint AS departurePoint, s.name AS spotName " +
             "FROM Room r LEFT JOIN Spot s ON (r.spot = s)" +
             "WHERE " +
+            "(:spotId IS NULL OR s.id = :spotId) " +
+            "AND " +
             "ST_DISTANCE_SPHERE(:point, r.departurePoint) <= :radius " +
             "ORDER BY " +
             "ST_DISTANCE_SPHERE(:point, r.departurePoint)"
     )
-    List<SearchWithRadiusResponseInterface> findNearRoomsInRadius(@Param("point") Point point, @Param("radius") Long radius);
+    List<SearchWithRadiusResponseInterface> findNearRoomsInRadius(@Param("spotId") Long spotId, @Param("point") Point point, @Param("radius") Long radius);
 }

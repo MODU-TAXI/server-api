@@ -55,4 +55,9 @@ public class MailServiceImpl implements MailService {
     public void sendCoolSmsBalanceMessage(Long balance) {
         mailUtil.sendEmailCoolSmsBalanceMail(balance);
     }
+
+    @Override
+    public void sendAligoRemainSmsMessage(String smsCnt) {
+        mailUtil.sendAligoRemainSmsMail(smsCnt);
+    }
 }

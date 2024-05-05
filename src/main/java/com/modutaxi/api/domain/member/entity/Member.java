@@ -33,9 +33,6 @@ public class Member extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String refreshToken = "";
-    @NotNull
-    @Builder.Default
     private double score = 0.0; // 평점
 
     @NotNull
@@ -49,10 +46,6 @@ public class Member extends BaseTime {
     @NotNull
     @Builder.Default
     private boolean status = true;
-
-    public void changeRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
 
     public void certificateEmail(String email) {
         this.role = Role.ROLE_MEMBER;
