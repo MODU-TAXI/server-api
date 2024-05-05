@@ -17,6 +17,7 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "pub/sub 관련 API")
 public class ChatController {
+    @Value("${jwt.jwt-key}")
+    private String jwtSecretKey;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ChatRoomRepository chatRoomRepository;
@@ -36,11 +39,12 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatMessageRepository chatMessageRepository;
 
+
     // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
     public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
 
-        String memberId = jwtTokenProvider.getMemberIdByAccessToken(token);
+        String memberId = jwtTokenProvider.getMemberIdByToken(token, jwtSecretKey);
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
 
         //닉네임 설정

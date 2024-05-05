@@ -18,6 +18,7 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -35,6 +36,9 @@ public class StompHandler implements ChannelInterceptor {
     private final ChatService chatService;
     private final RoomRepository roomRepository;
 //    private final StompErrorHandler stompErrorHandler;
+
+    @Value("${jwt.jwt-key}")
+    private String jwtSecretKey;
 
 
 
@@ -56,7 +60,7 @@ public class StompHandler implements ChannelInterceptor {
 
             String sessionId = (String) accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
-            String memberId = jwtTokenProvider.getMemberIdByAccessToken(token);
+            String memberId = jwtTokenProvider.getMemberIdByToken(token, jwtSecretKey);
 
             //임시로 세션아이디와 멤버아이디를 매핑.
             //이렇게 해야 다시 SUB으로 갈 때 구독을 할 수 있음.
