@@ -5,4 +5,5 @@ public interface MailService {
     Boolean checkMailDomain(String emailAddress);
     String checkEmailCertificationCode(Long memberId, String certificationCode);
     void sendCoolSmsBalanceMessage(Long balance);
+    void sendAligoRemainSmsMessage(String smsCnt);
 }

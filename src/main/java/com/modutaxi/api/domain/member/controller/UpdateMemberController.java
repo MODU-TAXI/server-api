@@ -8,7 +8,7 @@ import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificati
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,9 +40,9 @@ public class UpdateMemberController {
                     "key: refreshToken, value: ${refreshToken}."
     )
     @PatchMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshLogin(
+    public ResponseEntity<RefreshTokenResponse> refreshLogin(
             @CurrentMember Member member) {
-        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member.getId()),
+        return new ResponseEntity<>(updateMemberService.refreshAccessToken(member),
                 HttpStatus.OK);
     }
 
@@ -155,7 +155,7 @@ public class UpdateMemberController {
 
     @Operation(
             summary = "SMS 인증 메시지 발송",
-            description = "SMS 인증 메시지를 발송합니다.<br>**문자 발송에 건당 20원 씩 비용이 발생하므로 주의해주세요.**<br>로그인 시도 실패시 발급된 key, 인증번호 발급에 사용할 휴대폰 번호를 입력해주세요.<br>휴대전화 번호의 형식은 010-1234-5678 과 같이 '-'와 함께 요청해야합니다."
+            description = "SMS 인증 메시지를 발송합니다.<br>**문자 발송에 건당 8.4원 씩 비용이 발생하므로 주의해주세요.**<br>로그인 시도 실패시 발급된 key, 인증번호 발급에 사용할 휴대폰 번호를 입력해주세요.<br>휴대전화 번호의 형식은 010-1234-5678 과 같이 '-'와 함께 요청해야합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "문자 발송 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CertificationResponse.class))),
@@ -176,6 +176,13 @@ public class UpdateMemberController {
                             {
                                 "errorCode": "SMS_006",
                                 "message": "유효하지 않은 전화번호 형식입니다."
+                            }
+                            """),
+
+                    @ExampleObject(name = "SMS_008", description = "SMS 서비스 사업자와의 통신 문제", value = """
+                            {
+                                "errorCode": "SMS_008",
+                                "message": "SMS 발송에 실패했습니다. 잠시후 재시도 해주세요."
                             }
                             """),
             }))

@@ -6,9 +6,10 @@ import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
+import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.sms.service.SmsService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,11 @@ public class UpdateMemberService {
     private final MailUtil mailUtil;
     private final SmsService smsService;
 
-    public TokenResponse refreshAccessToken(Long memberId) {
-        return jwtTokenProvider.generateToken(memberId);
+    public RefreshTokenResponse refreshAccessToken(Member member) {
+        return new RefreshTokenResponse(
+                jwtTokenProvider.generateToken(member.getId()),
+                MemberMapper.toDto(member)
+        );
     }
 
     public CertificationResponse sendEmailCertificationMail(Long memberId, String receiver) {
