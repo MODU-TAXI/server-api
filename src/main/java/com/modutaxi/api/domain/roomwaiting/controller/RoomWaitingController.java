@@ -1,10 +1,11 @@
-package com.modutaxi.api.domain.roomwaiting;
+package com.modutaxi.api.domain.roomwaiting.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.ApplyResponse;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.MemberRoomInResponseList;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.RoomWaitingResponseList;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.RoomWaitingResponseList;
+import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

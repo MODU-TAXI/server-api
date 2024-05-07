@@ -85,8 +85,6 @@ dependencies {
 
     //Cool SMS
     implementation 'net.nurigo:sdk:4.2.7'
-    //Cool SMS
-    implementation 'net.nurigo:sdk:4.2.7'
 
     //Http Client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'

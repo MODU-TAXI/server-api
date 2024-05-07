@@ -58,7 +58,7 @@ public class StompHandler implements ChannelInterceptor {
         //웹소켓 연결 요청
         if (StompCommand.CONNECT == accessor.getCommand()) {
 
-            String sessionId = (String) accessor.getSessionId();
+            String sessionId = accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
             String memberId = jwtTokenProvider.getMemberIdByToken(token, jwtSecretKey);
 
@@ -69,7 +69,7 @@ public class StompHandler implements ChannelInterceptor {
 
         //구독 요청
         else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
-            String sessionId = (String) accessor.getSessionId();
+            String sessionId = accessor.getSessionId();
             String destination = (String) message.getHeaders().get("simpDestination");
 
             String roomId =
@@ -113,11 +113,9 @@ public class StompHandler implements ChannelInterceptor {
         }
 
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
-            String sessionId = (String) accessor.getSessionId();
+            String sessionId = accessor.getSessionId();
             // 세션에 대한 정보 삭제
             chatRoomRepository.removeUserBySessionIdEnterInfo(sessionId);
-            //웹소켓은 끊기면 걍 끊긴거다~
-            //대신 방 정보 매핑 삭제는 따로 API 호출을 해주어야 하는 것~
         }
 
         return message;

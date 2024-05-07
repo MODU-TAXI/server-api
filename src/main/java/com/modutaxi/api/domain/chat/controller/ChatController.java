@@ -7,6 +7,7 @@ import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
+import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
 import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
@@ -58,7 +59,7 @@ public class ChatController {
         Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow();
 
         //메세지 리퍼지토리에 저장
-        chatMessageRepository.save(ChatMessage.toEntity(message, room));
+        chatMessageRepository.save(ChatMessageMapper.toEntity(message, room));
     }
 
     @Operation(summary = "해당 모집방에 참여 가능한 지")

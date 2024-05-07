@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.roomwaiting;
+package com.modutaxi.api.domain.roomwaiting.service;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
@@ -10,7 +10,7 @@ import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.roomwaiting.RoomWaitingResponseDto.*;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +94,7 @@ public class RoomWaitingService {
 
     // TODO: 5/2/24 귀찮으니 코드 재사용
     public MemberRoomInResponseList getParticipateInRoom(Long roomId){
-        Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
+        Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         Set<String> memberIdSet = chatRoomRepository.findRoomInList(roomId.toString());
 

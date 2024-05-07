@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.roomwaiting;
+package com.modutaxi.api.domain.roomwaiting.mapper;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,7 +8,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-public class RoomWaitingResponseDto {
+public class RoomWaitingMapper {
     @Getter
     @AllArgsConstructor
     @Builder
@@ -43,7 +43,7 @@ public class RoomWaitingResponseDto {
 
         public static MemberRoomInResponse toDto(Member member) {
             return MemberRoomInResponse.builder()
-                .memberId(Long.valueOf(member.getId()))
+                .memberId(member.getId())
                 .name(member.getName())
                 .score(member.getScore())
                 .build();
