@@ -28,11 +28,13 @@ public class RoomInternalDto {
 
         private LocalDateTime departureTime;
 
+        private String departureName;
+
         private int wishHeadcount;
 
         private int expectedCharge;
 
-        private long duration;
+        private long durationMinutes;
 
         public static InternalUpdateRoomDto toDto(Room room) {
             return InternalUpdateRoomDto.builder()
@@ -41,8 +43,9 @@ public class RoomInternalDto {
                 .departureLongitude((float) room.getDeparturePoint().getX())
                 .departureLatitude((float) room.getDeparturePoint().getY())
                 .departureTime(room.getDepartureTime())
+                .departureName(room.getDepartureName())
                 .wishHeadcount(room.getWishHeadcount())
-                .duration(room.getDuration())
+                .durationMinutes(room.getDurationMinutes())
                 .expectedCharge(room.getExpectedCharge())
                 .build();
         }
