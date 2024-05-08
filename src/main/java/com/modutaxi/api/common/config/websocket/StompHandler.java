@@ -40,20 +40,10 @@ public class StompHandler implements ChannelInterceptor {
     @Value("${jwt.jwt-key}")
     private String jwtSecretKey;
 
-
-
-    // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
+    
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        System.out.println("---------------------------------------");
-        System.out.println("Command: " + accessor.getCommand());
-        System.out.println("Destination: " + accessor.getDestination());
-        System.out.println("Message Headers: " + accessor.getMessageHeaders());
-        System.out.println("First Native Header: " + accessor.getFirstNativeHeader("token"));
-        System.out.println("Session ID: " + accessor.getSessionId());
-        System.out.println("User: " + accessor.getUser());
-        System.out.println("Subscription ID: " + accessor.getSubscriptionId());
 
         //웹소켓 연결 요청
         if (StompCommand.CONNECT == accessor.getCommand()) {
