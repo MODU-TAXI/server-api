@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.room.service;
 
 import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertRoomTagListToBitMask;
+import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
@@ -62,21 +63,26 @@ public class RegisterRoomService {
 
         int expectedCharge = taxiInfo.get("taxiFare").asInt();
 
-        long duration = taxiInfo.get("duration").asLong();
+        long durationMinutes = taxiInfo.get("duration").asLong() / MILLIS_PER_MINUTE;
 
-        Room room = RoomMapper.toEntity(member, spot,
-            expectedCharge, duration,
-            convertRoomTagListToBitMask(
-                createRoomRequest.getRoomTagBitMask()),
-            createRoomRequest.getDepartureLongitude(), createRoomRequest.getDepartureLatitude(),
-            createRoomRequest.getDepartureTime()
+        Room room = RoomMapper.toEntity(
+            member,
+            spot,
+            expectedCharge,
+            durationMinutes,
+            convertRoomTagListToBitMask(createRoomRequest.getRoomTagBitMask()),
+            createRoomRequest.getDepartureLongitude(),
+            createRoomRequest.getDepartureLatitude(),
+            createRoomRequest.getDepartureTime(),
+            createRoomRequest.getDepartureName(),
+            createRoomRequest.getWishHeadcount()
         );
 
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
         roomRepository.save(room);
         registerTaxiInfoService.savePath(room.getId(), path);
-        return RoomDetailResponse.toDto(room, path);
+        return RoomMapper.toDto(room, path);
     }
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {

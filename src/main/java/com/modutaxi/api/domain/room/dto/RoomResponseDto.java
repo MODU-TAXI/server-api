@@ -1,18 +1,13 @@
 package com.modutaxi.api.domain.room.dto;
 
-import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
-
-import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.mongodb.client.model.geojson.LineString;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.data.geo.Point;
+
+import java.util.List;
 
 public class RoomResponseDto {
 
@@ -20,98 +15,77 @@ public class RoomResponseDto {
     @Builder
     @AllArgsConstructor
     public static class RoomDetailResponse {
-
+        @Schema(description = "택시팟 id")
         private Long roomId;
-
+        @Schema(description = "도착 거점 id")
         private Long spotId;
-
-        private long managerId;
-
-        private String managerName;
-
-        private double score;
-
+        @Schema(example = "2022.05.05 (일)", description = "출발 일자")
+        private String departureDairyDate;
+        @Schema(example = "126.65464", description = "도착지 경도")
+        private Float arrivalLongitude;
+        @Schema(example = "37.45169", description = "도착지 위도")
+        private Float arrivalLatitude;
+        @Schema(example = "14:00", description = "도착 시간")
+        private String arrivalTime;
+        @Schema(example = "주안역", description = "도착 거점 이름")
+        private String arrivalName;
+        @Schema(description = "택시팟 카테고리")
         private List<RoomTagBitMask> roomTagBitMaskList;
-
-        @Schema(example = "126.65464", description = "출발지 경도")
+        @Schema(example = "126.68557", description = "출발지 경도")
         private Float departureLongitude;
-
-        @Schema(example = "37.45169", description = "출발지 위도")
+        @Schema(example = "37.46761", description = "출발지 위도")
         private Float departureLatitude;
-
-        private LocalDateTime departureTime;
-
+        @Schema(example = "12:00", description = "출발 시간")
+        private String departureTime;
+        @Schema(example = "센트리빌", description = "출발지 이름")
+        private String departureName;
+        @Schema(example = "2", description = "현재 인원수")
+        private int currentHeadcount;
+        @Schema(example = "3", description = "목표 인원수")
         private int wishHeadcount;
-
-        private long duration;
-
+        @Schema(example = "30", description = "이동 예상시간 (분)")
+        private long durationMinutes;
+        @Schema(example = "5000", description = "인당 예상 요금(목표 인원 다 찼을 때 기준)")
+        private int expectedChargePerPerson;
+        @Schema(example = "15000", description = "예상 요금")
         private int expectedCharge;
-
+        @Schema(description = "경로")
         private LineString path;
-
-        public static RoomDetailResponse toDto(Room room, LineString path) {
-            return RoomDetailResponse.builder()
-                .roomId(room.getId())
-                .spotId(room.getSpot().getId())
-                .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departureLongitude((float) room.getDeparturePoint().getX())
-                .departureLatitude((float) room.getDeparturePoint().getY())
-                .departureTime(room.getDepartureTime())
-                .wishHeadcount(room.getWishHeadcount())
-                .duration(room.getDuration())
-                .expectedCharge(room.getExpectedCharge())
-                .path(path)
-                .managerId(room.getRoomManager().getId())
-                .managerName(room.getRoomManager().getName())
-                .score(room.getRoomManager().getScore())
-                .build();
-        }
     }
 
     @Getter
     @Builder
     @AllArgsConstructor
     public static class RoomSimpleResponse {
-
+        @Schema(description = "택시팟 id")
         private Long roomId;
-
+        @Schema(description = "도착 거점 id")
         private Long spotId;
-
+        @Schema(example = "14:00", description = "도착 시간")
+        private String arrivalTime;
+        @Schema(example = "주안역", description = "도착 거점 이름")
+        private String arrivalName;
+        @Schema(description = "택시팟 카테고리")
         private List<RoomTagBitMask> roomTagBitMaskList;
-
-        @Schema(example = "126.65464", description = "출발지 경도")
-        private Float departureLongitude;
-
-        @Schema(example = "37.45169", description = "출발지 위도")
-        private Float departureLatitude;
-
-        private LocalDateTime departureTime;
-
+        @Schema(example = "12:00", description = "출발 시간")
+        private String departureTime;
+        @Schema(example = "센트리빌", description = "출발지 이름")
+        private String departureName;
+        @Schema(example = "2", description = "현재 인원수")
+        private int currentHeadcount;
+        @Schema(example = "3", description = "목표 인원수")
         private int wishHeadcount;
-
-        private long duration;
-
+        @Schema(example = "30", description = "이동 예상시간 (분)")
+        private long durationMinutes;
+        @Schema(example = "5000", description = "인당 예상 요금(목표 인원 다 찼을 때 기준)")
+        private int expectedChargePerPerson;
+        @Schema(example = "15000", description = "예상 요금")
         private int expectedCharge;
-
-        public static RoomSimpleResponse toDto(Room room) {
-            return RoomSimpleResponse.builder()
-                .roomId(room.getId())
-                .spotId(room.getSpot().getId())
-                .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-                .departureLongitude((float) room.getDeparturePoint().getX())
-                .departureLatitude((float) room.getDeparturePoint().getY())
-                .departureTime(room.getDepartureTime())
-                .wishHeadcount(room.getWishHeadcount())
-                .duration(room.getDuration())
-                .expectedCharge(room.getExpectedCharge())
-                .build();
-        }
     }
 
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponse {
-
         @Schema(example = "2", description = "방 id")
         private Long id;
         @Schema(example = "126.65464", description = "출발지 경도")
@@ -125,8 +99,14 @@ public class RoomResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchWithRadiusResponses {
-
         @Schema(description = "방 리스트")
         List<SearchWithRadiusResponse> rooms;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteRoomResponse {
+        @Schema(example = "true", description = "수행완료 여부")
+        private Boolean isDeleted;
     }
 }
