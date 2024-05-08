@@ -47,8 +47,11 @@ public class RoomMapper {
             .build();
     }
 
-    public static RoomDetailResponse toDto(Room room, LineString path) {
+    public static RoomDetailResponse toDto(Room room, Member member, LineString path) {
         return RoomDetailResponse.builder()
+            .managerId(member.getId())
+            .score(member.getScore())
+            .isMyRoom(room.getRoomManager().getId().equals(member.getId()))
             .roomId(room.getId())
             .spotId(room.getSpot().getId())
             .departureDairyDate(TimeFormatConverter.convertTimeToDiaryDate(room.getDepartureTime()))

@@ -2,9 +2,12 @@ package com.modutaxi.api.domain.room.service;
 
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchWithRadiusResponseInterface;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
@@ -39,6 +42,7 @@ public class GetRoomService {
     @Value("${env.imminent-time.back}")
     private Long imminentTimeBack;
 
+    private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final GetSpotService getSpotService;
@@ -50,8 +54,11 @@ public class GetRoomService {
         LineString path = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
+        Member member = memberRepository.findByIdAndStatusTrue(room.getRoomManager().getId())
+            .orElseThrow(() -> new BaseException(
+                MemberErrorCode.EMPTY_MEMBER));
 
-        return RoomMapper.toDto(room, path);
+        return RoomMapper.toDto(room, member, path);
     }
 
     public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size, Long spotId, List<RoomTagBitMask> tags, Boolean isImminent) {

@@ -82,7 +82,7 @@ public class RegisterRoomService {
 
         roomRepository.save(room);
         registerTaxiInfoService.savePath(room.getId(), path);
-        return RoomMapper.toDto(room, path);
+        return RoomMapper.toDto(room, member, path);
     }
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {

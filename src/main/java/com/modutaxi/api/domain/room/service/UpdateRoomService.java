@@ -67,7 +67,7 @@ public class UpdateRoomService {
 
         room.update(newRoomData);
 
-        return RoomMapper.toDto(room, path);
+        return RoomMapper.toDto(room, member, path);
     }
 
     @Transactional
@@ -81,6 +81,9 @@ public class UpdateRoomService {
 
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
+
+        // TODO: 5/9/24 매핑 정보 삭제
+
         return new DeleteRoomResponse(true);
     }
 
