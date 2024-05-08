@@ -178,6 +178,7 @@ public class UpdateMemberController {
                                 "message": "유효하지 않은 전화번호 형식입니다."
                             }
                             """),
+
                     @ExampleObject(name = "SMS_008", description = "SMS 서비스 사업자와의 통신 문제", value = """
                             {
                                 "errorCode": "SMS_008",
