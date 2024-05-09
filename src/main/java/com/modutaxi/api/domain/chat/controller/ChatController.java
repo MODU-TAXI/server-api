@@ -31,8 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name = "pub/sub 관련 API")
 public class ChatController {
-    @Value("${jwt.jwt-key}")
-    private String jwtSecretKey;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ChatRoomRepository chatRoomRepository;
@@ -45,7 +43,7 @@ public class ChatController {
     @MessageMapping("/chat")
     public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
 
-        String memberId = jwtTokenProvider.getMemberIdByToken(token, jwtSecretKey);
+        String memberId = jwtTokenProvider.getMemberIdByToken(token);
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
 
         //닉네임 설정

@@ -165,6 +165,16 @@ public class JwtTokenProvider {
     }
 
     /**
+     * Token 에서 memberId를 추출하는 함수 (웹소켓용)
+     *
+     * @return memberId (String)
+     */
+    public String getMemberIdByToken(String token) {
+        return Jwts.parser().setSigningKey(jwtSecretKey).parseClaimsJws(token).
+            getBody().get("memberId").toString();
+    }
+
+    /**
      * 헤더에서 AUTHORIZATION_HEADER key의 value에 해당하는 AccessToken을 추출
      *
      * @return AccessToken (String)
