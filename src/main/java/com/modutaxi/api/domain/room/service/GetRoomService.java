@@ -42,21 +42,18 @@ public class GetRoomService {
     @Value("${env.imminent-time.back}")
     private Long imminentTimeBack;
 
-    private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final GetSpotService getSpotService;
 
-    public RoomDetailResponse getRoomDetail(Long roomId) {
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         LineString path = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
-        Member member = memberRepository.findByIdAndStatusTrue(room.getRoomManager().getId())
-            .orElseThrow(() -> new BaseException(
-                MemberErrorCode.EMPTY_MEMBER));
+
 
         return RoomMapper.toDto(room, member, path);
     }
