@@ -36,36 +36,32 @@ public class StompHandler implements ChannelInterceptor {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     private final RoomRepository roomRepository;
-//    private final StompErrorHandler stompErrorHandler;
+    private final StompExceptionHandler stompExceptionHandler;
 
     
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        System.out.println("---------------------------------------");
-        System.out.println("Command: " + accessor.getCommand());
-        System.out.println("Destination: " + accessor.getDestination());
-        System.out.println("Message Headers: " + accessor.getMessageHeaders());
-        System.out.println("First Native Header: " + accessor.getFirstNativeHeader("token"));
-        System.out.println("Session ID: " + accessor.getSessionId());
-        System.out.println("User: " + accessor.getUser());
-        System.out.println("Subscription ID: " + accessor.getSubscriptionId());
+        System.out.println("---------------------------------------------------------------------------------------------------------------------");
+        log.info("Command: {}", accessor.getCommand());
+        log.info("Destination: {}", accessor.getDestination());
+        log.info("Message Headers: {}", accessor.getMessageHeaders());
+        log.info("First Native Header: {}", accessor.getFirstNativeHeader("token"));
+        log.info("Session ID: {}", accessor.getSessionId());
 
         //웹소켓 연결 요청
         if (StompCommand.CONNECT == accessor.getCommand()) {
-
             String sessionId = accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
 
             String memberId = jwtTokenProvider.getMemberIdByToken(token);
 
-
             chatRoomRepository.setUserInfo(sessionId, memberId);
+            log.info("CONNECT {}", token);
         }
 
         //구독 요청
         else if (StompCommand.SUBSCRIBE == accessor.getCommand()) {
-            System.out.println("구독 시작");
             String sessionId = accessor.getSessionId();
             String destination = (String) message.getHeaders().get("simpDestination");
 
@@ -79,7 +75,7 @@ public class StompHandler implements ChannelInterceptor {
 
             //roomId가 안들어왔으면 컷
             if (roomId == null) {
-                System.out.println("roomId가 안들어옴");
+                log.info("roomId가 안들어옴");
                 throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
             }
 
@@ -90,7 +86,7 @@ public class StompHandler implements ChannelInterceptor {
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 컷
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
             if (chatRoomMappingInfo != null && !roomId.equals(chatRoomMappingInfo.getRoomId())) {
-                System.out.println("이미 연결된 방이 있는데 애꿎은 방을 들어가려고 함");
+                log.info("이미 연결된 방이 있는데 애꿎은 방을 들어가려고 함");
                 throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
             }
 
@@ -98,7 +94,7 @@ public class StompHandler implements ChannelInterceptor {
             int count = ChatNickName.valueOf(nickName).getValue();
 
             if (chatRoomRepository.getUserCount(roomId) >= 15) {
-                System.out.println("인원수가 다 참");
+                log.info("인원수가 다 참");
                 throw new BaseException(ChatErrorCode.FULL_CHAT_ROOM);
             }
 
@@ -108,7 +104,8 @@ public class StompHandler implements ChannelInterceptor {
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
                 chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
-                        chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now()));
+                        chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now()));
+
             }
         }
 
