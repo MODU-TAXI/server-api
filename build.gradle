@@ -80,8 +80,14 @@ dependencies {
     // Spatial Data
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
 
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     //Cool SMS
     implementation 'net.nurigo:sdk:4.2.7'
+
+    //Http Client
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
 
     // Firebase
     implementation 'com.google.firebase:firebase-admin:9.2.0'

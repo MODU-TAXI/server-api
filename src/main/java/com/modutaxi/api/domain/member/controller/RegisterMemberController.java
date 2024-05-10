@@ -66,4 +66,14 @@ public class RegisterMemberController {
         return ResponseEntity.ok(registerMemberService.checkMembership(
                 type, loginRequest.getAccessToken()));
     }
+
+    /**
+     * [POST] 로그아웃
+     * /logout
+     */
+    @Operation(summary = "로그아웃", description = "헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요!")
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.ok().build();
+    }
 }

@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.member.repository;
 
 public interface RedisRTKRepository {
-    Boolean save(String refreshToken, Long memberId);
-    String findAndDeleteById(String key);
+    void save(Long memberId, String refreshToken, Long duration);
+
+    String findAndDeleteById(String memberId);
 }

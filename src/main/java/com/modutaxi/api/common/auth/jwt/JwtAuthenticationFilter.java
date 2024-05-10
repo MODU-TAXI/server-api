@@ -36,9 +36,13 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             authentication = jwtTokenProvider.getRefreshAuthentication(refreshToken); // authentication 세팅
         }
         // 헤더에 aceessToken을 보냈을 경우
-        else if(token != null) {
+        else if (token != null) {
             jwtTokenProvider.validateAccessToken(token); // 유효성 검사
             authentication = jwtTokenProvider.getAccessAuthentication(token); // authentication 세팅
+            // 로그아웃 요청
+            if (((HttpServletRequest) request).getRequestURI().equals("/api/members/logout")) {
+                jwtTokenProvider.logout(token);
+            }
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);

@@ -13,10 +13,9 @@ import java.util.concurrent.TimeUnit;
 @Repository
 @RequiredArgsConstructor
 public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Serializable, RedisRTKRepository {
+
     private final RedisTemplate<String, String> redisTemplate;
     private ValueOperations<String, String> valueOperations;
-
-    public static final int REFRESH_TOKEN_VALID_DAYS = 7;
 
     @PostConstruct
     protected void init() {
@@ -25,15 +24,13 @@ public class RedisRTKRepositoryImpl extends BaseRedisRepository implements Seria
     }
 
     @Override
-    public Boolean save(String refreshToken, Long memberId) {
-        String key = generateGlobalKey(refreshToken);
-        valueOperations.set(key, memberId.toString());
-        redisTemplate.expire(key, REFRESH_TOKEN_VALID_DAYS, TimeUnit.DAYS);
-        return true;
+    public void save(Long memberId, String refreshToken, Long duration) {
+        String key = generateGlobalKey(memberId.toString());
+        valueOperations.set(key, refreshToken, duration, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public String findAndDeleteById(String key) {
-        return valueOperations.getAndDelete(generateGlobalKey(key));
+    public String findAndDeleteById(String memberId) {
+        return valueOperations.getAndDelete(generateGlobalKey(memberId));
     }
 }

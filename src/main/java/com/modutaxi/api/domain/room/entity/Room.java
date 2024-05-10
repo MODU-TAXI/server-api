@@ -42,7 +42,7 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private long duration = 3600000;
+    private long durationMinutes = 3600000;
 
     @NotNull
     @Builder.Default
@@ -56,8 +56,15 @@ public class Room extends BaseTime {
     private Point departurePoint = null;
 
     @NotNull
+    private String departureName;
+
+    @NotNull
     @Builder.Default
     private LocalDateTime departureTime = LocalDateTime.now();
+
+    @NotNull
+    @Builder.Default
+    private int currentHeadcount = 0;
 
     @NotNull
     @Builder.Default
@@ -71,9 +78,10 @@ public class Room extends BaseTime {
         Coordinate coordinate
             = new Coordinate(updateRoomDto.getDepartureLongitude(), updateRoomDto.getDepartureLatitude());
         this.departurePoint = geometryFactory.createPoint(coordinate);
+        this.departureName = updateRoomDto.getDepartureName();
         this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();
-        this.duration = updateRoomDto.getDuration();
+        this.durationMinutes = updateRoomDto.getDurationMinutes();
     }
 }
