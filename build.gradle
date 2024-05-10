@@ -5,7 +5,7 @@ plugins {
 }
 
 jar {
-   enabled = false
+    enabled = false
 }
 
 group = 'com.modu-taxi'
@@ -66,7 +66,6 @@ dependencies {
     // AWS - S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-
     // WebClient
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -88,6 +87,9 @@ dependencies {
 
     //Http Client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
+
+    // Firebase
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
@@ -97,6 +99,6 @@ tasks.named('test') {
 processResources.dependsOn('copySubmodule')
 task copySubmodule(type: Copy) {
     from './config'
-    include '*.yml'
+    include '*.yml', '*.json'
     into './src/main/resources'
 }
