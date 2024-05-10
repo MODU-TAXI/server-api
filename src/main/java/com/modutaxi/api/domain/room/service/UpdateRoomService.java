@@ -8,6 +8,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
+import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -18,6 +19,8 @@ import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
+import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
@@ -38,6 +41,8 @@ public class UpdateRoomService {
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
+    private final RoomWaitingService roomWaitingService;
+    private final ChatRoomRepository chatRoomRepository;
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
     private static final float MIN_LONGITUDE = 124;
@@ -82,7 +87,12 @@ public class UpdateRoomService {
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
 
-        // TODO: 5/9/24 매핑 정보 삭제
+        MemberRoomInResponseList memberRoomInResponseList
+            = roomWaitingService.getParticipateInRoom(roomId);
+
+        memberRoomInResponseList.getInList().forEach(
+            item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
+        );
 
         return new DeleteRoomResponse(true);
     }
