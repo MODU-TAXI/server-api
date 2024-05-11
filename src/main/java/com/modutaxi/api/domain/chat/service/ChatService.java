@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.chat.service;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
@@ -28,16 +29,11 @@ public class ChatService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final RoomRepository roomRepository;
+    private final FcmService fcmService;
     /**
      * 채팅방에 메시지 발송할 수 있도록
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
-
-        if (chatMessageRequestDto.getType().equals(MessageType.JOIN)) {
-            chatMessageRequestDto.setContent(chatMessageRequestDto.getSender() + "님이 들어왔습니다.");
-        } else if (chatMessageRequestDto.getType().equals(MessageType.LEAVE)) {
-            chatMessageRequestDto.setContent(chatMessageRequestDto.getSender() + "님이 나갔습니다.");
-        }
 
         redisTemplate.convertAndSend(channelTopic.getTopic(),
             ChatMessageMapper.toDto(chatMessageRequestDto));
@@ -61,7 +57,8 @@ public class ChatService {
         int count = ChatNickName.valueOf(chatRoomMappingInfo.getNickname()).getValue();
         // 클라이언트 퇴장 메시지 발송한다.
         ChatMessageRequestDto chatMessageRequestDto = new ChatMessageRequestDto(Long.valueOf(
-                chatRoomMappingInfo.getRoomId()), MessageType.LEAVE, "",
+                chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
+            chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
                 chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now());
 
         sendChatMessage(chatMessageRequestDto);

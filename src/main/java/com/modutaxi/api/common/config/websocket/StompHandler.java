@@ -42,14 +42,6 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        System.out.println("---------------------------------------");
-        System.out.println("Command: " + accessor.getCommand());
-        System.out.println("Destination: " + accessor.getDestination());
-        System.out.println("Message Headers: " + accessor.getMessageHeaders());
-        System.out.println("First Native Header: " + accessor.getFirstNativeHeader("token"));
-        System.out.println("Session ID: " + accessor.getSessionId());
-        System.out.println("User: " + accessor.getUser());
-        System.out.println("Subscription ID: " + accessor.getSubscriptionId());
 
         //웹소켓 연결 요청
         if (StompCommand.CONNECT == accessor.getCommand()) {
@@ -107,7 +99,8 @@ public class StompHandler implements ChannelInterceptor {
                 chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
-                chatService.sendChatMessage(new ChatMessageRequestDto(Long.valueOf(roomId),MessageType.JOIN,"",
+                chatService.sendChatMessage(new ChatMessageRequestDto(
+                    Long.valueOf(roomId),MessageType.JOIN,nickName + "님이 들어왔습니다.",
                         chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now()));
             }
         }
