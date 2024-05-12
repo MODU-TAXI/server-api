@@ -22,7 +22,14 @@ public class FcmController {
     @Operation(summary = "FCM 구독")
     @GetMapping("/subscribe")
     public void subscribeTopic(@CurrentMember Member member,
-                               @RequestParam Long chatroomId) {
-        fcmService.subscribe(member, chatroomId);
+                               @RequestParam Long roomId) {
+        fcmService.subscribe(member, roomId);
+    }
+
+    @Operation(summary = "FCM 구독 취소")
+    @GetMapping("/unsubscribe")
+    public void unsubscribeTopic(@CurrentMember Member member,
+                                 @RequestParam Long roomId) {
+        fcmService.unsubscribe(member, roomId);
     }
 }
