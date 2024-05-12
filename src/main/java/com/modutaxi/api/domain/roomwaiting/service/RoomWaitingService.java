@@ -2,10 +2,13 @@ package com.modutaxi.api.domain.roomwaiting.service;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
@@ -26,6 +29,8 @@ public class RoomWaitingService {
     private final RoomRepository roomRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final GetMemberService getMemberService;
+    private final FcmService fcmService;
+    private final MemberRepository memberRepository;
     public ApplyResponse applyForParticipate(Member member, String roomId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
@@ -50,6 +55,7 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
         chatRoomRepository.addToWaitingList(roomId, member.getId().toString());
+        fcmService.sendNewParticipant(room.getRoomManager(), roomId);
         return new ApplyResponse(true);
     }
 
@@ -57,6 +63,8 @@ public class RoomWaitingService {
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
+        Member participant = memberRepository.findByIdAndStatusTrue(Long.valueOf(memberId))
+            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
         if(chatRoomRepository.findChatInfoByMemberId(memberId)!=null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
@@ -82,12 +90,12 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 
-
-        // TODO: 5/2/24 String이 아닌 Fcm 알림 전송으로 변경
         //대기열에서 제거
         chatRoomRepository.removeFromWaitingList(roomId, memberId);
         //채팅방에 저장
         chatRoomRepository.addRoomInMemberList(roomId, memberId);
+
+        fcmService.sendPermitParticipate(participant, roomId);
 
         return new ApplyResponse(true);
     }

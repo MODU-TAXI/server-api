@@ -5,6 +5,7 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
@@ -99,9 +100,11 @@ public class StompHandler implements ChannelInterceptor {
                 chatRoomRepository.setUserEnterInfo(memberId, chatRoomMappingInfo);
                 // 채팅방의 인원수 체크
                 chatRoomRepository.plusUserCount(roomId, count);
-                chatService.sendChatMessage(new ChatMessageRequestDto(
+                ChatMessageRequestDto joinMessage = new ChatMessageRequestDto(
                     Long.valueOf(roomId),MessageType.JOIN,nickName + "님이 들어왔습니다.",
-                        chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now()));
+                    chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now());
+
+                chatService.sendChatMessage(joinMessage);
             }
         }
 

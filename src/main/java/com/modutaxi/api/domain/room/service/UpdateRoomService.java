@@ -8,6 +8,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
+import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
@@ -43,6 +44,8 @@ public class UpdateRoomService {
     private final GetTaxiInfoService getTaxiInfoService;
     private final RoomWaitingService roomWaitingService;
     private final ChatRoomRepository chatRoomRepository;
+    private final FcmService fcmService;
+
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
     private static final float MIN_LONGITUDE = 124;
@@ -71,7 +74,7 @@ public class UpdateRoomService {
         }
 
         room.update(newRoomData);
-
+        fcmService.sendUpdateRoomInfo(member.getId(), roomId);
         return RoomMapper.toDto(room, member, path);
     }
 
@@ -84,16 +87,18 @@ public class UpdateRoomService {
 
         checkManager(room.getRoomManager().getId(), member.getId());
 
+        Long deleteRoomId = room.getId();
+
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
 
         MemberRoomInResponseList memberRoomInResponseList
-            = roomWaitingService.getParticipateInRoom(roomId);
+            = roomWaitingService.getParticipateInRoom(deleteRoomId);
 
         memberRoomInResponseList.getInList().forEach(
             item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
-
+        fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
         return new DeleteRoomResponse(true);
     }
 

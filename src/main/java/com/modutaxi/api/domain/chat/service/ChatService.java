@@ -35,6 +35,8 @@ public class ChatService {
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
 
+        fcmService.sendChatMessage(chatMessageRequestDto);
+
         redisTemplate.convertAndSend(channelTopic.getTopic(),
             ChatMessageMapper.toDto(chatMessageRequestDto));
     }
@@ -56,12 +58,12 @@ public class ChatService {
 
         int count = ChatNickName.valueOf(chatRoomMappingInfo.getNickname()).getValue();
         // 클라이언트 퇴장 메시지 발송한다.
-        ChatMessageRequestDto chatMessageRequestDto = new ChatMessageRequestDto(Long.valueOf(
+        ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(
                 chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
             chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
                 chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now());
 
-        sendChatMessage(chatMessageRequestDto);
+        sendChatMessage(leaveMessage);
 
         chatRoomRepository.removeUserByMemberIdEnterInfo(member.getId().toString());
         chatRoomRepository.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
