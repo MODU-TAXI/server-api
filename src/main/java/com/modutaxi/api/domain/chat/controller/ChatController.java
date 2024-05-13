@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @RestController
 @Tag(name = "pub/sub 관련 API")
@@ -46,9 +48,10 @@ public class ChatController {
         String memberId = jwtTokenProvider.getMemberIdByToken(token);
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
 
-        //닉네임 설정
         message.setSender(chatRoomMappingInfo.getNickname());
         message.setMemberId(memberId);
+        message.setDateTime(LocalDateTime.now());
+
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);
