@@ -35,6 +35,17 @@ public class FcmService {
         }
     }
 
+    public void subscribe(Long memberId, Long roomId) {
+        String fcmToken = validateAndGetFcmToken(memberId);
+        try {
+            FirebaseMessaging.getInstance()
+                    .subscribeToTopic(
+                            Collections.singletonList(fcmToken), Long.toString(roomId));
+        } catch (FirebaseMessagingException e) {
+            throw new BaseException(ChatErrorCode.FAIL_FCM_SUBSCRIBE);
+        }
+    }
+
     public void unsubscribe(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         try {
@@ -161,7 +172,7 @@ public class FcmService {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
                 .putData("MessageType", "SUCCESS_MATCHING")
-                .putData("message", "어디어디 방 매칭에 성공했어요.")
+                .putData("message", "방이 삭제 되었어요.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
                 .build();

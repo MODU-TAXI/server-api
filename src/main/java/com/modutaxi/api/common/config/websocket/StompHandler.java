@@ -37,6 +37,7 @@ public class StompHandler implements ChannelInterceptor {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     private final RoomRepository roomRepository;
+    private final FcmService fcmService;
 //    private final StompErrorHandler stompErrorHandler;
 
     
@@ -105,6 +106,7 @@ public class StompHandler implements ChannelInterceptor {
                     chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now());
 
                 chatService.sendChatMessage(joinMessage);
+                fcmService.subscribe(Long.valueOf(memberId),Long.valueOf(roomId));
             }
         }
 

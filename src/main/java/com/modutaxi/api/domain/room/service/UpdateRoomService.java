@@ -97,6 +97,7 @@ public class UpdateRoomService {
         memberRoomInResponseList.getInList().forEach(
             item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
+
         fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
         roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
