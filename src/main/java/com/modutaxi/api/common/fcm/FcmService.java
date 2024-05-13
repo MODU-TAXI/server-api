@@ -59,7 +59,7 @@ public class FcmService {
 
     public void send(Message message) {
         try {
-            firebaseMessaging.getInstance().send(message);
+            FirebaseMessaging.getInstance().send(message);
             Gson gson = new Gson();
             String fcmMessageJson = gson.toJson(message);
             log.info("FCM 메시지: " + fcmMessageJson);
