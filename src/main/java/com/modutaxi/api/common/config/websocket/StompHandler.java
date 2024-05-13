@@ -106,7 +106,6 @@ public class StompHandler implements ChannelInterceptor {
                     chatRoomMappingInfo.getNickname(),memberId, LocalDateTime.now());
 
                 chatService.sendChatMessage(joinMessage);
-                fcmService.subscribe(Long.valueOf(memberId),Long.valueOf(roomId));
             }
         }
 

@@ -35,17 +35,6 @@ public class FcmService {
         }
     }
 
-    public void subscribe(Long memberId, Long roomId) {
-        String fcmToken = validateAndGetFcmToken(memberId);
-        try {
-            FirebaseMessaging.getInstance()
-                    .subscribeToTopic(
-                            Collections.singletonList(fcmToken), Long.toString(roomId));
-        } catch (FirebaseMessagingException e) {
-            throw new BaseException(ChatErrorCode.FAIL_FCM_SUBSCRIBE);
-        }
-    }
-
     public void unsubscribe(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         try {
