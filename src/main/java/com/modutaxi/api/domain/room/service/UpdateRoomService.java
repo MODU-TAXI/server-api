@@ -80,16 +80,16 @@ public class UpdateRoomService {
 
     @Transactional
     public DeleteRoomResponse deleteRoom(Member member, Long roomId) {
+
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
         TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
         checkManager(room.getRoomManager().getId(), member.getId());
 
         Long deleteRoomId = room.getId();
-
-        roomRepository.delete(room);
 
         MemberRoomInResponseList memberRoomInResponseList
             = roomWaitingService.getParticipateInRoom(deleteRoomId);
@@ -98,6 +98,7 @@ public class UpdateRoomService {
             item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
         fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
+        roomRepository.delete(room);
         taxiInfoMongoRepository.delete(taxiInfo);
         return new DeleteRoomResponse(true);
     }

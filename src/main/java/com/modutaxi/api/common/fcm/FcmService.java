@@ -118,6 +118,7 @@ public class FcmService {
                 .putData("message", "새로운 참가 요청이 들어왔습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
+                .setTopic(roomId)
                 .build();
         send(message);
     }
