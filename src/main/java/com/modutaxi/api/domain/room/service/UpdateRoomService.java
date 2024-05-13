@@ -90,7 +90,6 @@ public class UpdateRoomService {
         Long deleteRoomId = room.getId();
 
         roomRepository.delete(room);
-        taxiInfoMongoRepository.delete(taxiInfo);
 
         MemberRoomInResponseList memberRoomInResponseList
             = roomWaitingService.getParticipateInRoom(deleteRoomId);
@@ -99,6 +98,7 @@ public class UpdateRoomService {
             item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
         fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
+        taxiInfoMongoRepository.delete(taxiInfo);
         return new DeleteRoomResponse(true);
     }
 
