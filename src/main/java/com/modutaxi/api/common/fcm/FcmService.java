@@ -68,6 +68,16 @@ public class FcmService {
         }
     }
 
+    public void testSend(Member member){
+        String fcmToken = validateAndGetFcmToken(member.getId());
+        Message message = Message.builder()
+                .putData("MessageType", "TEST")
+                .putData("content", "민우 븅~딱")
+                .setToken(fcmToken)
+                .build();
+        send(message);
+    }
+
     /**
      * 채팅 메세지 전송, 토큰으로만
      */

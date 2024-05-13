@@ -32,4 +32,10 @@ public class FcmController {
                                  @RequestParam Long roomId) {
         fcmService.unsubscribe(member, roomId);
     }
+
+    @Operation(summary = "FCM 테스트")
+    @GetMapping("/test")
+    public void testFcm(@CurrentMember Member member){
+        fcmService.testSend(member);
+    }
 }
