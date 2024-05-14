@@ -83,8 +83,8 @@ public class RegisterRoomService {
 
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
-        chatRoomRepository.addRoomInMemberList(room.getId().toString(), member.getId().toString());
         roomRepository.save(room);
+        chatRoomRepository.addRoomInMemberList(room.getId().toString(), member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
         return RoomMapper.toDto(room, member, path);
     }
