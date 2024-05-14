@@ -98,20 +98,9 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
                 = roomWaitingService.getParticipateInRoom(deleteRoomId);
 
-        RoomWaitingResponseList roomWaitingResponseList
-                = roomWaitingService.getWaitingList(deleteRoomId);
-
         //참가자들의 매핑된 방 정보 삭제
         memberRoomInResponseList.getInList().forEach(
-                item -> {
-                    chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString());
-                    chatRoomRepository.removeFromRoomInList(deleteRoomId.toString(), item.getMemberId().toString());
-                }
-        );
-
-        //대기열 리스트 삭제
-        roomWaitingResponseList.getWaitingList().forEach(
-                item -> chatRoomRepository.removeFromWaitingList(deleteRoomId.toString(), item.getMemberId().toString())
+                item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
 
 
