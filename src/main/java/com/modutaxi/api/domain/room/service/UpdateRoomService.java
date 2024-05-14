@@ -10,6 +10,7 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -94,12 +95,30 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
             = roomWaitingService.getParticipateInRoom(deleteRoomId);
 
+        //참가자들의 매핑된 방 정보 삭제
         memberRoomInResponseList.getInList().forEach(
             item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
         );
 
-        fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
+        //채팅방 유저수 정보 삭제
+        chatRoomRepository.deleteUserCount(roomId.toString());
+        //방 삭제
         roomRepository.delete(room);
+
+        //참가자들에게 글 삭제 알림
+        //참가자들 fcm 구독 끊기
+        memberRoomInResponseList.getInList().forEach(
+                item -> {
+                    fcmService.sendDeleteRoom(item.getMemberId(), deleteRoomId);
+                    fcmService.unsubscribe(item.getMemberId(), deleteRoomId);
+                }
+        );
+
+        //대기열 & 참가리스트 삭제
+        chatRoomRepository.removeRoomInList(deleteRoomId.toString());
+        chatRoomRepository.removeRoomWaitingList(deleteRoomId.toString());
+
+        //경로 정보 삭제
         taxiInfoMongoRepository.delete(taxiInfo);
         return new DeleteRoomResponse(true);
     }

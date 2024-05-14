@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
 import com.modutaxi.api.domain.member.entity.Member;
 
 import java.util.Collections;
@@ -21,11 +20,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class FcmService {
 
-    private final FirebaseMessaging firebaseMessaging;
     private final RedisFcmRepositoryImpl redisFcmRepository;
 
-    public void subscribe(Member member, Long roomId) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
+    public void subscribe(Long memberId, Long roomId) {
+        String fcmToken = validateAndGetFcmToken(memberId);
         try {
             FirebaseMessaging.getInstance()
                     .subscribeToTopic(
@@ -35,8 +33,8 @@ public class FcmService {
         }
     }
 
-    public void unsubscribe(Member member, Long roomId) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
+    public void unsubscribe(Long memberId, Long roomId) {
+        String fcmToken = validateAndGetFcmToken(memberId);
         try {
             FirebaseMessaging.getInstance()
                     .unsubscribeFromTopic(
@@ -57,38 +55,19 @@ public class FcmService {
         }
     }
 
+    // TODO: 5/14/24 프론트 측 테스트를 위한 메서드입니다.
     public void testSend(Member member){
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("MessageType", "TEST")
-                .putData("content", "민우 븅~딱")
+                .putData("content", "테스트메세지")
                 .setToken(fcmToken)
                 .build();
         send(message);
     }
 
     /**
-     * 채팅 메세지 전송, 토큰으로만
-     */
-    // TODO: 5/12/24 사용안할 수도
-    public void sendChatMessage(Member member,
-                                ChatMessageRequestDto chatMessageRequestDto) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
-
-        Message message = Message.builder()
-                .putData("roomId", chatMessageRequestDto.getRoomId().toString())
-                .putData("MessageType", chatMessageRequestDto.getType().toString())
-                .putData("content", chatMessageRequestDto.getContent())
-                .putData("sender", chatMessageRequestDto.getSender())
-                .putData("memberId", chatMessageRequestDto.getMemberId())
-                .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
-                .setToken(fcmToken)
-                .build();
-        send(message);
-    }
-
-    /**
-     * 채팅 메세지 전송, 누군가 채팅방 나갔을 때, 누군가 채팅방 구독했을 때(들어왔을 때)
+     * 채팅 메세지 전송(일반 채팅 & 채팅방 퇴장 & 채팅방 입장)
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
         Message message = Message.builder()
@@ -108,7 +87,7 @@ public class FcmService {
      */
     public void sendUpdateRoomInfo(Long managerId, Long roomId) {
         Message message = Message.builder()
-                .putData("MessageType", "MESSAGE")
+                .putData("MessageType", "ROOM_UPDATE")
                 .putData("roomId", Long.toString(roomId))
                 .putData("message", "참여해 있는 방 정보가 업데이트 되었습니다.")
                 .putData("managerId", managerId.toString())
@@ -124,8 +103,8 @@ public class FcmService {
     public void sendNewParticipant(Member roomManager, String roomId) {
         String fcmToken = validateAndGetFcmToken(roomManager.getId());
         Message message = Message.builder()
-                .putData("MessageType", "PARTICIPATION_REQUEST")
-                .putData("message", "새로운 참가 요청이 들어왔습니다.")
+                .putData("MessageType", "PARTICIPATE_REQUEST")
+                .putData("message", "새로운 참가자의 참가 요청이 들어왔습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
                 .build();
@@ -139,8 +118,8 @@ public class FcmService {
     public void sendSuccessMatching(Long managerId, Long roomId) {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "SUCCESS_MATCHING")
-                .putData("message", "어디어디 방 매칭에 성공했어요.")
+                .putData("MessageType", "MATCHING_COMPLETE")
+                .putData("message", "방 매칭이 완료되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
                 .build();
@@ -155,8 +134,8 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "REQUEST_REMIT")
-                .putData("message", "정산해주세요!!")
+                .putData("MessageType", "REMIT_REQUEST")
+                .putData("message", "정산해주세요.")
                 .putData("bill", String.valueOf(bill))
                 .setTopic(roomId.toString())
                 .build();
@@ -164,13 +143,13 @@ public class FcmService {
     }
 
     /**
-     * 방 삭제 되었을 때(방장을 제외한 전부)
+     * 방 삭제 되었을 때
      */
     public void sendDeleteRoom(Long managerId, Long roomId) {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "SUCCESS_MATCHING")
-                .putData("message", "방이 삭제 되었어요.")
+                .putData("MessageType", "ROOM_DELETE")
+                .putData("message", "방이 삭제 되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
                 .build();
@@ -178,13 +157,13 @@ public class FcmService {
     }
 
     /**
-     * 사용자 매칭수락 받았을 때 알림
+     * 사용자가 매칭수락 받았을 때 알림
      */
     public void sendPermitParticipate(Member participant, String chatroomId) {
         String fcmToken = validateAndGetFcmToken(participant.getId());
         Message message = Message.builder()
-                .putData("MessageType", "SUCCESS_MATCHING")
-                .putData("message", "방 매칭에 성공했어요.")
+                .putData("MessageType", "MATCHING_SUCCESS")
+                .putData("message", "방 매칭에 성공했습니다.")
                 .putData("roomId", chatroomId)
                 .setToken(fcmToken)
                 .build();
@@ -198,8 +177,8 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("chatroomId", Long.toString(chatroomId))
-                .putData("MessageType", "NEW_MATCHING")
-                .putData("message", "어디어디 방 매칭에 성공했어요.")
+                .putData("MessageType", "TIME_TO_DEPART")
+                .putData("message", "예정되어 있던 출발 시간이 되었습니다.")
                 .setToken(fcmToken)
                 .build();
         send(message);
@@ -212,8 +191,8 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("chatroomId", Long.toString(chatroomId))
-                .putData("MessageType", "NEW_MATCHING")
-                .putData("message", "어디어디 방 매칭에 성공했어요.")
+                .putData("MessageType", "DEPART_10_MINUTES_AGO")
+                .putData("message", "출발 10분 전입니다.")
                 .setToken(fcmToken)
                 .build();
         send(message);
@@ -227,5 +206,5 @@ public class FcmService {
         }
         return fcmToken;
     }
-    // TODO: 5/12/24 토픽 검정 로직도 필요한가?
+    // TODO: 5/14/24 토픽 검정 로직
 }

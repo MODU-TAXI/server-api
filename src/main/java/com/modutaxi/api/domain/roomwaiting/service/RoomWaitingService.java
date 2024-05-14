@@ -31,6 +31,10 @@ public class RoomWaitingService {
     private final GetMemberService getMemberService;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
+
+    /**
+     * 방 참가 신청
+     */
     public ApplyResponse applyForParticipate(Member member, String roomId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
@@ -59,6 +63,9 @@ public class RoomWaitingService {
         return new ApplyResponse(true);
     }
 
+    /**
+     * 방 참가 수락
+     */
     public ApplyResponse acceptForParticipate(Member member, String roomId, String memberId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
@@ -100,7 +107,9 @@ public class RoomWaitingService {
         return new ApplyResponse(true);
     }
 
-    // TODO: 5/2/24 귀찮으니 코드 재사용
+    /**
+     * 방 참가 인원리스트 조회
+     */
     public MemberRoomInResponseList getParticipateInRoom(Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
@@ -115,6 +124,9 @@ public class RoomWaitingService {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * 매칭 대기 인원리스트 조회
+     */
     public RoomWaitingResponseList getWaitingList(Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));

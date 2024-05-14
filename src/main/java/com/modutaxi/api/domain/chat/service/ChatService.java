@@ -34,13 +34,15 @@ public class ChatService {
      * 채팅방에 메시지 발송할 수 있도록
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
-
-        fcmService.sendChatMessage(chatMessageRequestDto);
-
         redisTemplate.convertAndSend(channelTopic.getTopic(),
             ChatMessageMapper.toDto(chatMessageRequestDto));
+
+        fcmService.sendChatMessage(chatMessageRequestDto);
     }
 
+    /**
+     * 퇴장 로직
+     */
     public DeleteResponse deleteChatRoomInfo(Member member){
         ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
 
@@ -65,9 +67,10 @@ public class ChatService {
 
         sendChatMessage(leaveMessage);
 
+        chatRoomRepository.removeFromRoomInList(room.getId().toString(), member.getId().toString());
         chatRoomRepository.removeUserByMemberIdEnterInfo(member.getId().toString());
         chatRoomRepository.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
-
+        fcmService.unsubscribe(member.getId(), room.getId());
         return new DeleteResponse(true);
     }
 

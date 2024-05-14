@@ -57,6 +57,11 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
         return waitOperations.remove(ROOM_WAITING_LIST + "_" + roomId, memberId);
     }
 
+    //대기열 전체 삭제
+    public void removeRoomWaitingList(String roomId){
+        waitOperations.remove(ROOM_WAITING_LIST + "_" + roomId);
+    }
+
     //대기열 멤버 목록 조회
     public Set<String> findWaitingList(String roomId) {
         return waitOperations.members(ROOM_WAITING_LIST + "_" + roomId);
@@ -75,6 +80,11 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     //채팅방에서 특정 멤버 삭제
     public Long removeFromRoomInList(String roomId, String memberId) {
         return waitOperations.remove(ROOM_IN_LIST + "_" + roomId, memberId);
+    }
+
+    //참가 리스트 전체 삭제
+    public void removeRoomInList(String roomId){
+        waitOperations.remove(ROOM_IN_LIST + "_" + roomId);
     }
 
     //채팅방 안에 멤버 목록 조회
@@ -136,5 +146,9 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     // 채팅방에 입장한 유저수 -1
     public long minusUserCount(String roomId, int count) {
         return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId, count)).orElse(0L);
+    }
+
+    public void deleteUserCount(String roomId){
+        valueOperations.getAndDelete(USER_COUNT + "_" + roomId);
     }
 }
