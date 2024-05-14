@@ -71,7 +71,7 @@ public class FcmService {
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
         Message message = Message.builder()
-                .putData("roomId", chatMessageRequestDto.getRoomId().toString())
+                .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
                 .putData("MessageType", chatMessageRequestDto.getType().toString())
                 .putData("content", chatMessageRequestDto.getContent())
                 .putData("sender", chatMessageRequestDto.getSender())

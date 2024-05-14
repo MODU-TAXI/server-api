@@ -94,13 +94,9 @@ public class UpdateRoomService {
 
         Long deleteRoomId = room.getId();
 
+
         MemberRoomInResponseList memberRoomInResponseList
                 = roomWaitingService.getParticipateInRoom(deleteRoomId);
-
-        //참가자들의 매핑된 방 정보 삭제
-        memberRoomInResponseList.getInList().forEach(
-                item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
-        );
 
 
         //채팅방 유저수 정보 삭제
@@ -112,11 +108,15 @@ public class UpdateRoomService {
         //참가자들 fcm 구독 끊기
         memberRoomInResponseList.getInList().forEach(
                 item -> {
-                    fcmService.sendDeleteRoom(item.getMemberId(), deleteRoomId);
+                    fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
                     fcmService.unsubscribe(item.getMemberId(), deleteRoomId);
                 }
         );
 
+        //참가자들의 매핑된 방 정보 삭제
+        memberRoomInResponseList.getInList().forEach(
+                item -> chatRoomRepository.removeUserByMemberIdEnterInfo(item.getMemberId().toString())
+        );
 
         //경로 정보 삭제
         taxiInfoMongoRepository.delete(taxiInfo);
