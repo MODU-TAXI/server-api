@@ -88,6 +88,13 @@ dependencies {
 
     //Http Client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'com.querydsl:querydsl-sql-spatial:5.0.0'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 tasks.named('test') {
@@ -99,4 +106,18 @@ task copySubmodule(type: Copy) {
     from './config'
     include '*.yml'
     into './src/main/resources'
+}
+
+def generated = "src/main/generated"
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+
+clean {
+    delete file(generated)
 }

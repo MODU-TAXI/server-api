@@ -44,3 +44,6 @@ src/main/resources/*.yml
 ### act ###
 *.secrets
 artifacts/
+
+### QueryDSL ###
+**/generated
