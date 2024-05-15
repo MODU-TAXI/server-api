@@ -49,7 +49,7 @@ public class RoomMapper {
 
     public static RoomDetailResponse toDto(Room room, Member member, LineString path) {
         return RoomDetailResponse.builder()
-            .managerId(member.getId())
+            .managerId(room.getRoomManager().getId())
             .score(member.getScore())
             .isMyRoom(room.getRoomManager().getId().equals(member.getId()))
             .roomId(room.getId())
