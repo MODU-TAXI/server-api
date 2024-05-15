@@ -60,7 +60,7 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("MessageType", "TEST")
-                .putData("content", "테스트메세지")
+                .putData("message", "테스트메세지")
                 .setToken(fcmToken)
                 .build();
         send(message);
@@ -73,7 +73,7 @@ public class FcmService {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
                 .putData("MessageType", chatMessageRequestDto.getType().toString())
-                .putData("content", chatMessageRequestDto.getContent())
+                .putData("message", chatMessageRequestDto.getContent())
                 .putData("sender", chatMessageRequestDto.getSender())
                 .putData("memberId", chatMessageRequestDto.getMemberId())
                 .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
