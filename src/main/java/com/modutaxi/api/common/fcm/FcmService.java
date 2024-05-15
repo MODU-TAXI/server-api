@@ -159,12 +159,12 @@ public class FcmService {
     /**
      * 사용자가 매칭수락 받았을 때 알림
      */
-    public void sendPermitParticipate(Member participant, String chatroomId) {
+    public void sendPermitParticipate(Member participant, String roomId) {
         String fcmToken = validateAndGetFcmToken(participant.getId());
         Message message = Message.builder()
                 .putData("MessageType", "MATCHING_SUCCESS")
                 .putData("message", "방 매칭에 성공했습니다.")
-                .putData("roomId", chatroomId)
+                .putData("roomId", roomId)
                 .setToken(fcmToken)
                 .build();
         send(message);
@@ -173,10 +173,10 @@ public class FcmService {
     /**
      * 출발 시각이 되었을 때(스프링 스케줄러 cron식으로 보내기)
      */
-    public void sendDepartureTime(Member member, Long chatroomId) {
+    public void sendDepartureTime(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
-                .putData("chatroomId", Long.toString(chatroomId))
+                .putData("chatroomId", Long.toString(roomId))
                 .putData("MessageType", "TIME_TO_DEPART")
                 .putData("message", "예정되어 있던 출발 시간이 되었습니다.")
                 .setToken(fcmToken)
@@ -187,10 +187,10 @@ public class FcmService {
     /**
      * 출발 10(임시)분 전
      */
-    public void send10MinutesBeforeDepartureTime(Member member, Long chatroomId) {
+    public void send10MinutesBeforeDepartureTime(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
-                .putData("chatroomId", Long.toString(chatroomId))
+                .putData("chatroomId", Long.toString(roomId))
                 .putData("MessageType", "DEPART_10_MINUTES_AGO")
                 .putData("message", "출발 10분 전입니다.")
                 .setToken(fcmToken)

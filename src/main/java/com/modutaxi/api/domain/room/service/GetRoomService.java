@@ -2,12 +2,10 @@ package com.modutaxi.api.domain.room.service;
 
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchWithRadiusResponseInterface;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;

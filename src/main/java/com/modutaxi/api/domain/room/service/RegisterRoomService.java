@@ -16,7 +16,6 @@ import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
