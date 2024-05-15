@@ -2,8 +2,11 @@ package com.modutaxi.api.domain.room.mapper;
 
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.mongodb.client.model.geojson.LineString;
@@ -70,20 +73,24 @@ public class RoomMapper {
             .build();
     }
 
-    public static RoomSimpleResponse toDto(Room room) {
+    public static RoomSimpleResponse toDto(SearchListResponse dao) {
         return RoomSimpleResponse.builder()
-            .roomId(room.getId())
-            .spotId(room.getSpot().getId())
-            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime().plusMinutes(room.getDurationMinutes())))
-            .arrivalName(room.getSpot().getName())
-            .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
-            .departureTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime()))
-            .departureName(room.getDepartureName())
-            .currentHeadcount(room.getCurrentHeadcount())
-            .wishHeadcount(room.getWishHeadcount())
-            .durationMinutes(room.getDurationMinutes())
-            .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
-            .expectedCharge(room.getExpectedCharge())
+            .roomId(dao.getId())
+            .spotId(dao.getSpotId())
+            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(dao.getDepartureTime().plusMinutes(dao.getDurationMinutes())))
+            .arrivalName(dao.getSpotName())
+            .roomTagBitMaskList(convertBitMaskToRoomTagList(dao.getRoomTagBitMask()))
+            .departureTime(TimeFormatConverter.covertTimeToShortClockTime(dao.getDepartureTime()))
+            .departureName(dao.getDepartureName())
+            .currentHeadcount(dao.getCurrentHeadcount())
+            .wishHeadcount(dao.getWishHeadcount())
+            .durationMinutes(dao.getDurationMinutes())
+            .expectedChargePerPerson((dao.getExpectedCharge()) / (dao.getWishHeadcount() + 1))
+            .expectedCharge(dao.getExpectedCharge())
             .build();
+    }
+
+    public static SearchWithRadiusResponse toDto(SearchMapResponse dao) {
+        return new SearchWithRadiusResponse(dao.getId(), (float) dao.getDeparturePoint().getX(), (float) dao.getDeparturePoint().getY(), dao.getSpotName());
     }
 }
