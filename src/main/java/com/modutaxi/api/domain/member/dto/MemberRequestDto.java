@@ -72,4 +72,14 @@ public class MemberRequestDto {
         @Schema(description = "등록할 닉네임")
         private String nickname;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateProfileRequest {
+        @Schema(description = "변경할 닉네임")
+        private String nickname;
+        @Schema(description = "변경할 프로필 이미지의 S3 링크")
+        private String ImageUrl;
+    }
 }

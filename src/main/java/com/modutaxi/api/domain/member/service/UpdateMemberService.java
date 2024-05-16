@@ -3,15 +3,19 @@ package com.modutaxi.api.domain.member.service;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.UpdateProfileResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.sms.service.SmsService;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -83,4 +87,23 @@ public class UpdateMemberService {
         return new CertificationResponse(
             smsService.checkSmsCertificationCode(signupKey, phoneNumber, certificationCode));
     }
+
+    @Transactional
+    public UpdateProfileResponse updateProfile(Member member, String nickname, String imageUrl) {
+        checkNickname(nickname);
+        // imageUrl == "" 라면 삭제 요청을 뜻하므로 null 로 초기화해줍니다.
+        member.updateProfile(nickname, Objects.equals(imageUrl, "") ? null : imageUrl);
+        memberRepository.save(member);
+        return new UpdateProfileResponse(member.getNickname(), member.getImageUrl());
+    }
+
+    private void checkNickname(String nickname) {
+        // 중복 체크
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
+        }
+        // 그 외 필터링
+        NicknameValidator.validate(nickname);
+    }
+
 }

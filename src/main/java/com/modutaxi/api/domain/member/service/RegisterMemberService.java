@@ -99,16 +99,19 @@ public class RegisterMemberService {
      */
     @Transactional
     public NicknameResponse registerNickname(Member member, String nickname) {
+        checkNickname(nickname);
+        member.changeNickname(nickname);
+        memberRepository.save(member);
+        return new NicknameResponse(member.getNickname());
+    }
+
+    private void checkNickname(String nickname) {
         // 중복 체크
         if (memberRepository.existsByNickname(nickname)) {
             throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
         }
         // 그 외 필터링
         NicknameValidator.validate(nickname);
-        // 닉네임 등록 성공
-        member.changeNickname(nickname);
-        memberRepository.save(member);
-        return new NicknameResponse(member.getNickname());
     }
 
     /**

@@ -2,13 +2,16 @@ package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequest;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.UpdateProfileRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.UpdateProfileResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +24,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -234,5 +241,60 @@ public class UpdateMemberController {
     @PostMapping("/sms/confirm")
     public ResponseEntity<CertificationResponse> confirmSmsCertification(@RequestBody ConfirmSmsCertificationReqeust request) {
         return ResponseEntity.ok(updateMemberService.checkSmsCertificationCode(request.getKey(), request.getPhoneNumber(), request.getCertificationCode()));
+    }
+
+    /**
+     * [PATCH] 멤버 프로필 변경
+     * /api/members
+     */
+    @Operation(
+        summary = "멤버 프로필 변경",
+        description = "멤버 프로필을 변경합니다.<br>" +
+            "헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요!<br>" +
+            "등록한 프로필 사진을 삭제하고 싶다면 blank(\"\")를 보내주세요!"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "프로필 변경 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UpdateProfileResponse.class))),
+        @ApiResponse(responseCode = "400", description = "프로필 변경 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+            @ExampleObject(name = "MEMBER_003", description = "닉네임 중복", value = """
+                {
+                    "errorCode": "MEMBER_003",
+                    "message": "이미 있는 닉네임이에요!"
+                }
+                """),
+            @ExampleObject(name = "MEMBER_006", description = "공백, 특수문자 포함", value = """
+                {
+                    "errorCode": "MEMBER_006",
+                    "message": "공백, 특수문자는 사용할 수 없어요!"
+                }
+                """),
+            @ExampleObject(name = "MEMBER_007", description = "닉네임 최소 길이 제한", value = """
+                {
+                    "errorCode": "MEMBER_007",
+                    "message": "닉네임은 최소 2글자부터 가능해요!"
+                }
+                """),
+            @ExampleObject(name = "MEMBER_008", description = "닉네임 최대 길이 제한", value = """
+                {
+                    "errorCode": "MEMBER_008",
+                    "message": "닉네임은 최대 12글자까지 가능해요!"
+                }
+                """),
+            @ExampleObject(name = "MEMBER_009", description = "비속어 혹은 부적절한 단어", value = """
+                {
+                    "errorCode": "MEMBER_009",
+                    "message": "비속어 혹은 부적절한 단어가 포함된 닉네임은 생성할 수 없어요!"
+                }
+                """),
+        })),
+    })
+    @PatchMapping("")
+    public ResponseEntity<UpdateProfileResponse> updateMemberProfile(
+        @CurrentMember Member member,
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(schema = @Schema(implementation = UpdateProfileRequest.class)))
+        @RequestBody UpdateProfileRequest request
+    ) {
+        return ResponseEntity.ok(updateMemberService.updateProfile(
+            member, request.getNickname(), request.getImageUrl()));
     }
 }

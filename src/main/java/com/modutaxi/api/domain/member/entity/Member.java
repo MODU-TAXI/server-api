@@ -79,6 +79,11 @@ public class Member extends BaseTime {
         this.nickname = nickname;
     }
 
+    public void updateProfile(String nickname, String imageUrl) {
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+    }
+
     public String getImageUrl() {
         return Objects.requireNonNullElse(this.imageUrl, BASIC_PROFILE_IMAGE_URL);
     }

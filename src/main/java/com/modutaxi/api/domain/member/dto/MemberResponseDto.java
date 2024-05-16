@@ -70,4 +70,14 @@ public class MemberResponseDto {
         @Schema(example = "80%", description = "최근 매칭 확률")
         private String matchingProbability;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateProfileResponse {
+        @Schema(example = "헤일", description = "변경 완료한 닉네임")
+        private String nickname;
+        @Schema(example = "-",
+            description = "변경 완료한 프로필 이미지 S3 링크")
+        private String imageUrl;
+    }
 }
