@@ -1,11 +1,20 @@
 package com.modutaxi.api.domain.member.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -31,6 +40,8 @@ public class Member extends BaseTime {
     @Email
     private String email;
 
+    private String nickname;
+
     @NotNull
     @Builder.Default
     private double score = 0.0; // 평점
@@ -50,5 +61,9 @@ public class Member extends BaseTime {
     public void certificateEmail(String email) {
         this.role = Role.ROLE_MEMBER;
         this.email = email;
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

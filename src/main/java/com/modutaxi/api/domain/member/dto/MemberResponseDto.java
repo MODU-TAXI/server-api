@@ -48,4 +48,10 @@ public class MemberResponseDto {
         private String email;
         private double score;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class NicknameResponse {
+        private String nickname;
+    }
 }

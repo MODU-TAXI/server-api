@@ -64,4 +64,12 @@ public class MemberRequestDto {
         @Schema(description = "인증번호")
         private String certificationCode;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class NicknameRequest {
+        @Schema(description = "등록할 닉네임")
+        private String nickname;
+    }
 }
