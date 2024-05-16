@@ -54,4 +54,20 @@ public class MemberResponseDto {
     public static class NicknameResponse {
         private String nickname;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class MemberProfileResponse {
+        @Schema(example = "1", description = "조회한 멤버의 Id")
+        private Long id;
+        @Schema(example = "헤일", description = "닉네임")
+        private String nickname;
+        @Schema(example = "true", description = "학생 인증 여부")
+        private boolean isCertified;
+        @Schema(example = "-", description = "프로필 이미지 S3 링크")
+        private String imageUrl;
+        @Schema(example = "80%", description = "최근 매칭 확률")
+        private String matchingProbability;
+    }
 }

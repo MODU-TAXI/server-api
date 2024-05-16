@@ -12,11 +12,10 @@ import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.sms.service.SmsService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +27,11 @@ public class UpdateMemberService {
     private final MailUtil mailUtil;
     private final SmsService smsService;
 
+    //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public RefreshTokenResponse refreshAccessToken(Member member) {
         return new RefreshTokenResponse(
-                jwtTokenProvider.generateToken(member.getId()),
-                MemberMapper.toDto(member)
+            jwtTokenProvider.generateToken(member.getId()),
+            MemberMapper.toDto(member)
         );
     }
 
@@ -47,11 +47,13 @@ public class UpdateMemberService {
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, receiver);
         // 이메일 발송
-        return new CertificationResponse(mailService.sendEmailCertificationMail(memberId, receiver));
+        return new CertificationResponse(
+            mailService.sendEmailCertificationMail(memberId, receiver));
     }
 
     @Transactional
-    public CertificationResponse checkEmailCertificationCode(Long memberId, String certificationCode) {
+    public CertificationResponse checkEmailCertificationCode(Long memberId,
+        String certificationCode) {
         String email = mailService.checkEmailCertificationCode(memberId, certificationCode);
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, email);
@@ -61,9 +63,14 @@ public class UpdateMemberService {
     }
 
     private void getNotCertificatedMember(Long memberId, String email) {
-        Optional<Member> member = memberRepository.findCertificatedMember(memberId, email, Role.ROLE_VISITOR);
-        if (member.isEmpty()) return;
-        if (member.get().getId() == memberId) throw new BaseException(MailErrorCode.ALREADY_CERTIFIED_EMAIL);
+        Optional<Member> member = memberRepository.findCertificatedMember(memberId, email,
+            Role.ROLE_VISITOR);
+        if (member.isEmpty()) {
+            return;
+        }
+        if (member.get().getId() == memberId) {
+            throw new BaseException(MailErrorCode.ALREADY_CERTIFIED_EMAIL);
+        }
         throw new BaseException(MailErrorCode.USED_EMAIL);
     }
 
@@ -71,7 +78,9 @@ public class UpdateMemberService {
         return new CertificationResponse(smsService.sendCertificationCode(signupKey, phoneNumber));
     }
 
-    public CertificationResponse checkSmsCertificationCode(String signupKey, String phoneNumber, String certificationCode) {
-        return new CertificationResponse(smsService.checkSmsCertificationCode(signupKey, phoneNumber, certificationCode));
+    public CertificationResponse checkSmsCertificationCode(String signupKey, String phoneNumber,
+        String certificationCode) {
+        return new CertificationResponse(
+            smsService.checkSmsCertificationCode(signupKey, phoneNumber, certificationCode));
     }
 }

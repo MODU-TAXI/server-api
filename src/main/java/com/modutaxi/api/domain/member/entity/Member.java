@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.member.entity;
 
+import static com.modutaxi.api.common.constants.ServerConstants.BASIC_PROFILE_IMAGE_URL;
+
 import com.modutaxi.api.common.entity.BaseTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,6 +45,15 @@ public class Member extends BaseTime {
 
     private String nickname;
 
+    private String imageUrl;
+
+    @NotNull
+    @Builder.Default
+    private int matchingCount = 0;  // 매칭 횟수
+    @NotNull
+    @Builder.Default
+    private int noShowCount = 0;    // 노쇼 횟수
+
     @NotNull
     @Builder.Default
     private double score = 0.0; // 평점
@@ -65,5 +77,17 @@ public class Member extends BaseTime {
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getImageUrl() {
+        return Objects.requireNonNullElse(this.imageUrl, BASIC_PROFILE_IMAGE_URL);
+    }
+
+    public boolean isCertified() {
+        return this.role == Role.ROLE_MEMBER;
+    }
+
+    public String getMatchingProbability() {
+        return (this.noShowCount / this.matchingCount * 100) + "%";
     }
 }
