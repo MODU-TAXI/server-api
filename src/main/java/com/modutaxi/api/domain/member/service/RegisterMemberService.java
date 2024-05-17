@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RegisterMemberService {
 
@@ -35,7 +36,6 @@ public class RegisterMemberService {
     /**
      * 회원 가입
      */
-    @Transactional
     public TokenResponse registerMember(String key, String name, Gender gender, String phoneNumber,
         String fcmToken) {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
@@ -97,7 +97,6 @@ public class RegisterMemberService {
     /**
      * 닉네임 유효성 검사 및 등록 성공 시 닉네임 그대로 반환
      */
-    @Transactional
     public NicknameResponse registerNickname(Member member, String nickname) {
         checkNickname(nickname);
         member.changeNickname(nickname);
