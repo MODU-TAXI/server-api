@@ -8,7 +8,7 @@ import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
@@ -32,7 +32,7 @@ public class RegisterRoomService {
 
     private final RoomRepository roomRepository;
     private final SpotRepository spotRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
 
     private final GetTaxiInfoService getTaxiInfoService;
     private final RegisterTaxiInfoService registerTaxiInfoService;
@@ -83,7 +83,7 @@ public class RegisterRoomService {
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
         roomRepository.save(room);
-        chatRoomRepository.addRoomInMemberList(room.getId().toString(), member.getId().toString());
+        redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(), member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
         return RoomMapper.toDto(room, member, path);
     }

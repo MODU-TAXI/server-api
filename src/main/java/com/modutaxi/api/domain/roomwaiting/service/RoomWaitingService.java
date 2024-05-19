@@ -6,7 +6,7 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.service.GetMemberService;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RoomWaitingService {
     private final RoomRepository roomRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final GetMemberService getMemberService;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
@@ -40,17 +40,17 @@ public class RoomWaitingService {
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         //이미 해당 채팅방에 있을 때
-        if(chatRoomRepository.findMemberInRoomInList(roomId, member.getId().toString())){
+        if(redisChatRoomRepositoryImpl.findMemberInRoomInList(roomId, member.getId().toString())){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 
         //이미 다른 방에 들어가 있을 때
-        if(chatRoomRepository.findChatInfoByMemberId(member.getId().toString())!=null){
+        if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString())!=null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
         }
 
         //이미 해당 대기열에 있을 때
-        if(chatRoomRepository.findMemberInWaitingList(roomId, member.getId().toString())){
+        if(redisChatRoomRepositoryImpl.findMemberInWaitingList(roomId, member.getId().toString())){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_WAITING_LIST);
         }
 
@@ -58,7 +58,7 @@ public class RoomWaitingService {
         if(room.getRoomStatus().equals(RoomStatus.COMPLETE)){
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
-        chatRoomRepository.addToWaitingList(roomId, member.getId().toString());
+        redisChatRoomRepositoryImpl.addToWaitingList(roomId, member.getId().toString());
         fcmService.sendNewParticipant(room.getRoomManager(), roomId);
         return new ApplyResponse(true);
     }
@@ -73,7 +73,7 @@ public class RoomWaitingService {
         Member participant = memberRepository.findByIdAndStatusTrue(Long.valueOf(memberId))
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
-        if(chatRoomRepository.findChatInfoByMemberId(memberId)!=null){
+        if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId)!=null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
         }
 
@@ -88,19 +88,19 @@ public class RoomWaitingService {
         }
 
         // 대기열에 특정 사용자가 존재하지 않으면 에러
-        if(!chatRoomRepository.findMemberInWaitingList(roomId, memberId)){
+        if(!redisChatRoomRepositoryImpl.findMemberInWaitingList(roomId, memberId)){
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
         }
 
         //이미 유저가 해당 방에 존재할 때
-        if(chatRoomRepository.findMemberInRoomInList(roomId, memberId)){
+        if(redisChatRoomRepositoryImpl.findMemberInRoomInList(roomId, memberId)){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 
         //대기열에서 제거
-        chatRoomRepository.removeFromWaitingList(roomId, memberId);
+        redisChatRoomRepositoryImpl.removeFromWaitingList(roomId, memberId);
         //채팅방에 저장
-        chatRoomRepository.addRoomInMemberList(roomId, memberId);
+        redisChatRoomRepositoryImpl.addRoomInMemberList(roomId, memberId);
 
         fcmService.sendPermitParticipate(participant, roomId);
 
@@ -113,7 +113,7 @@ public class RoomWaitingService {
     public MemberRoomInResponseList getParticipateInRoom(Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-        Set<String> memberIdSet = chatRoomRepository.findRoomInList(roomId.toString());
+        Set<String> memberIdSet = redisChatRoomRepositoryImpl.findRoomInList(roomId.toString());
 
         List<Long> memberIdList = new ArrayList<>(memberIdSet).stream().map(Long::valueOf).toList();
         List<Member> waitingUserList = getMemberService.getMemberList(memberIdList);
@@ -131,7 +131,7 @@ public class RoomWaitingService {
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        Set<String> memberIdSet = chatRoomRepository.findWaitingList(roomId.toString());
+        Set<String> memberIdSet = redisChatRoomRepositoryImpl.findWaitingList(roomId.toString());
 
         List<Long> memberIdList = new ArrayList<>(memberIdSet).stream().map(Long::valueOf).toList();
         List<Member> waitingUserList = getMemberService.getMemberList(memberIdList);

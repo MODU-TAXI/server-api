@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class ChatRoomRepository extends BaseRedisRepository implements Serializable {
+public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements Serializable {
 
     // Redis CacheKeys
 
@@ -38,7 +38,7 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
 
     @PostConstruct
     protected void init() {
-        classInstance = ChatRoomRepository.class;
+        classInstance = RedisChatRoomRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
         hashOperations = redisTemplate.opsForHash();
         chatInfoHashOperations = chatInfoRedisTemplate.opsForHash();

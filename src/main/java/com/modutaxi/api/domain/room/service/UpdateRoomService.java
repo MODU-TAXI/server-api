@@ -9,7 +9,7 @@ import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
@@ -46,7 +46,7 @@ public class UpdateRoomService {
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
     private final RoomWaitingService roomWaitingService;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final FcmService fcmService;
 
     private static final float MIN_LATITUDE = 33;
@@ -98,7 +98,7 @@ public class UpdateRoomService {
                 = roomWaitingService.getParticipateInRoom(deleteRoomId);
 
         //채팅방 유저수 정보 삭제
-        chatRoomRepository.deleteUserCount(roomId.toString());
+        redisChatRoomRepositoryImpl.deleteUserCount(roomId.toString());
         //방 삭제
         roomRepository.delete(room);
 
@@ -113,7 +113,7 @@ public class UpdateRoomService {
 
         //참가자들의 매핑된 방 정보 삭제
         memberRoomInResponseList.getInList().forEach(
-                item -> chatRoomRepository.removeUserByMemberIdEnterInfo(
+                item -> redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(
                         item.getMemberId().toString())
         );
 

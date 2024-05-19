@@ -11,7 +11,7 @@ import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.ChatNickName;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class ChatService {
     private final ChannelTopic channelTopic;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final RoomRepository roomRepository;
     private final FcmService fcmService;
     /**
@@ -44,7 +44,7 @@ public class ChatService {
      * 퇴장 로직
      */
     public DeleteResponse deleteChatRoomInfo(Member member){
-        ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
 
         if(chatRoomMappingInfo == null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
@@ -67,9 +67,9 @@ public class ChatService {
 
         sendChatMessage(leaveMessage);
 
-        chatRoomRepository.removeFromRoomInList(room.getId().toString(), member.getId().toString());
-        chatRoomRepository.removeUserByMemberIdEnterInfo(member.getId().toString());
-        chatRoomRepository.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
+        redisChatRoomRepositoryImpl.removeFromRoomInList(room.getId().toString(), member.getId().toString());
+        redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(member.getId().toString());
+        redisChatRoomRepositoryImpl.minusUserCount(chatRoomMappingInfo.getRoomId(), count);
         fcmService.unsubscribe(member.getId(), room.getId());
         return new DeleteResponse(true);
     }
@@ -78,11 +78,11 @@ public class ChatService {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BaseException(
                 RoomErrorCode.EMPTY_ROOM));
 
-        if(chatRoomRepository.findChatInfoByMemberId(member.getId().toString()) != null){
+        if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString()) != null){
             throw new BaseException(RoomErrorCode.ALREADY_IN_ROOM);
         }
 
-        if(chatRoomRepository.getUserCount(roomId.toString()) >= 15){
+        if(redisChatRoomRepositoryImpl.getUserCount(roomId.toString()) >= 15){
             return new EnterableResponse(false);
         }
 
@@ -90,7 +90,7 @@ public class ChatService {
     }
 
     public ChatMappingResponse getChatRoomInfo(Member member){
-        ChatRoomMappingInfo chatInfo = chatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+        ChatRoomMappingInfo chatInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
         if(chatInfo == null){
             return new ChatMappingResponse("null",member.getId().toString());
         }

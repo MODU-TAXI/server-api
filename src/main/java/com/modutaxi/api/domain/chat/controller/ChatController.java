@@ -6,11 +6,10 @@ import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
 import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
 import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
-import com.modutaxi.api.domain.chat.repository.ChatRoomRepository;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
@@ -18,7 +17,6 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -35,7 +33,7 @@ import java.time.LocalDateTime;
 public class ChatController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final RoomRepository roomRepository;
     private final ChatService chatService;
     private final ChatMessageRepository chatMessageRepository;
@@ -46,7 +44,7 @@ public class ChatController {
     public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
 
         String memberId = jwtTokenProvider.getMemberIdByToken(token);
-        ChatRoomMappingInfo chatRoomMappingInfo = chatRoomRepository.findChatInfoByMemberId(memberId);
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
         message.setSender(chatRoomMappingInfo.getNickname());
         message.setMemberId(memberId);
