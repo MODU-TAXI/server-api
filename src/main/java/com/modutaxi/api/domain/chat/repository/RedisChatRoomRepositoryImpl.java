@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class ChatRoomRepository extends BaseRedisRepository implements Serializable {
+public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements Serializable {
 
     // Redis CacheKeys
 
@@ -38,7 +38,7 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
 
     @PostConstruct
     protected void init() {
-        classInstance = ChatRoomRepository.class;
+        classInstance = RedisChatRoomRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
         hashOperations = redisTemplate.opsForHash();
         chatInfoHashOperations = chatInfoRedisTemplate.opsForHash();
@@ -136,5 +136,9 @@ public class ChatRoomRepository extends BaseRedisRepository implements Serializa
     // 채팅방에 입장한 유저수 -1
     public long minusUserCount(String roomId, int count) {
         return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId, count)).orElse(0L);
+    }
+
+    public void deleteUserCount(String roomId){
+        valueOperations.getAndDelete(USER_COUNT + "_" + roomId);
     }
 }

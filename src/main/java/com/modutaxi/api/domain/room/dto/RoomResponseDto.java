@@ -15,6 +15,14 @@ public class RoomResponseDto {
     @Builder
     @AllArgsConstructor
     public static class RoomDetailResponse {
+        @Schema(example = "1", description = "매니저 ID")
+        private Long managerId;
+        @Schema(example = "String", description = "프로필 이미지 url")
+        private String profileImageUrl;
+        @Schema(example = "0", description = "점수")
+        private double score;
+        @Schema(example = "true", description = "내가 생성한 방인 지 체크")
+        private boolean isMyRoom;
         @Schema(description = "택시팟 id")
         private Long roomId;
         @Schema(description = "도착 거점 id")

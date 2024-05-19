@@ -5,6 +5,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
@@ -44,7 +45,7 @@ public class GetRoomService {
     private final GetSpotService getSpotService;
     private final RoomRepositoryDSL roomRepositoryDSL;
 
-    public RoomDetailResponse getRoomDetail(Long roomId) {
+    public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
@@ -52,7 +53,8 @@ public class GetRoomService {
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
-        return RoomMapper.toDto(room, path);
+
+        return RoomMapper.toDto(room, member, path);
     }
 
     public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size, Long spotId, List<RoomTagBitMask> tags, Point point, Long radius, Boolean isImminent, RoomSortType sortType) {
