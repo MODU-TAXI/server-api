@@ -45,3 +45,6 @@ src/main/resources/*.json
 ### act ###
 *.secrets
 artifacts/
+
+### QueryDSL ###
+**/generated

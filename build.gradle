@@ -5,7 +5,7 @@ plugins {
 }
 
 jar {
-    enabled = false
+   enabled = false
 }
 
 group = 'com.modu-taxi'
@@ -66,6 +66,7 @@ dependencies {
     // AWS - S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+
     // WebClient
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -88,6 +89,13 @@ dependencies {
     //Http Client
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
 
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation 'com.querydsl:querydsl-sql-spatial:5.0.0'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
     // Firebase
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
@@ -101,4 +109,18 @@ task copySubmodule(type: Copy) {
     from './config'
     include '*.yml', '*.json'
     into './src/main/resources'
+}
+
+def generated = "src/main/generated"
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+sourceSets {
+    main.java.srcDirs += [generated]
+}
+
+clean {
+    delete file(generated)
 }
