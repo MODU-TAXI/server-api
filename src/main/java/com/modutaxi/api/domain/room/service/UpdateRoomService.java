@@ -97,8 +97,6 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
                 = roomWaitingService.getParticipateInRoom(deleteRoomId);
 
-        //채팅방 유저수 정보 삭제
-        redisChatRoomRepositoryImpl.deleteUserCount(roomId.toString());
         //방 삭제
         roomRepository.delete(room);
 
