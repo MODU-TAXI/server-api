@@ -33,7 +33,7 @@ public class ChatService {
     private final FcmService fcmService;
 
     /**
-     * 채팅방에 메시지 발송할 수 있도록
+     * 채팅방에 메시지 pub
      */
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
         redisTemplate.convertAndSend(channelTopic.getTopic(),
@@ -45,7 +45,7 @@ public class ChatService {
     /**
      * 퇴장 로직
      */
-    public DeleteResponse deleteChatRoomInfo(Member member) {
+    public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Member member) {
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
 
         if (chatRoomMappingInfo == null) {
@@ -57,8 +57,10 @@ public class ChatService {
         );
 
         if (room.getRoomManager().equals(member)) {
-            throw new BaseException(RoomErrorCode.JUST_DELETE);
+            throw new BaseException(RoomErrorCode.MANAGER_CAN_ONLY_DELETE);
         }
+        // 현재 인원 감소
+        room.minusCurrentHeadCount();
 
         // 클라이언트 퇴장 메시지 발송한다.
         ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(

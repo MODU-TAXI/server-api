@@ -16,12 +16,14 @@ public class RoomWaitingMapper {
         private Long memberId;
         private String name;
         private double score;
+        private boolean thisIsMe;
 
-        public static RoomWaitingResponse toDto(Member member) { //TODO Mapper 로 전환 요망
+        public static RoomWaitingResponse toDto(Member member, boolean thisIsMe) { //TODO Mapper 로 전환 요망
             return RoomWaitingResponse.builder()
                 .memberId(Long.valueOf(member.getId()))
                 .name(member.getName())
                 .score(member.getScore())
+                .thisIsMe(thisIsMe)
                 .build();
         }
     }
@@ -40,12 +42,14 @@ public class RoomWaitingMapper {
         private Long memberId;
         private String name;
         private double score;
+        private boolean thisIsMe;
 
-        public static MemberRoomInResponse toDto(Member member) {
+        public static MemberRoomInResponse toDto(Member member, boolean thisIsMe) {
             return MemberRoomInResponse.builder()
                 .memberId(member.getId())
                 .name(member.getName())
                 .score(member.getScore())
+                .thisIsMe(thisIsMe)
                 .build();
         }
     }

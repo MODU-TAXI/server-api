@@ -95,7 +95,7 @@ public class UpdateRoomService {
         Long deleteRoomId = room.getId();
 
         MemberRoomInResponseList memberRoomInResponseList
-                = roomWaitingService.getParticipateInRoom(deleteRoomId);
+                = roomWaitingService.getParticipateInRoom(member, deleteRoomId);
 
         //방 삭제
         roomRepository.delete(room);

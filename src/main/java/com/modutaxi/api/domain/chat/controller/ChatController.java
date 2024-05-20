@@ -54,7 +54,7 @@ public class ChatController {
         // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);
 
-        // TODO: 5/2/24 roomId를 그냥 간접적인 저장으로 해도 될 것 같음. 여기서 RDS 갔다오면 당연히 느릴 수 밖에 없음.
+        // TODO: 5/2/24 mongoDB로 변경해야함 -> 시간 비교해서 리팩터링
         Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow();
 
         //메세지 리퍼지토리에 저장
@@ -76,7 +76,7 @@ public class ChatController {
     @Operation(summary = "퇴장!! 채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
     @DeleteMapping("/api/chats/info")
     public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
-        return ResponseEntity.ok(chatService.deleteChatRoomInfo(member));
+        return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
     }
 
 

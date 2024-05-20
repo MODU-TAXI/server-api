@@ -21,7 +21,7 @@ public class RedisSubscriber {
             messageSendingOperations.convertAndSend("/sub/chat/" + chatMessageResponse.getRoomId(),
                     chatMessageResponse);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("실패해쪙");
+            throw new RuntimeException("메세지 전송에 실패하였습니다.");
         }
     }
 }
