@@ -78,7 +78,7 @@ public class UpdateRoomService {
 
         room.update(newRoomData);
         fcmService.sendUpdateRoomInfo(member.getId(), roomId);
-        return RoomMapper.toDto(room, member, path);
+        return RoomMapper.toDto(room, member, path, true);
     }
 
     @Transactional
