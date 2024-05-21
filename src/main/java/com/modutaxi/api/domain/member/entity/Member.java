@@ -55,10 +55,6 @@ public class Member extends BaseTime {
     private int noShowCount = 0;    // 노쇼 횟수
 
     @NotNull
-    @Builder.Default
-    private double score = 0.0; // 평점
-
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Role role = Role.ROLE_VISITOR;
