@@ -17,7 +17,7 @@ public class RedisFcmRepositoryImpl extends BaseRedisRepository implements Seria
 
     @PostConstruct
     protected void init() {
-        classInstance = com.modutaxi.api.domain.member.repository.RedisRTKRepositoryImpl.class;
+        classInstance = com.modutaxi.api.common.fcm.RedisFcmRepositoryImpl.class;
         valueOperations = redisTemplate.opsForValue();
     }
 
