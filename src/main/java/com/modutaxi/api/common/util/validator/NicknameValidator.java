@@ -19,9 +19,9 @@ public class NicknameValidator {
         if (nickname.length() > 12) {
             throw new BaseException(MemberErrorCode.TOO_LONG_NICKNAME);
         }
-        // 공백 또는 특수 문자 포함
+        // 공백 또는 특수 문자 포함 (한글, 영어, 숫자만 사용할 수 있어요!)
         if (!VALID_PATTERN.matcher(nickname).matches() || nickname.contains(" ")) {
-            throw new BaseException(MemberErrorCode.SPECIAL_CHARACTER_NICKNAME);
+            throw new BaseException(MemberErrorCode.INVALID_NICKNAME);
         }
         // 비속어 포함
         for (String profanity : ProfanityList.PROFANITIES) {
