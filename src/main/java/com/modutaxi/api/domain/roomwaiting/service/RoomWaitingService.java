@@ -110,7 +110,7 @@ public class RoomWaitingService {
     /**
      * 방 참가 인원리스트 조회
      */
-    public MemberRoomInResponseList getParticipateInRoom(Long roomId){
+    public MemberRoomInResponseList getParticipateInRoom(Member member, Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         Set<String> memberIdSet = redisChatRoomRepositoryImpl.findRoomInList(roomId.toString());
@@ -120,14 +120,14 @@ public class RoomWaitingService {
 
         return new MemberRoomInResponseList(
             waitingUserList.stream()
-                .map(MemberRoomInResponse::toDto)
+                .map(iter -> MemberRoomInResponse.toDto(iter, iter.getId().equals(member.getId())))
                 .collect(Collectors.toList()));
     }
 
     /**
      * 매칭 대기 인원리스트 조회
      */
-    public RoomWaitingResponseList getWaitingList(Long roomId){
+    public RoomWaitingResponseList getWaitingList(Member member, Long roomId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
@@ -138,7 +138,7 @@ public class RoomWaitingService {
 
         return new RoomWaitingResponseList(
             waitingUserList.stream()
-                .map(RoomWaitingResponse::toDto)
+                .map(iter -> RoomWaitingResponse.toDto(iter, iter.getId().equals(member.getId())))
                 .collect(Collectors.toList()));
     }
 }

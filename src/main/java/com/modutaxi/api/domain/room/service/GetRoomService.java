@@ -5,6 +5,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
@@ -44,6 +45,7 @@ public class GetRoomService {
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final GetSpotService getSpotService;
     private final RoomRepositoryDSL roomRepositoryDSL;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepository;
 
     public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
@@ -53,8 +55,9 @@ public class GetRoomService {
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
-
-        return RoomMapper.toDto(room, member, path);
+        String myParticipatedRoomId = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString()).getRoomId();
+        boolean isParticipate = myParticipatedRoomId.equals(roomId.toString());
+        return RoomMapper.toDto(room, member, path, isParticipate);
     }
 
     public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size, Long spotId, List<RoomTagBitMask> tags, Point point, Long radius, Boolean isImminent, RoomSortType sortType) {

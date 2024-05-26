@@ -4,13 +4,11 @@ import com.modutaxi.api.common.config.redis.BaseRedisRepository;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -22,16 +20,13 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
     private static final String ROOM_IN_LIST = "ROOM_IN_LIST"; //채팅방 참여
     private static final String ROOM_WAITING_LIST = "ROOM_WAITING_LIST"; // 대기열 저장
     public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
-    private static final String USER_COUNT = "USER_COUNT"; // 유저 수
 
     private final RedisTemplate<String, String> redisTemplate;
 
     private final RedisTemplate<String, ChatRoomMappingInfo> chatInfoRedisTemplate;
-    private ValueOperations<String, String> valueOperations;
     private HashOperations<String, String, String> hashOperations;
     private HashOperations<String, String, ChatRoomMappingInfo> chatInfoHashOperations;
     private SetOperations<String, String> waitOperations;
-
     private SetOperations<String, String> roomInOperations;
 
 
@@ -39,7 +34,6 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
     @PostConstruct
     protected void init() {
         classInstance = RedisChatRoomRepositoryImpl.class;
-        valueOperations = redisTemplate.opsForValue();
         hashOperations = redisTemplate.opsForHash();
         chatInfoHashOperations = chatInfoRedisTemplate.opsForHash();
         waitOperations = redisTemplate.opsForSet();
@@ -122,23 +116,4 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
         chatInfoHashOperations.delete(ENTER_INFO,memberId);
     }
 
-
-    // 채팅방 유저수 조회
-    public long getUserCount(String roomId) {
-        return Long.valueOf(Optional.ofNullable(valueOperations.get(USER_COUNT + "_" + roomId)).orElse("0"));
-    }
-
-    // 채팅방에 입장한 유저수 +1
-    public long plusUserCount(String roomId, int count) {
-        return Optional.ofNullable(valueOperations.increment(USER_COUNT + "_" + roomId, count)).orElse(0L);
-    }
-
-    // 채팅방에 입장한 유저수 -1
-    public long minusUserCount(String roomId, int count) {
-        return Optional.ofNullable(valueOperations.decrement(USER_COUNT + "_" + roomId, count)).orElse(0L);
-    }
-
-    public void deleteUserCount(String roomId){
-        valueOperations.getAndDelete(USER_COUNT + "_" + roomId);
-    }
 }

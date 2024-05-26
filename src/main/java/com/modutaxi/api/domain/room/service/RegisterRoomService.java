@@ -85,7 +85,7 @@ public class RegisterRoomService {
         roomRepository.save(room);
         redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(), member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
-        return RoomMapper.toDto(room, member, path);
+        return RoomMapper.toDto(room, member, path, true);
     }
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {

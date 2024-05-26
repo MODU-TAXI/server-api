@@ -50,11 +50,12 @@ public class RoomMapper {
             .build();
     }
 
-    public static RoomDetailResponse toDto(Room room, Member member, LineString path) {
+    public static RoomDetailResponse toDto(Room room, Member member, LineString path, boolean isParticipate) {
         return RoomDetailResponse.builder()
             .managerId(room.getRoomManager().getId())
             .score(member.getScore())
             .isMyRoom(room.getRoomManager().getId().equals(member.getId()))
+            .isParticipate(isParticipate)
             .roomId(room.getId())
             .spotId(room.getSpot().getId())
             .departureDairyDate(TimeFormatConverter.convertTimeToDiaryDate(room.getDepartureTime()))

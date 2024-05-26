@@ -23,6 +23,8 @@ public class RoomResponseDto {
         private double score;
         @Schema(example = "true", description = "내가 생성한 방인 지 체크")
         private boolean isMyRoom;
+        @Schema(example = "true", description = "내가 참여해 있는 방인 지 체크")
+        private boolean isParticipate;
         @Schema(description = "택시팟 id")
         private Long roomId;
         @Schema(description = "도착 거점 id")
