@@ -14,6 +14,7 @@ import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -84,6 +85,12 @@ public class GetRoomService {
         List<SearchMapResponse> rooms = roomRepositoryDSL.findNearRoomsMap(spotId, checkTags(tags), isImminent, searchPoint, radius, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack));
         List<SearchRoomWithRadiusResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
         return new SearchRoomWithRadiusResponses(roomList);
+    }
+
+    public RoomPreviewResponse getRoomPreview(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+        return RoomMapper.toDto(room);
     }
 
     private Integer checkTags(List<RoomTagBitMask> tags) {

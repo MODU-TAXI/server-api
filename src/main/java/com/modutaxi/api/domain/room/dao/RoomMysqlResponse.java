@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.room.dao;
 
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import lombok.Getter;
 import org.locationtech.jts.geom.Point;
 
@@ -28,4 +29,17 @@ public class RoomMysqlResponse {
         long durationMinutes;
         int expectedCharge;
     }
+
+    @Getter
+    public static class PreviewResponse {
+        Long roomId;
+        LocalDateTime departureTime;
+        String departureName;
+        String spotName;
+        RoomStatus roomStatus;
+        int currentHeadcount;
+        int wishHeadcount;
+        int expectedCharge;
+    }
+
 }
