@@ -102,6 +102,7 @@ public class RoomWaitingService {
         //채팅방에 저장
         redisChatRoomRepositoryImpl.addRoomInMemberList(roomId, memberId);
 
+        fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
         fcmService.sendPermitParticipate(participant, roomId);
 
         return new ApplyResponse(true);
