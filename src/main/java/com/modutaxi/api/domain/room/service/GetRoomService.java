@@ -5,6 +5,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
@@ -55,8 +56,15 @@ public class GetRoomService {
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
-        String myParticipatedRoomId = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString()).getRoomId();
-        boolean isParticipate = myParticipatedRoomId.equals(roomId.toString());
+        boolean isParticipate = false;
+
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+
+        if (chatRoomMappingInfo != null) {
+            String myParticipatedRoomId = chatRoomMappingInfo.getRoomId();
+            isParticipate = myParticipatedRoomId.equals(roomId.toString());
+        }
+
         return RoomMapper.toDto(room, member, path, isParticipate);
     }
 
