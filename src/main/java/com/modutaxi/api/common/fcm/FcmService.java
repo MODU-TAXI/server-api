@@ -3,6 +3,7 @@ package com.modutaxi.api.common.fcm;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import com.google.gson.Gson;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
@@ -62,6 +63,10 @@ public class FcmService {
                 .putData("MessageType", "TEST")
                 .putData("message", "테스트메세지")
                 .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("테스트메세지")
+                        .build())
                 .build();
         send(message);
     }
@@ -78,6 +83,10 @@ public class FcmService {
                 .putData("memberId", chatMessageRequestDto.getMemberId())
                 .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
                 .setTopic(chatMessageRequestDto.getRoomId().toString())
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody(chatMessageRequestDto.getContent())
+                        .build())
                 .build();
         send(message);
     }
@@ -92,6 +101,10 @@ public class FcmService {
                 .putData("message", "참여해 있는 방 정보가 업데이트 되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("참여해 있는 방 정보가 업데이트 되었습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -107,6 +120,10 @@ public class FcmService {
                 .putData("message", "새로운 참가자의 참가 요청이 들어왔습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("새로운 참가자의 참가 요청이 들어왔습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -122,6 +139,10 @@ public class FcmService {
                 .putData("message", "방 매칭이 완료되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("방 매칭이 완료되었습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -138,6 +159,10 @@ public class FcmService {
                 .putData("message", "정산해주세요.")
                 .putData("bill", String.valueOf(bill))
                 .setTopic(roomId.toString())
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("정산해주세요.")
+                        .build())
                 .build();
         send(message);
     }
@@ -152,6 +177,10 @@ public class FcmService {
                 .putData("message", "방이 삭제 되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("방이 삭제 되었습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -166,6 +195,10 @@ public class FcmService {
                 .putData("message", "방 매칭에 성공했습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("방 매칭에 성공했습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -176,10 +209,14 @@ public class FcmService {
     public void sendDepartureTime(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
-                .putData("chatroomId", Long.toString(roomId))
+                .putData("roomId", Long.toString(roomId))
                 .putData("MessageType", "TIME_TO_DEPART")
                 .putData("message", "예정되어 있던 출발 시간이 되었습니다.")
                 .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("훈훈한훈님")
+                        .setBody("예정되어 있던 출발 시간이 되었습니다.")
+                        .build())
                 .build();
         send(message);
     }
@@ -190,10 +227,14 @@ public class FcmService {
     public void send10MinutesBeforeDepartureTime(Member member, Long roomId) {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
-                .putData("chatroomId", Long.toString(roomId))
+                .putData("roomId", Long.toString(roomId))
                 .putData("MessageType", "DEPART_10_MINUTES_AGO")
                 .putData("message", "출발 10분 전입니다.")
                 .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("훈님")
+                        .setBody("출발 10분 전입니다.")
+                        .build())
                 .build();
         send(message);
     }
