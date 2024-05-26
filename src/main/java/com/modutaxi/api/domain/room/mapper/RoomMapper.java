@@ -2,10 +2,12 @@ package com.modutaxi.api.domain.room.mapper;
 
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.PreviewResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.spot.entity.Spot;
@@ -96,5 +98,19 @@ public class RoomMapper {
 
     public static SearchWithRadiusResponse toDto(SearchMapResponse dao) {
         return new SearchWithRadiusResponse(dao.getId(), (float) dao.getDeparturePoint().getX(), (float) dao.getDeparturePoint().getY(), dao.getSpotName());
+    }
+
+    public static RoomPreviewResponse toDto(Room room) {
+        return RoomPreviewResponse.builder()
+            .roomId(room.getId())
+            .arrivalName(room.getSpot().getName())
+            .departureTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime()))
+            .departureName(room.getDepartureName())
+            .currentHeadcount(room.getCurrentHeadcount())
+            .wishHeadcount(room.getWishHeadcount())
+            .roomStatus(room.getRoomStatus())
+            .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
+            .expectedCharge(room.getExpectedCharge())
+            .build();
     }
 }

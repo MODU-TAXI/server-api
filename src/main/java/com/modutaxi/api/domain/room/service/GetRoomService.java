@@ -12,6 +12,7 @@ import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponses;
 import com.modutaxi.api.domain.room.entity.Room;
@@ -84,6 +85,12 @@ public class GetRoomService {
         List<SearchMapResponse> rooms = roomRepositoryDSL.findNearRoomsMap(spotId, checkTags(tags), isImminent, searchPoint, radius, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack));
         List<SearchWithRadiusResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
         return new SearchWithRadiusResponses(roomList);
+    }
+
+    public RoomPreviewResponse getRoomPreview(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+        return RoomMapper.toDto(room);
     }
 
     private Integer checkTags(List<RoomTagBitMask> tags) {
