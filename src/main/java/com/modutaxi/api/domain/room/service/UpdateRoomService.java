@@ -8,6 +8,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.*;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
+import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
@@ -49,6 +50,7 @@ public class UpdateRoomService {
     private final GetTaxiInfoService getTaxiInfoService;
     private final RoomWaitingService roomWaitingService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
+    private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
 
@@ -100,6 +102,8 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
                 = roomWaitingService.getParticipateInRoom(member, deleteRoomId);
 
+        //메세지 삭제
+        chatMessageService.deleteChatMessage(roomId);
         //방 삭제
         roomRepository.delete(room);
 
