@@ -24,7 +24,6 @@ public class ChatMessage extends BaseTime {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Room room;
 
     private MessageType messageType;
