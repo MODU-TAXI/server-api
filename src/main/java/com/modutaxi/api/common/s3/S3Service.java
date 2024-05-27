@@ -1,8 +1,6 @@
 package com.modutaxi.api.common.s3;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -10,15 +8,12 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.S3ErrorCode;
 import com.modutaxi.api.common.s3.dto.S3Result;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 @Service
@@ -47,9 +42,9 @@ public class S3Service {
         return new S3Result(amazonS3Client.getUrl(bucket, fileName).toString(), fileName);
     }
 
-
-    public void deleteFile(String fileName) {
+    public void deleteFile(String imageUrl) {
         try {
+            String fileName = parseFileName(imageUrl);
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -58,6 +53,11 @@ public class S3Service {
 
     private String createFileName(String fileName) {
         return UUID.randomUUID() + "_" + fileName;
+    }
+
+    private String parseFileName(String imageUrl) {
+        String[] st = imageUrl.split("/");
+        return st[st.length - 1];
     }
 
 }

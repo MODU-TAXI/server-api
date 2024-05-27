@@ -18,7 +18,7 @@ public class MemberResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
-    public static class RefreshTokenResponse {
+    public static class TokenAndMemberResponse {
         private TokenResponse tokenResponse;
         private MemberInfoResponse memberInfoResponse;
     }
@@ -43,9 +43,40 @@ public class MemberResponseDto {
     public static class MemberInfoResponse {
         private Long id;
         private String name;
+        private String nickname;
         private Gender gender;
         private String phoneNumber;
         private String email;
-        private double score;
+        private String imageUrl;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class NicknameResponse {
+        private String nickname;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class MemberProfileResponse {
+        @Schema(example = "1", description = "조회한 멤버의 Id")
+        private Long id;
+        @Schema(example = "헤일", description = "닉네임")
+        private String nickname;
+        @Schema(example = "true", description = "학생 인증 여부")
+        private boolean isCertified;
+        @Schema(example = "-", description = "프로필 이미지 S3 링크")
+        private String imageUrl;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateProfileResponse {
+        @Schema(example = "헤일", description = "변경 완료한 닉네임")
+        private String nickname;
+        @Schema(example = "-",
+            description = "변경 완료한 프로필 이미지 S3 링크")
+        private String imageUrl;
     }
 }
