@@ -4,6 +4,7 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.common.s3.S3Service;
 import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
@@ -31,6 +32,7 @@ public class UpdateMemberService {
     private final MailService mailService;
     private final MailUtil mailUtil;
     private final SmsService smsService;
+    private final S3Service s3Service;
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public RefreshTokenResponse refreshAccessToken(Member member) {
@@ -92,8 +94,14 @@ public class UpdateMemberService {
     @Transactional
     public UpdateProfileResponse updateProfile(Member member, String nickname, String imageUrl) {
         checkNickname(nickname);
-        // imageUrl == "" 라면 삭제 요청을 뜻하므로 null 로 초기화해줍니다.
-        member.updateProfile(nickname, Objects.equals(imageUrl, "") ? null : imageUrl);
+        // imageUrl == "" 로 들어오면 삭제 요청입니다.
+        if (Objects.equals(imageUrl, "")) {
+            if (member.existsNickname()) {   // 프로필 사진이 있었다면 s3에서 삭제
+                s3Service.deleteFile(member.getImageUrl());
+            }
+            imageUrl = null;
+        }
+        member.updateProfile(nickname, imageUrl);
         memberRepository.save(member);
         return new UpdateProfileResponse(member.getNickname(), member.getImageUrl());
     }

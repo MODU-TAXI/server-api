@@ -88,7 +88,8 @@ public class Member extends BaseTime {
         return this.role == Role.ROLE_MEMBER;
     }
 
-    public String getMatchingProbability() {
-        return (this.noShowCount / this.matchingCount * 100) + "%";
+    public boolean existsNickname() {
+        return this.nickname != null;
     }
+
 }
