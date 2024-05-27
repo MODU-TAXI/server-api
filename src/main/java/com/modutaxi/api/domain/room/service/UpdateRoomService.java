@@ -5,19 +5,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
-import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
-import com.modutaxi.api.common.exception.errorcode.SpotError;
-import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
+import com.modutaxi.api.common.exception.errorcode.*;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
-
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.*;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
@@ -31,14 +30,18 @@ import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import static java.rmi.server.LogStream.log;
 import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UpdateRoomService {
 
     private final RoomRepository roomRepository;
@@ -48,6 +51,7 @@ public class UpdateRoomService {
     private final RoomWaitingService roomWaitingService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final FcmService fcmService;
+    private final MemberRepository memberRepository;
 
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
@@ -110,13 +114,15 @@ public class UpdateRoomService {
         );
 
         //참가자들의 매핑된 방 정보 삭제
-        memberRoomInResponseList.getInList().forEach(
-                item -> redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(
-                        item.getMemberId().toString())
+        memberRoomInResponseList.getInList().forEach(item -> {
+            log("item = " + item.getMemberId());
+            redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(
+                    item.getMemberId().toString());
+            }
         );
 
         //경로 정보 삭제
-        taxiInfoMongoRepository.delete(taxiInfo);
+        taxiInfoMongoRepository.deleteById(taxiInfo.getId());
         return new DeleteRoomResponse(true);
     }
 
@@ -237,5 +243,45 @@ public class UpdateRoomService {
         if (!managerId.equals(memberId)) {
             throw new BaseException(RoomErrorCode.NOT_ROOM_MANAGER);
         }
+    }
+
+    @Transactional
+    public UpdateRoomResponse finishMatching(Member manager, Long roomId, UpdateRoomStatusRequest updateRoomStatusRequest) {
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
+        checkManager(room.getRoomManager().getId(), manager.getId());
+
+        if(!room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+            throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
+        }
+        //룸 상태 변경
+        room.roomStatusUpdate();
+
+        //request 조회
+        List<NonParticipant> userList = updateRoomStatusRequest.getNonParticipantList();
+
+        //member 정당성 확인
+        List<Member> nonParticipantList = userList.stream()
+                .map(nonParticipant -> {
+                    Member member = memberRepository.findByIdAndStatusTrue(nonParticipant.getUserId())
+                            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+                    boolean isInRoom = redisChatRoomRepositoryImpl.findMemberInRoomInList
+                            (roomId.toString(), nonParticipant.toString());
+
+                    if(!isInRoom) {
+                        throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
+                    }
+
+                    return member;
+                }).toList();
+
+        // TODO: 5/27/24 실제로 참여하지 않은 애들 처리
+        // ex) redisChatRoomRepositoryImpl.removeFromRoomInList(roomId.toString(), nonParticipant.getUserId().toString());
+        // ex) 새로운 저장공간에 실제 참여한 리스트 저장
+
+        return new UpdateRoomResponse(true);
     }
 }

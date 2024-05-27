@@ -141,4 +141,11 @@ public class RoomResponseDto {
         @Schema(example = "true", description = "수행완료 여부")
         private Boolean isDeleted;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateRoomResponse {
+        @Schema(example = "true", description = "수행완료 여부")
+        private Boolean isUpdated;
+    }
 }
