@@ -61,7 +61,7 @@ public class FcmService {
     public void testSend(Member member){
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
-                .putData("MessageType", "TEST")
+                .putData("messageType", "TEST")
                 .putData("message", "테스트메세지")
                 .setToken(fcmToken)
                 .setNotification(Notification.builder()
@@ -78,7 +78,7 @@ public class FcmService {
     public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
-                .putData("MessageType", chatMessageRequestDto.getType().toString())
+                .putData("messageType", chatMessageRequestDto.getType().toString())
                 .putData("message", chatMessageRequestDto.getType().equals(MessageType.IMAGE)
                     ? "사진" : chatMessageRequestDto.getContent())
                 .putData("sender", chatMessageRequestDto.getSender())
@@ -98,7 +98,7 @@ public class FcmService {
      */
     public void sendUpdateRoomInfo(Long managerId, Long roomId) {
         Message message = Message.builder()
-                .putData("MessageType", "ROOM_UPDATE")
+                .putData("messageType", "ROOM_UPDATE")
                 .putData("roomId", Long.toString(roomId))
                 .putData("message", "참여해 있는 방 정보가 업데이트 되었습니다.")
                 .putData("managerId", managerId.toString())
@@ -118,7 +118,7 @@ public class FcmService {
     public void sendNewParticipant(Member roomManager, String roomId) {
         String fcmToken = validateAndGetFcmToken(roomManager.getId());
         Message message = Message.builder()
-                .putData("MessageType", "PARTICIPATE_REQUEST")
+                .putData("messageType", "PARTICIPATE_REQUEST")
                 .putData("message", "새로운 참가자의 참가 요청이 들어왔습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
@@ -137,7 +137,7 @@ public class FcmService {
     public void sendSuccessMatching(Long managerId, Long roomId) {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "MATCHING_COMPLETE")
+                .putData("messageType", "MATCHING_COMPLETE")
                 .putData("message", "방 매칭이 완료되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
@@ -157,7 +157,7 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "REMIT_REQUEST")
+                .putData("messageType", "REMIT_REQUEST")
                 .putData("message", "정산해주세요.")
                 .putData("bill", String.valueOf(bill))
                 .setTopic(roomId.toString())
@@ -175,7 +175,7 @@ public class FcmService {
     public void sendDeleteRoom(Long managerId, Long roomId) {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "ROOM_DELETE")
+                .putData("messageType", "ROOM_DELETE")
                 .putData("message", "방이 삭제 되었습니다.")
                 .putData("managerId", managerId.toString())
                 .setTopic(roomId.toString())
@@ -193,7 +193,7 @@ public class FcmService {
     public void sendPermitParticipate(Member participant, String roomId) {
         String fcmToken = validateAndGetFcmToken(participant.getId());
         Message message = Message.builder()
-                .putData("MessageType", "MATCHING_SUCCESS")
+                .putData("messageType", "MATCHING_SUCCESS")
                 .putData("message", "방 매칭에 성공했습니다.")
                 .putData("roomId", roomId)
                 .setToken(fcmToken)
@@ -212,7 +212,7 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "TIME_TO_DEPART")
+                .putData("messageType", "TIME_TO_DEPART")
                 .putData("message", "예정되어 있던 출발 시간이 되었습니다.")
                 .setToken(fcmToken)
                 .setNotification(Notification.builder()
@@ -230,7 +230,7 @@ public class FcmService {
         String fcmToken = validateAndGetFcmToken(member.getId());
         Message message = Message.builder()
                 .putData("roomId", Long.toString(roomId))
-                .putData("MessageType", "DEPART_10_MINUTES_AGO")
+                .putData("messageType", "DEPART_10_MINUTES_AGO")
                 .putData("message", "출발 10분 전입니다.")
                 .setToken(fcmToken)
                 .setNotification(Notification.builder()
