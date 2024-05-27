@@ -9,7 +9,7 @@ import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.RefreshTokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.UpdateProfileResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
@@ -35,8 +35,8 @@ public class UpdateMemberService {
     private final S3Service s3Service;
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
-    public RefreshTokenResponse refreshAccessToken(Member member) {
-        return new RefreshTokenResponse(
+    public TokenAndMemberResponse refreshAccessToken(Member member) {
+        return new TokenAndMemberResponse(
             jwtTokenProvider.generateToken(member.getId()),
             MemberMapper.toDto(member)
         );

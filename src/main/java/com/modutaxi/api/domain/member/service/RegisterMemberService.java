@@ -10,7 +10,7 @@ import com.modutaxi.api.common.fcm.RedisFcmRepositoryImpl;
 import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.MembershipResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
@@ -36,7 +36,8 @@ public class RegisterMemberService {
     /**
      * 회원 가입
      */
-    public TokenResponse registerMember(String key, String name, Gender gender, String phoneNumber,
+    public TokenAndMemberResponse registerMember(String key, String name, Gender gender,
+        String phoneNumber,
         String fcmToken) {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
         String snsId = checkSnsIdKey(key);
@@ -69,7 +70,7 @@ public class RegisterMemberService {
     /**
      * 존재하는 멤버에 대해 로그인
      */
-    public TokenResponse login(SocialLoginType type, String accessToken, String fcmToken)
+    public TokenAndMemberResponse login(SocialLoginType type, String accessToken, String fcmToken)
         throws IOException {
         String snsId = getSnsIdByAccessToken(type, accessToken);
         Member member = memberRepository.findBySnsIdAndStatusTrue(snsId)
@@ -128,8 +129,11 @@ public class RegisterMemberService {
     /**
      * 로그인 토큰 생성 및 리프레시 토큰 저장 함수
      */
-    private TokenResponse generateMemberToken(Member member) {
-        return jwtTokenProvider.generateToken(member.getId());
+    private TokenAndMemberResponse generateMemberToken(Member member) {
+        return new TokenAndMemberResponse(
+            jwtTokenProvider.generateToken(member.getId()),
+            MemberMapper.toDto(member)
+        );
     }
 
     /**

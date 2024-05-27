@@ -18,7 +18,7 @@ public class MemberResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
-    public static class RefreshTokenResponse {
+    public static class TokenAndMemberResponse {
         private TokenResponse tokenResponse;
         private MemberInfoResponse memberInfoResponse;
     }

@@ -8,7 +8,7 @@ import com.modutaxi.api.domain.member.dto.MemberRequestDto.NicknameRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.MembershipResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
+import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.RegisterMemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +41,7 @@ public class RegisterMemberController {
      */
     @Operation(summary = "소셜 회원가입")
     @PostMapping("/sign-up")
-    public ResponseEntity<TokenResponse> register(
+    public ResponseEntity<TokenAndMemberResponse> register(
         @Valid @RequestBody SignUpRequest signUpRequest) {
         return ResponseEntity.ok(registerMemberService.registerMember(
             signUpRequest.getKey(),
@@ -56,7 +56,7 @@ public class RegisterMemberController {
      */
     @Operation(summary = "소셜 로그인")
     @PostMapping("/{type}/login")
-    public ResponseEntity<TokenResponse> login(
+    public ResponseEntity<TokenAndMemberResponse> login(
         @PathVariable(name = "type") SocialLoginType type,
         @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
