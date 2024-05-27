@@ -78,7 +78,7 @@ public class UpdateRoomService {
 
         room.update(newRoomData);
         fcmService.sendUpdateRoomInfo(member.getId(), roomId);
-        return RoomMapper.toDto(room, member, path);
+        return RoomMapper.toDto(room, member, path, true);
     }
 
     @Transactional
@@ -95,10 +95,8 @@ public class UpdateRoomService {
         Long deleteRoomId = room.getId();
 
         MemberRoomInResponseList memberRoomInResponseList
-                = roomWaitingService.getParticipateInRoom(deleteRoomId);
+                = roomWaitingService.getParticipateInRoom(member, deleteRoomId);
 
-        //채팅방 유저수 정보 삭제
-        redisChatRoomRepositoryImpl.deleteUserCount(roomId.toString());
         //방 삭제
         roomRepository.delete(room);
 

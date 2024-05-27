@@ -28,14 +28,16 @@ public class RoomWaitingController {
 
     @Operation(summary = "대기열 리스트 조회")
     @GetMapping("/api/rooms/{roomId}/members/waiting")
-    public ResponseEntity<RoomWaitingResponseList> getWaitingList(@PathVariable Long roomId) {
-        return ResponseEntity.ok(roomWaitingService.getWaitingList(roomId));
+    public ResponseEntity<RoomWaitingResponseList> getWaitingList(@CurrentMember Member member,
+                                                                  @PathVariable Long roomId) {
+        return ResponseEntity.ok(roomWaitingService.getWaitingList(member, roomId));
     }
 
     @Operation(summary = "특정 방 참가 리스트 조회")
     @GetMapping("/api/rooms/{roomId}/members/in")
-    public ResponseEntity<MemberRoomInResponseList> acceptForParticipate(@PathVariable String roomId) {
-        return ResponseEntity.ok(roomWaitingService.getParticipateInRoom(Long.valueOf(roomId)));
+    public ResponseEntity<MemberRoomInResponseList> getParticipateInRoom(@CurrentMember Member member,
+                                                                         @PathVariable String roomId) {
+        return ResponseEntity.ok(roomWaitingService.getParticipateInRoom(member, Long.valueOf(roomId)));
     }
 
     @Operation(summary = "특정 사용자 입장 수락")

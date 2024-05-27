@@ -15,7 +15,7 @@ public enum RoomErrorCode implements ErrorCode {
     DEPARTURE_BEFORE_CURRENT("ROOM_005", "출발 시간은 현재 시간보다 이전일 수 없습니다.", HttpStatus.BAD_REQUEST),
     DEPARTURE_EXCEED_RANGE("ROOM_006", "출발 위치는 대한민국을 벗어날 수 없습니다.", HttpStatus.BAD_REQUEST),
     POINT_IS_NOT_INDEPENDENT("ROOM_007", "위도와 경도는 한 묶음", HttpStatus.CONFLICT),
-    JUST_DELETE("ROOM_008", "룸 매니저는 퇴장이 안됩니다~ 삭제만 가능", HttpStatus.BAD_REQUEST),
+    MANAGER_CAN_ONLY_DELETE("ROOM_008", "룸 매니저는 퇴장할 수 없습니다. 룸 매니저는 오로지 삭제만 가능합니다.", HttpStatus.BAD_REQUEST),
     ALREADY_IN_ROOM("ROOM_009", "이미 방에 참가하고 있습니다.", HttpStatus.BAD_REQUEST),
     ;
 
