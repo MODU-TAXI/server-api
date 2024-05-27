@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import static java.rmi.server.LogStream.log;
 import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 
 @RequiredArgsConstructor
@@ -104,25 +103,31 @@ public class UpdateRoomService {
         //방 삭제
         roomRepository.delete(room);
 
-        //참가자들에게 글 삭제 알림
-        //참가자들 fcm 구독 끊기
-        memberRoomInResponseList.getInList().forEach(
-                item -> {
-                    fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
-                    fcmService.unsubscribe(item.getMemberId(), deleteRoomId);
-                }
-        );
+        // 참가자들에게 방 삭제 알림 및 FCM 구독 해지
+        memberRoomInResponseList.getInList().forEach(item -> {
+            try {
+                fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
+                fcmService.unsubscribe(item.getMemberId(), deleteRoomId);
+            } catch (IllegalArgumentException e) {
+                log.error("memberId: {}에 대해 roomId: {}에서 FCM 알림 전송 또는 구독 해지 실패. 오류: {}", item.getMemberId(), deleteRoomId, e.getMessage());
+            }
+        });
 
         //참가자들의 매핑된 방 정보 삭제
         memberRoomInResponseList.getInList().forEach(item -> {
-            log("item = " + item.getMemberId());
-            redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(
-                    item.getMemberId().toString());
+                try {
+                    log.info("{}번 유저 삭제하겠습니다.", item.getMemberId());
+                    redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(
+                            item.getMemberId().toString());
+                } catch (Exception e) {
+                    log.error("memberId: {}에 대해 삭제 실패하셨습니다. 오류: {}",item.getMemberId(), e.getMessage());
+                }
             }
         );
 
         //경로 정보 삭제
         taxiInfoMongoRepository.deleteById(taxiInfo.getId());
+        log.info("taxiInfo정보가 삭제되었습니다.");
         return new DeleteRoomResponse(true);
     }
 
