@@ -2,11 +2,10 @@ package com.modutaxi.api.domain.roomwaiting.mapper;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 public class RoomWaitingMapper {
     @Getter
@@ -14,14 +13,14 @@ public class RoomWaitingMapper {
     @Builder
     public static class RoomWaitingResponse {
         private Long memberId;
-        private String name;
-        private double score;
+        private String nickname;
+        private String imageUrl;
 
         public static RoomWaitingResponse toDto(Member member) { //TODO Mapper 로 전환 요망
             return RoomWaitingResponse.builder()
-                .memberId(Long.valueOf(member.getId()))
-                .name(member.getName())
-                .score(member.getScore())
+                .memberId(member.getId())
+                .nickname(member.getNickname())
+                .imageUrl(member.getImageUrl())
                 .build();
         }
     }
@@ -38,14 +37,14 @@ public class RoomWaitingMapper {
     @Builder
     public static class MemberRoomInResponse {
         private Long memberId;
-        private String name;
-        private double score;
+        private String nickname;
+        private String imageUrl;
 
         public static MemberRoomInResponse toDto(Member member) {
             return MemberRoomInResponse.builder()
                 .memberId(member.getId())
-                .name(member.getName())
-                .score(member.getScore())
+                .nickname(member.getNickname())
+                .imageUrl(member.getImageUrl())
                 .build();
         }
     }

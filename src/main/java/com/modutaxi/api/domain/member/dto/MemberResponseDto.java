@@ -43,10 +43,11 @@ public class MemberResponseDto {
     public static class MemberInfoResponse {
         private Long id;
         private String name;
+        private String nickname;
         private Gender gender;
         private String phoneNumber;
         private String email;
-        private double score;
+        private String imageUrl;
     }
 
     @Getter
@@ -67,8 +68,6 @@ public class MemberResponseDto {
         private boolean isCertified;
         @Schema(example = "-", description = "프로필 이미지 S3 링크")
         private String imageUrl;
-        @Schema(example = "80%", description = "최근 매칭 확률")
-        private String matchingProbability;
     }
 
     @Getter

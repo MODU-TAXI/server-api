@@ -22,10 +22,11 @@ public class MemberMapper {
         return MemberInfoResponse.builder()
             .id(member.getId())
             .name(member.getName())
+            .nickname(member.getNickname())
             .gender(member.getGender())
             .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
-            .score(member.getScore())
+            .imageUrl(member.getImageUrl())
             .build();
     }
 
@@ -35,7 +36,6 @@ public class MemberMapper {
             .nickname(member.getNickname())
             .isCertified(member.isCertified())
             .imageUrl(member.getImageUrl())
-            .matchingProbability(member.getMatchingProbability())
             .build();
     }
 
