@@ -107,8 +107,8 @@ public class StompHandler implements ChannelInterceptor {
                         Long.valueOf(roomId), MessageType.JOIN, nickName + "님이 들어왔습니다.",
                         chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now());
 
-                chatService.sendChatMessage(joinMessage);
                 fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
+                chatService.sendChatMessage(joinMessage);
             }
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = accessor.getSessionId();
