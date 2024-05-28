@@ -79,15 +79,15 @@ public class FcmService {
         Message message = Message.builder()
                 .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
                 .putData("messageType", chatMessageRequestDto.getType().toString())
-                .putData("message", chatMessageRequestDto.getType().equals(MessageType.IMAGE)
-                    ? "사진" : chatMessageRequestDto.getContent())
+                .putData("message", chatMessageRequestDto.getContent())
                 .putData("sender", chatMessageRequestDto.getSender())
                 .putData("memberId", chatMessageRequestDto.getMemberId())
                 .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
                 .setTopic(chatMessageRequestDto.getRoomId().toString())
                 .setNotification(Notification.builder()
                         .setTitle("모두의택시")
-                        .setBody(chatMessageRequestDto.getContent())
+                        .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
+                                ? "사진" : chatMessageRequestDto.getContent())
                         .build())
                 .build();
         send(message);
