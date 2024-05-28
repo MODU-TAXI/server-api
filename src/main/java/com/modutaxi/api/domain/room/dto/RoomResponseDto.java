@@ -4,11 +4,10 @@ import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.mongodb.client.model.geojson.LineString;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 public class RoomResponseDto {
 
@@ -20,8 +19,6 @@ public class RoomResponseDto {
         private Long managerId;
         @Schema(example = "String", description = "프로필 이미지 url")
         private String profileImageUrl;
-        @Schema(example = "0", description = "점수")
-        private double score;
         @Schema(example = "true", description = "내가 생성한 방인 지 체크")
         private boolean isMyRoom;
         @Schema(example = "true", description = "내가 참여해 있는 방인 지 체크")
