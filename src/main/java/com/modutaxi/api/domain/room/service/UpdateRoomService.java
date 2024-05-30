@@ -289,7 +289,7 @@ public class UpdateRoomService {
 
         // TODO: 5/27/24 실제로 참여하지 않은 애들 처리
         // ex) redisChatRoomRepositoryImpl.removeFromRoomInList(roomId.toString(), nonParticipant.getUserId().toString());
-        // ex) 새로운 저장공간에 실제 참여한 리스트 저장
+        // ex) 새로운 저장공간에 실제 참여한 리스트 저장 -> 이 방향이 요구사항에 적합할듯
 
         return new UpdateRoomResponse(true);
     }
