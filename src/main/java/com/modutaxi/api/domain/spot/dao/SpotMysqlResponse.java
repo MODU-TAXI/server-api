@@ -20,6 +20,10 @@ public class SpotMysqlResponse {
     public interface SearchWithRadiusResponseInterface {
         Long getId();
 
+        String getName();
+
+        String getAddress();
+
         Point getSpotPoint();
     }
 }

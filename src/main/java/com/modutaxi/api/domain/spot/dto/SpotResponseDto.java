@@ -80,6 +80,10 @@ public class SpotResponseDto {
     public static class SearchSpotWithRadiusResponse {
         @Schema(example = "2", description = "거점 id")
         private Long id;
+        @Schema(example = "인하대학교 후문", description = "거점 이름")
+        private String name;
+        @Schema(example = "인천 미추홀구 용현동 253", description = "거점 주소")
+        private String address;
         @Schema(example = "126.68045", description = "경도")
         private Float longitude;
         @Schema(example = "37.46504", description = "위도")

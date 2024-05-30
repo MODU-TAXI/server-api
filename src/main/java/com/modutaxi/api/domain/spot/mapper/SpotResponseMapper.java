@@ -18,6 +18,6 @@ public class SpotResponseMapper {
     }
 
     public static SearchSpotWithRadiusResponse toSearchWithRadiusResponse(SearchWithRadiusResponseInterface spot) {
-        return new SearchSpotWithRadiusResponse(spot.getId(), (float) spot.getSpotPoint().getX(), (float) spot.getSpotPoint().getY());
+        return new SearchSpotWithRadiusResponse(spot.getId(), spot.getName(), spot.getAddress(), (float) spot.getSpotPoint().getX(), (float) spot.getSpotPoint().getY());
     }
 }
