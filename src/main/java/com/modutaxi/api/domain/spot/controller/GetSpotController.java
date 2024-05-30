@@ -9,7 +9,7 @@ import com.modutaxi.api.domain.spot.dto.SpotRequestDto.GetAreaSpotRequest;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotResponses;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponse;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponses;
-import com.modutaxi.api.domain.spot.dto.SpotResponseDto.SearchWithRadiusResponses;
+import com.modutaxi.api.domain.spot.dto.SpotResponseDto.SearchSpotWithRadiusResponses;
 import com.modutaxi.api.domain.spot.service.GetSpotService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -124,18 +124,15 @@ public class GetSpotController {
             description = "조회 위치 요청 반경의 원형 내 거점을 조회합니다.<br>조회하려는 구역의 반경 크기와 조회하려는 위치의 경도(longitude), 위도(latitude)를 입력해주세요.<br>거점 id와 위치의 경도(longitude), 위도(latitude)를 반환합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchWithRadiusResponses.class))),
+            @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchSpotWithRadiusResponses.class))),
     })
-    public ResponseEntity<SearchWithRadiusResponses> getRadiusSpots(
-            @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m")
-            @RequestParam(value = "radius", defaultValue = "500", required = false) Long radius,
-            @Parameter(description = "경도")
-            @RequestParam(value = "longitude") Float longitude,
-            @Parameter(description = "위도")
-            @RequestParam(value = "latitude") Float latitude
+    public ResponseEntity<SearchSpotWithRadiusResponses> getRadiusSpots(
+            @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m") @RequestParam(defaultValue = "500", required = false) Long radius,
+            @Parameter(description = "검색 기준 경도") @RequestParam Float searchLongitude,
+            @Parameter(description = "검색 기준 위도") @RequestParam Float searchLatitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
-        Coordinate coordinate = new Coordinate(longitude, latitude);
+        Coordinate coordinate = new Coordinate(searchLongitude, searchLatitude);
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getSpotService.getRadiusSpots(point, radius));
     }

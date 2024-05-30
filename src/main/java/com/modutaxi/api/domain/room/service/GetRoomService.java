@@ -9,8 +9,8 @@ import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponses;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -64,13 +64,13 @@ public class GetRoomService {
         return new PageResponseDto<>(PageRequest.of(page, size).getPageNumber(), roomSlice.hasNext(), roomSimpleResponseList);
     }
 
-    public SearchWithRadiusResponses getRadiusRooms(Long spotId, List<RoomTagBitMask> tags, Point searchPoint, Long radius, Boolean isImminent) {
+    public SearchRoomWithRadiusResponses getRadiusRooms(Long spotId, List<RoomTagBitMask> tags, Point searchPoint, Long radius, Boolean isImminent) {
         if (spotId != null)
             getSpotService.getSpot(spotId);
         LocalDateTime timeNow = LocalDateTime.now();
         List<SearchMapResponse> rooms = roomRepositoryDSL.findNearRoomsMap(spotId, checkTags(tags), isImminent, searchPoint, radius, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack));
-        List<SearchWithRadiusResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
-        return new SearchWithRadiusResponses(roomList);
+        List<SearchRoomWithRadiusResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
+        return new SearchRoomWithRadiusResponses(roomList);
     }
 
     private Integer checkTags(List<RoomTagBitMask> tags) {

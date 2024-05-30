@@ -85,7 +85,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
-    public static class SearchWithRadiusResponse {
+    public static class SearchRoomWithRadiusResponse {
         @Schema(example = "2", description = "방 id")
         private Long id;
         @Schema(example = "126.65464", description = "출발지 경도")
@@ -98,9 +98,9 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
-    public static class SearchWithRadiusResponses {
+    public static class SearchRoomWithRadiusResponses {
         @Schema(description = "방 리스트")
-        List<SearchWithRadiusResponse> rooms;
+        List<SearchRoomWithRadiusResponse> rooms;
     }
 
     @Getter

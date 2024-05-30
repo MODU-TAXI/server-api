@@ -4,7 +4,7 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.pagination.PageResponseDto;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponses;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.service.GetRoomService;
@@ -90,9 +90,9 @@ public class GetRoomController {
         description = "조회 위치 요청 반경의 원형 내 방의 좌표를 모두 조회합니다.<br>**필수 파라미터**<br>&emsp;**searchLongitude**(경도)<br>&emsp;**searchLatitude**(위도)<br><br>**선택 파라미터**<br>&emsp;**spotId**(지정 거점id)<br>&emsp;**radius**(조회 반경) : 기본값(500m)<br>&emsp;**roomTags**(방 카테고리)<br>&emsp;**isImminent**(마감 임박 여부)<br><br>**방 id**와 **longitude**(경도), **latitude**(위도), **거점명**을 반환합니다."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchWithRadiusResponses.class))),
+        @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchRoomWithRadiusResponses.class))),
     })
-    public ResponseEntity<SearchWithRadiusResponses> getRadiusRooms(
+    public ResponseEntity<SearchRoomWithRadiusResponses> getRadiusRooms(
         @Parameter(description = "거점 id") @RequestParam(required = false) Long spotId,
         @Parameter(description = "거리 반경<br>단위: 미터<br>기본값: 500m") @RequestParam(defaultValue = "500", required = false) Long radius,
         @Parameter(description = "방 카테고리") @RequestParam(required = false) List<RoomTagBitMask> roomTags,

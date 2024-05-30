@@ -77,7 +77,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
-    public static class SearchWithRadiusResponse {
+    public static class SearchSpotWithRadiusResponse {
         @Schema(example = "2", description = "거점 id")
         private Long id;
         @Schema(example = "126.68045", description = "경도")
@@ -88,8 +88,8 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
-    public static class SearchWithRadiusResponses {
+    public static class SearchSpotWithRadiusResponses {
         @Schema(description = "거점 리스트")
-        List<SearchWithRadiusResponse> spots;
+        List<SearchSpotWithRadiusResponse> spots;
     }
 }

@@ -6,7 +6,7 @@ import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchWithRadiusResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.mongodb.client.model.geojson.LineString;
@@ -90,7 +90,7 @@ public class RoomMapper {
             .build();
     }
 
-    public static SearchWithRadiusResponse toDto(SearchMapResponse dao) {
-        return new SearchWithRadiusResponse(dao.getId(), (float) dao.getDeparturePoint().getX(), (float) dao.getDeparturePoint().getY(), dao.getSpotName());
+    public static SearchRoomWithRadiusResponse toDto(SearchMapResponse dao) {
+        return new SearchRoomWithRadiusResponse(dao.getId(), (float) dao.getDeparturePoint().getX(), (float) dao.getDeparturePoint().getY(), dao.getSpotName());
     }
 }
