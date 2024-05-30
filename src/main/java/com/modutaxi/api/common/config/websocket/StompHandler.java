@@ -3,9 +3,10 @@ package com.modutaxi.api.common.config.websocket;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.SocketException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
-import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -74,19 +76,19 @@ public class StompHandler implements ChannelInterceptor {
             //roomId가 안들어왔으면 에러
             if (roomId == null) {
                 log.error("구독요청 \"sub/chat/{roomId}\" 에서 roomId가 들어오지 않았습니다.");
-                throw new BaseException(ChatErrorCode.FAULT_ROOM_ID);
+                throw new SocketException(StompErrorCode.FAULT_ROOM_ID);
             }
 
             //없는 방 연결하려 할 때 에러
             Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
-                    () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+                    () -> new SocketException(StompErrorCode.FAULT_ROOM_ID));
 
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 에러
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
             if (chatRoomMappingInfo != null && !roomId.equals(chatRoomMappingInfo.getRoomId())) {
                 log.error("사용자 ID: {}님은 현재 {}번 방에 참여해 있지만, 참여요청이 들어온 방은 {}번방 입니다. ",
                         memberId, chatRoomMappingInfo.getRoomId(), roomId);
-                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
+                throw new SocketException(StompErrorCode.ALREADY_ROOM_IN);
             }
 
             // TODO: 5/20/24 병합되면 member.getNickName으로 변경
@@ -95,7 +97,7 @@ public class StompHandler implements ChannelInterceptor {
             // TODO: 5/20/24 매직넘버 제거 [MS-131 전체 상수 패키지에 작성 예정]
             if (room.getCurrentHeadcount() >= 4) {
                 log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
-                throw new BaseException(ChatErrorCode.FULL_CHAT_ROOM);
+                throw new SocketException(StompErrorCode.FULL_CHAT_ROOM);
             }
 
             if (chatRoomMappingInfo == null) {

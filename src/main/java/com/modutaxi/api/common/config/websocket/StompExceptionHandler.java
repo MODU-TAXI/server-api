@@ -1,5 +1,6 @@
 package com.modutaxi.api.common.config.websocket;
 
+import com.modutaxi.api.common.auth.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
@@ -43,25 +44,28 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
     @Override
     protected Message<byte[]> handleInternal(StompHeaderAccessor errorHeaderAccessor, byte[] errorPayload,
                                              @Nullable Throwable cause, @Nullable StompHeaderAccessor clientHeaderAccessor) {
-
-        String errorMessage =  "규정되지 않은 에러입니다.";
-        String errorCause = "No exception";
+        String errorCause = "";
 
         if (cause != null) {
-            errorMessage = cause.getMessage();
-            errorCause = (cause.getCause() != null) ? cause.getCause().toString() : "null";
-            errorHeaderAccessor.setHeader("error-message", errorMessage);
-            errorHeaderAccessor.setHeader("error-cause", errorCause);
+            errorCause = (cause.getCause() != null) ? cause.getCause().toString() : "No exception";
         }
 
-//        assert cause != null;
-//        System.out.println("cause = " + cause.getCause());
-        // 예외 메시지를 포함한 새로운 payload 생성
+        log.error(errorCause);
+        String fullErrorMessage = extractErrorCode(errorCause);
 
-        String fullErrorMessage = "Error: " + errorMessage + "\nCause: " + errorCause;
         byte[] newPayload = fullErrorMessage.getBytes(StandardCharsets.UTF_8);
 
-        log.error("payload: " + errorPayload  + "\n" + "cause: " + cause.getMessage() + ", " + cause.getCause());
         return MessageBuilder.createMessage(newPayload, errorHeaderAccessor.getMessageHeaders());
+    }
+
+    private String extractErrorCode(String input) {
+        String[] parts = input.split(":");
+        // 콜론 다음 부분의 앞뒤 공백을 제거하여 반환
+        if (parts.length > 1) {
+            return parts[1].trim();
+        } else {
+            // ':' 문자가 없는 경우 빈 문자열 반환
+            return "No exception";
+        }
     }
 }
