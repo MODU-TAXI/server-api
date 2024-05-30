@@ -42,7 +42,7 @@ public class SpotResponseDto {
         private Float longitude;
         @Schema(example = "37.46504", description = "위도")
         private Float latitude;
-        @Schema(example = "3204.821669916938", description = "거리, 미터단위")
+        @Schema(example = "3204.821669916938", description = "거리, 미터단위", nullable = true)
         private Double distance;
         @Schema(example = "true", description = "좋아요 여부")
         private Boolean liked;

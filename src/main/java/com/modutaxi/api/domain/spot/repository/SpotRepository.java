@@ -18,7 +18,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     Boolean existsByNameEquals(String name);
 
     @Query("SELECT " +
-            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) AS distance, (CASE WHEN l.member = :member THEN true ELSE false END) AS liked " +
+            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, (CASE WHEN :point IS NULL THEN NULL ELSE ST_DISTANCE_SPHERE(:point, s.spotPoint) END) AS distance, (CASE WHEN l.member = :member THEN true ELSE false END) AS liked " +
             "FROM Spot s LEFT JOIN LikedSpot l ON (s.id = l.spot.id) " +
             "WHERE " +
             "s.id = :id")
@@ -42,7 +42,7 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     List<SearchWithRadiusResponseInterface> findNearSpotsInRadius(@Param("point") Point point, @Param("radius") Long radius);
 
     @Query("SELECT " +
-            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, ST_DISTANCE_SPHERE(:currentPoint, s.spotPoint) AS distance, (CASE WHEN l.member = :member THEN true ELSE false END) AS liked " +
+            "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, (CASE WHEN :currentPoint IS NULL THEN NULL ELSE ST_DISTANCE_SPHERE(:currentPoint, s.spotPoint) END) AS distance, (CASE WHEN l.member = :member THEN true ELSE false END) AS liked " +
             "FROM Spot s LEFT JOIN LikedSpot l ON (s.id = l.spot.id) " +
             "ORDER BY " +
             "ST_DISTANCE_SPHERE(:searchPoint, s.spotPoint) "
