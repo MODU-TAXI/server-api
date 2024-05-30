@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -29,8 +28,8 @@ public class S3Controller {
 
     @Hidden
     @DeleteMapping
-    public ResponseEntity<String> deleteFile(@RequestParam String fileName) {
-        s3Service.deleteFile(fileName);
+    public ResponseEntity<String> deleteFile(@RequestParam(value = "imageUrl") String imageUrl) {
+        s3Service.deleteFile(imageUrl);
         return ResponseEntity.ok("파일을 삭제하였습니다.");
     }
 }

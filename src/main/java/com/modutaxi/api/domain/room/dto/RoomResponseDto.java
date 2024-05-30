@@ -3,11 +3,10 @@ package com.modutaxi.api.domain.room.dto;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.mongodb.client.model.geojson.LineString;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 public class RoomResponseDto {
 
@@ -15,6 +14,14 @@ public class RoomResponseDto {
     @Builder
     @AllArgsConstructor
     public static class RoomDetailResponse {
+        @Schema(example = "1", description = "매니저 ID")
+        private Long managerId;
+        @Schema(example = "String", description = "프로필 이미지 url")
+        private String profileImageUrl;
+        @Schema(example = "true", description = "내가 생성한 방인 지 체크")
+        private boolean isMyRoom;
+        @Schema(example = "true", description = "내가 참여해 있는 방인 지 체크")
+        private boolean isParticipate;
         @Schema(description = "택시팟 id")
         private Long roomId;
         @Schema(description = "도착 거점 id")

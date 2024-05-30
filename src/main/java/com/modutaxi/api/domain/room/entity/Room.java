@@ -7,7 +7,9 @@ import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -64,7 +66,7 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private int currentHeadcount = 0;
+    private int currentHeadcount = 1;
 
     @NotNull
     @Builder.Default
@@ -76,12 +78,20 @@ public class Room extends BaseTime {
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate
-            = new Coordinate(updateRoomDto.getDepartureLongitude(), updateRoomDto.getDepartureLatitude());
+                = new Coordinate(updateRoomDto.getDepartureLongitude(), updateRoomDto.getDepartureLatitude());
         this.departurePoint = geometryFactory.createPoint(coordinate);
         this.departureName = updateRoomDto.getDepartureName();
         this.departureTime = updateRoomDto.getDepartureTime();
         this.wishHeadcount = updateRoomDto.getWishHeadcount();
         this.expectedCharge = updateRoomDto.getExpectedCharge();
         this.durationMinutes = updateRoomDto.getDurationMinutes();
+    }
+
+    public void plusCurrentHeadCount() {
+        this.currentHeadcount++;
+    }
+
+    public void minusCurrentHeadCount() {
+        this.currentHeadcount++;
     }
 }

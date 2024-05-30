@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.room.mapper;
 
+import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
+
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
@@ -10,14 +12,11 @@ import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResp
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.mongodb.client.model.geojson.LineString;
+import java.time.LocalDateTime;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-
-import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
 
 @Component
 public class RoomMapper {
@@ -50,14 +49,18 @@ public class RoomMapper {
             .build();
     }
 
-    public static RoomDetailResponse toDto(Room room, LineString path) {
+    public static RoomDetailResponse toDto(Room room, Member member, LineString path, boolean isParticipate) {
         return RoomDetailResponse.builder()
+            .managerId(room.getRoomManager().getId())
+            .isMyRoom(room.getRoomManager().getId().equals(member.getId()))
+            .isParticipate(isParticipate)
             .roomId(room.getId())
             .spotId(room.getSpot().getId())
             .departureDairyDate(TimeFormatConverter.convertTimeToDiaryDate(room.getDepartureTime()))
             .arrivalLongitude((float) room.getSpot().getSpotPoint().getX())
             .arrivalLatitude((float) room.getSpot().getSpotPoint().getY())
-            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime().plusMinutes(room.getDurationMinutes())))
+            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(
+                room.getDepartureTime().plusMinutes(room.getDurationMinutes())))
             .arrivalName(room.getSpot().getName())
             .roomTagBitMaskList(convertBitMaskToRoomTagList(room.getRoomTagBitMask()))
             .departureLongitude((float) room.getDeparturePoint().getX())
@@ -77,7 +80,8 @@ public class RoomMapper {
         return RoomSimpleResponse.builder()
             .roomId(dao.getId())
             .spotId(dao.getSpotId())
-            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(dao.getDepartureTime().plusMinutes(dao.getDurationMinutes())))
+            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(
+                dao.getDepartureTime().plusMinutes(dao.getDurationMinutes())))
             .arrivalName(dao.getSpotName())
             .roomTagBitMaskList(convertBitMaskToRoomTagList(dao.getRoomTagBitMask()))
             .departureTime(TimeFormatConverter.covertTimeToShortClockTime(dao.getDepartureTime()))

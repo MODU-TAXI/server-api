@@ -1,7 +1,9 @@
 package com.modutaxi.api.domain.room.controller;
 
+import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
@@ -38,8 +40,8 @@ public class GetRoomController {
 
     @Operation(summary = "경로를 포함한 방 정보 상세 조회")
     @GetMapping("/{id}")
-    public ResponseEntity<RoomDetailResponse> getRoomDetail(@PathVariable Long id) {
-        return ResponseEntity.ok(getRoomService.getRoomDetail(id));
+    public ResponseEntity<RoomDetailResponse> getRoomDetail(@CurrentMember Member member, @PathVariable Long id) {
+        return ResponseEntity.ok(getRoomService.getRoomDetail(member, id));
     }
 
     @Operation(summary = "경로를 제외한 방 리스트 조회",
