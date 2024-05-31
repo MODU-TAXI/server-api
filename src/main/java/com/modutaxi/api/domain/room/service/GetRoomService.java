@@ -93,12 +93,6 @@ public class GetRoomService {
         return RoomMapper.toDto(room);
     }
 
-    public RoomPreviewResponse getRoomPreview(Long roomId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-        return RoomMapper.toDto(room);
-    }
-
     private Integer checkTags(List<RoomTagBitMask> tags) {
         Integer tagBitMask = RoomTagBitMaskConverter.convertRoomTagListToBitMask(tags);
         if ((RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue() & tagBitMask) == RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue())
