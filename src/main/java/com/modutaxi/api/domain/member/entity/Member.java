@@ -92,4 +92,8 @@ public class Member extends BaseTime {
         return this.nickname != null;
     }
 
+    public void plusOneReportCount() {
+        this.reportCount++;
+    }
+
 }
