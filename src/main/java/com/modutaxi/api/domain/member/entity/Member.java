@@ -96,4 +96,8 @@ public class Member extends BaseTime {
         this.reportCount++;
     }
 
+    public void setStatusFalse() {
+        this.status = false;
+    }
+
 }

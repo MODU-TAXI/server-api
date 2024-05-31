@@ -6,6 +6,7 @@ import static com.modutaxi.api.domain.report.mapper.ReportMapper.toEntity;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ReportErrorCode;
+import com.modutaxi.api.common.slack.SlackService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.report.dto.ReportResponseDto.ReportResponse;
@@ -22,26 +23,30 @@ public class RegisterReportService {
 
     private final MemberRepository memberRepository;
     private final ReportRepository reportRepository;
+    private final SlackService slackService;
 
     public ReportResponse register(Long reporterId, Long targetId, ReportType type,
         String content) {
+        // validation
         Member targetMember = memberRepository.findByIdAndStatusTrue(targetId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-
         validateContentLength(content);
 
+        // 저장
         Report report = toEntity(reporterId, targetId, type, content);
         reportRepository.save(report);
 
-        // 같은 날, 같은 멤버가, 같은 멤버를 신고 했다면 카운팅하지 않습니다.
+        // 관리자 슬랙에 메시지 전송
+        slackService.sendReportMessage(report);
+
+        // 같은 날, 같은 멤버가, 같은 멤버를 신고한게 아니라면
         if (!existsTodayDuplicateReport(reporterId, targetId)) {
+            // 신고 횟수 카운팅
             targetMember.plusOneReportCount();
         }
 
-        if (targetMember.getReportCount() >= REPORT_STANDARD) {
-            // TODO: 신고가 기준 치 이상 누적되었을 때, 임시 비활성화 처리 및 슬랙 메시지 전송 로직 추가
-            // TODO: 비활성화 처리 이메일 전송 필요하다면 로직 추가
-        }
+        // 신고 누적 체크 및 대응
+        checkExceededReportStandard(targetMember);
 
         return new ReportResponse(report.getId());
     }
@@ -60,4 +65,18 @@ public class RegisterReportService {
         return reportRepository.existsByCreatedAtAndReportedIdAndTargetId(
             date, reporterId, targetId);
     }
+
+    /**
+     * 해당 멤버에 대한 신고가 기준치 이상 누적되었다면 임시 비활성화 처리 후, 관리자 슬랙에 메시지를 전송합니다.
+     */
+    private void checkExceededReportStandard(Member member) {
+        if (member.getReportCount() >= REPORT_STANDARD) {
+            // 임시 비활성화 처리
+            member.setStatusFalse();
+            // 관리자 슬랙에 메시지 전송
+            slackService.sendTemporaryBlockMemberMessage(member);
+            // TODO: 비활성화 처리 이메일 전송 필요하다면 로직 추가
+        }
+    }
+
 }
