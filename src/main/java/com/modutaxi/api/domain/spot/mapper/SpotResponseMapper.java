@@ -4,7 +4,7 @@ import com.modutaxi.api.domain.spot.dao.SpotMysqlResponse.SearchWithRadiusRespon
 import com.modutaxi.api.domain.spot.dao.SpotMysqlResponse.SpotWithDistanceResponseInterface;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotResponse;
 import com.modutaxi.api.domain.spot.dto.SpotResponseDto.GetSpotWithDistanceResponse;
-import com.modutaxi.api.domain.spot.dto.SpotResponseDto.SearchWithRadiusResponse;
+import com.modutaxi.api.domain.spot.dto.SpotResponseDto.SearchSpotWithRadiusResponse;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import org.springframework.data.geo.Point;
 
@@ -17,7 +17,7 @@ public class SpotResponseMapper {
         return new GetSpotResponse(spot.getId(), spot.getName(), spot.getAddress(), new Point(spot.getSpotPoint().getX(), spot.getSpotPoint().getY()));
     }
 
-    public static SearchWithRadiusResponse toSearchWithRadiusResponse(SearchWithRadiusResponseInterface spot) {
-        return new SearchWithRadiusResponse(spot.getId(), (float) spot.getSpotPoint().getX(), (float) spot.getSpotPoint().getY());
+    public static SearchSpotWithRadiusResponse toSearchWithRadiusResponse(SearchWithRadiusResponseInterface spot) {
+        return new SearchSpotWithRadiusResponse(spot.getId(), spot.getName(), spot.getAddress(), (float) spot.getSpotPoint().getX(), (float) spot.getSpotPoint().getY());
     }
 }
