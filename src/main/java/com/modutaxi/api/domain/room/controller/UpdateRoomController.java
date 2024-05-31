@@ -53,7 +53,7 @@ public class UpdateRoomController {
         return ResponseEntity.ok(updateRoomService.deleteRoom(member, id));
     }
 
-    @Operation(summary = "모집방 상태 변경", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.")
+    @Operation(summary = "매칭 완료", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.<br>방에는 참여해있지만 실제 동승하지 않은 유저의 ID를 리스트 형태로 보내주세요.<br>")
     @PatchMapping("/finish/matching/{id}")
     public ResponseEntity<UpdateRoomResponse> updateRoomStatus(
         @CurrentMember Member member,

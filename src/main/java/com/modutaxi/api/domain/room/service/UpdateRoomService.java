@@ -8,6 +8,11 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.*;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
+import com.modutaxi.api.domain.chat.service.ChatService;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
+import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
@@ -32,7 +37,6 @@ import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +57,8 @@ public class UpdateRoomService {
     private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
+    private final ChatService chatService;
+    private final ChatMessageRepository chatMessageRepository;
 
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
@@ -290,6 +296,16 @@ public class UpdateRoomService {
         // TODO: 5/27/24 실제로 참여하지 않은 애들 처리
         // ex) redisChatRoomRepositoryImpl.removeFromRoomInList(roomId.toString(), nonParticipant.getUserId().toString());
         // ex) 새로운 저장공간에 실제 참여한 리스트 저장 -> 이 방향이 요구사항에 적합할듯
+
+        ChatMessageRequestDto chatMessageRequestDto =
+                new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
+                        ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now());
+
+        chatService.sendChatMessage(chatMessageRequestDto);
+        fcmService.sendChatMessage(chatMessageRequestDto);
+
+        //메세지 리퍼지토리에 저장
+        chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequestDto, room));
 
         return new UpdateRoomResponse(true);
     }

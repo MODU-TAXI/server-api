@@ -4,5 +4,6 @@ public enum MessageType {
     JOIN,
     CHAT,
     LEAVE,
-    IMAGE
+    IMAGE,
+    CHAT_BOT
 }
