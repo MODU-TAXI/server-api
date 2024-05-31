@@ -1,7 +1,6 @@
 package com.modutaxi.api.domain.chatmessage.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.room.entity.Room;
 import jakarta.persistence.*;
 
@@ -10,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 @Entity
 @NoArgsConstructor
