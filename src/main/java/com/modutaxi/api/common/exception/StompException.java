@@ -4,10 +4,10 @@ import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import lombok.Getter;
 
 @Getter
-public class SocketException extends RuntimeException {
+public class StompException extends RuntimeException {
     private final StompErrorCode errorCode;
 
-    public SocketException(StompErrorCode errorCode) {
+    public StompException(StompErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }

@@ -79,9 +79,9 @@ public class ControllerAdvice {
     /**
      * CASE: 소켓 에러
      */
-    @ExceptionHandler(SocketException.class)
-    public ResponseEntity<SocketException> handleBaseException(SocketException e) {
-        return new ResponseEntity<>(new SocketException(e.getErrorCode()), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(StompException.class)
+    public ResponseEntity<StompException> handleBaseException(StompException e) {
+        return new ResponseEntity<>(new StompException(e.getErrorCode()), HttpStatus.BAD_REQUEST);
     }
 
 
