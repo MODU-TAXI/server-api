@@ -4,7 +4,6 @@ import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertB
 
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.PreviewResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;

@@ -11,7 +11,6 @@ import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
-import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.service.GetMemberService;
