@@ -302,7 +302,6 @@ public class UpdateRoomService {
                         ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now());
 
         chatService.sendChatMessage(chatMessageRequestDto);
-        fcmService.sendChatMessage(chatMessageRequestDto);
 
         //메세지 리퍼지토리에 저장
         chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequestDto, room));
