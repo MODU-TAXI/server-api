@@ -112,4 +112,18 @@ public class RoomMapper {
             .expectedCharge(room.getExpectedCharge())
             .build();
     }
+
+    public static RoomPreviewResponse toDto(Room room) {
+        return RoomPreviewResponse.builder()
+            .roomId(room.getId())
+            .arrivalName(room.getSpot().getName())
+            .departureTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime()))
+            .departureName(room.getDepartureName())
+            .currentHeadcount(room.getCurrentHeadcount())
+            .wishHeadcount(room.getWishHeadcount())
+            .roomStatus(room.getRoomStatus())
+            .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
+            .expectedCharge(room.getExpectedCharge())
+            .build();
+    }
 }
