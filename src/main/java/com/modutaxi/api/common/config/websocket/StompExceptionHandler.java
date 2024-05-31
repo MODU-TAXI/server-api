@@ -1,6 +1,5 @@
 package com.modutaxi.api.common.config.websocket;
 
-import com.modutaxi.api.common.auth.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
@@ -47,7 +46,7 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
         String errorCause = "";
 
         if (cause != null) {
-            errorCause = (cause.getCause() != null) ? cause.getCause().toString() : "No exception";
+            errorCause = (cause.getCause() != null) ? cause.getCause().toString() : "Undefined exception";
         }
 
         log.error(errorCause);
@@ -64,8 +63,8 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
         if (parts.length > 1) {
             return parts[1].trim();
         } else {
-            // ':' 문자가 없는 경우 빈 문자열 반환
-            return "No exception";
+            // ':' 문자가 없는 경우 정의된 에러 메세지 반환
+            return "Undefined exception";
         }
     }
 }
