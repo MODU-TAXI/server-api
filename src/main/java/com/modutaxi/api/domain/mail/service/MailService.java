@@ -6,4 +6,5 @@ public interface MailService {
     String checkEmailCertificationCode(Long memberId, String certificationCode);
     void sendCoolSmsBalanceMessage(Long balance);
     void sendAligoRemainSmsMessage(String smsCnt);
+    void sendTemporaryBlockMemberMail(String emailAddress);
 }
