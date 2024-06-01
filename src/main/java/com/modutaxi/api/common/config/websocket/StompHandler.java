@@ -40,6 +40,8 @@ public class StompHandler implements ChannelInterceptor {
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
 
+    private static final int FULL_MEMBER = 4;
+
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
@@ -89,11 +91,9 @@ public class StompHandler implements ChannelInterceptor {
                 throw new StompException(StompErrorCode.ALREADY_ROOM_IN);
             }
 
-            // TODO: 5/20/24 병합되면 member.getNickName으로 변경
-            String nickName = member.getName();
+            String nickName = member.getNickname();
 
-            // TODO: 5/20/24 매직넘버 제거 [MS-131 전체 상수 패키지에 작성 예정]
-            if (room.getCurrentHeadcount() >= 4) {
+            if (room.getCurrentHeadcount() >= FULL_MEMBER) {
                 log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
                 throw new StompException(StompErrorCode.FULL_CHAT_ROOM);
             }
