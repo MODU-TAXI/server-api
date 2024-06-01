@@ -29,18 +29,4 @@ public class RoomMysqlResponse {
         long durationMinutes;
         int expectedCharge;
     }
-
-    // TODO: 5/26/24 dao써보려다가 그냥 entity 넘김. 삭제예정
-    @Getter
-    public static class PreviewResponse {
-        Long roomId;
-        LocalDateTime departureTime;
-        String departureName;
-        String spotName;
-        RoomStatus roomStatus;
-        int currentHeadcount;
-        int wishHeadcount;
-        int expectedCharge;
-    }
-
 }
