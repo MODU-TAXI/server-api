@@ -23,7 +23,8 @@ public class MailServiceImpl implements MailService {
         CertCodeEntity certCodeEntity = redisMailCertCodeRepository.findById(memberId);
         if (certCodeEntity != null
             && certCodeEntity.getEmailAddress().equals(emailAddress)
-            && certCodeEntity.getCreatedAt().plusSeconds(certMailRestrictionSeconds).isAfter(LocalDateTime.now())
+            && certCodeEntity.getCreatedAt().plusSeconds(certMailRestrictionSeconds)
+            .isAfter(LocalDateTime.now())
         ) {
             throw new BaseException(MailErrorCode.TOO_MANY_CERTIFICATION_CODE_REQUEST);
         }

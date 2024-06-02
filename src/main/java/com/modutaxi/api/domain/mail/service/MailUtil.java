@@ -62,10 +62,10 @@ public class MailUtil {
     public void sendEmailCoolSmsBalanceMail(Long balance) {
         for (String bankerEmail : bankerEmailList) {
             sendSimpleEmailOnlyHtml(
-                    "[모두의 택시] Cool SMS 잔액 부족"
-                    , noReplySender
-                    , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
-                    , bankerEmail
+                "[모두의 택시] Cool SMS 잔액 부족"
+                , noReplySender
+                , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
+                , bankerEmail
             );
         }
     }
@@ -95,16 +95,20 @@ public class MailUtil {
         message.setSubject(new Content(title));
         message.setBody(new Body().withHtml(new Content(htmlContent)));
 
-        SendEmailRequest request = new SendEmailRequest(sender, new Destination().withToAddresses(receiver), message);
+        SendEmailRequest request = new SendEmailRequest(sender,
+            new Destination().withToAddresses(receiver), message);
         SendEmailResult result = amazonSimpleEmailService.sendEmail(request);
         if (result.getSdkHttpMetadata().getHttpStatusCode() != 200) {
-            throw new BaseException(SES_SERVER_ERROR, "메일 발송에 실패했습니다.\n" + result.getSdkHttpMetadata().toString());
+            throw new BaseException(SES_SERVER_ERROR,
+                "메일 발송에 실패했습니다.\n" + result.getSdkHttpMetadata().toString());
         }
         return result;
     }
 
     // full content mail
-    private SendRawEmailResult sendRawEmail(String title, String sender, String content, String receiver, String html, String fileRoot) throws MessagingException, IOException, NullPointerException {
+    private SendRawEmailResult sendRawEmail(String title, String sender, String content,
+        String receiver, String html, String fileRoot)
+        throws MessagingException, IOException, NullPointerException {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
 
@@ -115,7 +119,8 @@ public class MailUtil {
         message.setFrom(sender);
 
         // 메일 수신자 설정
-        message.setRecipients(jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(receiver));
+        message.setRecipients(jakarta.mail.Message.RecipientType.TO,
+            InternetAddress.parse(receiver));
         MimeMultipart messageBody = new MimeMultipart("alternative");
 
         // HTML, text wrapper 설정
@@ -151,7 +156,8 @@ public class MailUtil {
         // outputStream을 RawMessage로 변환
         RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
 
-        SendRawEmailResult result = amazonSimpleEmailService.sendRawEmail(new SendRawEmailRequest(rawMessage));
+        SendRawEmailResult result = amazonSimpleEmailService.sendRawEmail(
+            new SendRawEmailRequest(rawMessage));
         return result;
     }
 }
