@@ -64,6 +64,9 @@ public class Member extends BaseTime {
     private int reportCount = 0;
     @NotNull
     @Builder.Default
+    private boolean blocked = false;
+    @NotNull
+    @Builder.Default
     private boolean status = true;
 
     public void certificateEmail(String email) {
@@ -96,8 +99,8 @@ public class Member extends BaseTime {
         this.reportCount++;
     }
 
-    public void setStatusFalse() {
-        this.status = false;
+    public void setBlockedTrue() {
+        this.blocked = true;
     }
 
 }

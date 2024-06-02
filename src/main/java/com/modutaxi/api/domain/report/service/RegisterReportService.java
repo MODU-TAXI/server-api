@@ -77,7 +77,7 @@ public class RegisterReportService {
     private void checkExceededReportStandard(Member member) {
         if (member.getReportCount() >= REPORT_STANDARD && member.isStatus()) {
             // 임시 비활성화 처리
-            member.setStatusFalse();
+            member.setBlockedTrue();
             // 관리자 슬랙에 메시지 전송
             slackService.sendTemporaryBlockMemberMessage(member);
             // 이메일 존재하면 비활성화 처리 이메일 전송
