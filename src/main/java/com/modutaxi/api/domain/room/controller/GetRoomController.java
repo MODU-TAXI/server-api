@@ -7,6 +7,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.service.GetRoomService;
@@ -106,5 +107,17 @@ public class GetRoomController {
         Coordinate coordinate = new Coordinate(searchLongitude, searchLatitude);
         Point point = geometryFactory.createPoint(coordinate);
         return ResponseEntity.ok(getRoomService.getRadiusRooms(spotId, roomTags, point, radius, isImminent));
+    }
+
+    @GetMapping("/preview/{id}")
+    @Operation(
+            summary = "방 미리보기 조회",
+            description = "방 미리보기입니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "방 정보 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomPreviewResponse.class))),
+    })
+    public ResponseEntity<RoomPreviewResponse> getRoomPreview(@PathVariable Long id) {
+        return ResponseEntity.ok(getRoomService.getRoomPreview(id));
     }
 }

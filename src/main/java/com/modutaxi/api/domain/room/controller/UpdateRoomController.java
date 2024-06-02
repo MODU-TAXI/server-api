@@ -3,9 +3,12 @@ package com.modutaxi.api.domain.room.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.*;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.service.UpdateRoomService;
+import com.mongodb.lang.Nullable;
+import com.querydsl.sql.types.Null;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,5 +51,15 @@ public class UpdateRoomController {
         @PathVariable Long id
     ) {
         return ResponseEntity.ok(updateRoomService.deleteRoom(member, id));
+    }
+
+    @Operation(summary = "매칭 완료", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.<br>방에는 참여해있지만 실제 동승하지 않은 유저의 ID를 리스트 형태로 보내주세요.<br>")
+    @PatchMapping("/finish/matching/{id}")
+    public ResponseEntity<UpdateRoomResponse> updateRoomStatus(
+        @CurrentMember Member member,
+        @PathVariable Long id,
+        @RequestBody UpdateRoomStatusRequest updateRoomStatusRequest
+    ) {
+        return ResponseEntity.ok(updateRoomService.finishMatching(member, id, updateRoomStatusRequest));
     }
 }

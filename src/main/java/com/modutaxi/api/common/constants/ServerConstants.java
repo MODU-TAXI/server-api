@@ -1,7 +1,21 @@
 package com.modutaxi.api.common.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+@Component
 public final class ServerConstants {
 
-    // 프로필 기본 이미지
-    public static final String BASIC_PROFILE_IMAGE_URL = "임시 링크";
+    @Value("${cloud.aws.s3.basic-profile-image}")
+    private String basicProfileImageUrl;
+
+    public static String BASIC_PROFILE_IMAGE_URL;
+
+    @PostConstruct
+    private void init() {
+        BASIC_PROFILE_IMAGE_URL = basicProfileImageUrl;
+    }
+
 }

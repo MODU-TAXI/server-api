@@ -90,7 +90,7 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
         if (memberId == null) {
             return null;
         }
-        return (ChatRoomMappingInfo) chatInfoHashOperations.get(ENTER_INFO, memberId);
+        return chatInfoHashOperations.get(ENTER_INFO, memberId);
     }
 
     public String findMemberBySessionId(String sessionId) {

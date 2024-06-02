@@ -17,6 +17,7 @@ public enum RoomErrorCode implements ErrorCode {
     POINT_IS_NOT_INDEPENDENT("ROOM_007", "위도와 경도는 한 묶음", HttpStatus.CONFLICT),
     MANAGER_CAN_ONLY_DELETE("ROOM_008", "룸 매니저는 퇴장할 수 없습니다. 룸 매니저는 오로지 삭제만 가능합니다.", HttpStatus.BAD_REQUEST),
     ALREADY_IN_ROOM("ROOM_009", "이미 방에 참가하고 있습니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_MATCHING_COMPLETE("ROOM_010", "해당 방의 매칭은 이미 완료되었습니다.", HttpStatus.BAD_REQUEST)
     ;
 
     private final String errorCode;
