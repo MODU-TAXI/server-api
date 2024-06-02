@@ -275,12 +275,12 @@ public class UpdateRoomService {
         room.roomStatusUpdate();
 
         //request 조회
-        List<NonParticipant> userList = updateRoomStatusRequest.getNonParticipantList();
+        List<NonParticipant> memberList = updateRoomStatusRequest.getNonParticipantList();
 
         //member 정당성 확인
-        List<Member> nonParticipantList = userList.stream()
+        List<Member> nonParticipantList = memberList.stream()
                 .map(nonParticipant -> {
-                    Member member = memberRepository.findByIdAndStatusTrue(nonParticipant.getUserId())
+                    Member member = memberRepository.findByIdAndStatusTrue(nonParticipant.getMemberId())
                             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
                     boolean isInRoom = redisChatRoomRepositoryImpl.findMemberInRoomInList

@@ -66,7 +66,7 @@ public class RoomRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NonParticipant {
-        @Schema(description = "유저 id")
-        private Long userId;
+        @Schema(description = "멤버 id")
+        private Long memberId;
     }
 }
