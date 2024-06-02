@@ -19,6 +19,7 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 
 import java.time.LocalDateTime;
 
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -52,8 +53,12 @@ public class StompHandler implements ChannelInterceptor {
             String sessionId = accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
 
-            String memberId = jwtTokenProvider.getMemberIdByToken(token);
-            redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
+            try {
+                String memberId = jwtTokenProvider.getMemberIdByToken(token);
+                redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
+            } catch (JwtException e) {
+                throw new StompException(StompErrorCode.FAULT_JWT);
+            }
         }
 
         //구독 요청
@@ -74,9 +79,9 @@ public class StompHandler implements ChannelInterceptor {
 
 
             //roomId가 안들어왔으면 에러
-            if (roomId == null) {
+            if (roomId == null || roomId == "") {
                 log.error("구독요청 \"sub/chat/{roomId}\" 에서 roomId가 들어오지 않았습니다.");
-                throw new StompException(StompErrorCode.FAULT_ROOM_ID);
+                throw new StompException(StompErrorCode.ROOM_ID_IS_NULL);
             }
 
             //없는 방 연결하려 할 때 에러

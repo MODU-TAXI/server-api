@@ -7,13 +7,15 @@ import lombok.Getter;
 @Getter
 public enum StompErrorCode implements SocketErrorCode {
     FULL_CHAT_ROOM("SOCKET_001"),
-    FAULT_ROOM_ID("SOCKET_002"),
-    ALREADY_ROOM_IN("SOCKET_003"),
+    ROOM_ID_IS_NULL("SOCKET_002"),
+    FAULT_ROOM_ID("SOCKET_003"),
+    ALREADY_ROOM_IN("SOCKET_004"),
+    FAULT_JWT("SOCKET_005"),
     ;
-    private final String message;
+    private final String ErrorCode;
 
-    StompErrorCode(String message) {
-        this.message = message;
+    StompErrorCode(String ErrorCode) {
+        this.ErrorCode = ErrorCode;
     }
 
 }

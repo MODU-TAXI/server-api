@@ -8,7 +8,7 @@ public class StompException extends RuntimeException {
     private final StompErrorCode errorCode;
 
     public StompException(StompErrorCode errorCode) {
-        super(errorCode.getMessage());
+        super(errorCode.getErrorCode());
         this.errorCode = errorCode;
     }
 
