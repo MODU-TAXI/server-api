@@ -33,8 +33,16 @@ public class RegisterReportController {
      */
     @Operation(
         summary = "신고하기",
-        description = "신고 API 입니다.<br>" +
-            "헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요!"
+        description = "현재는 Member 신고만 가능합니다. targetId에 memberId를 넣어주세요. <br>" +
+            "헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요! <br>" +
+            "아래는 ReportType 입니다. ReportRequest 스케마에서도 확인 가능합니다!<br>" +
+            "<ul> <li>LEAVE_CHATROOM(중간에 채팅방을 나갔어요)</li>" +
+            "<li>LATE(제 시간에 도착하지 않았어요)</li>" +
+            "<li>FIRST_GONE(먼저 출발했어요)</li>" +
+            "<li>OUT_OF_TOUCH(연락이 되지 않아요)</li>" +
+            "<li>UNEXPECTED_ACCOUNTS(정산 금액이 예상과 달라요)</li>" +
+            "<li>NON_REMIT(정산 금액을 보내주지 않았어요)</li>" +
+            "<li>NON_REMIT(기타 (직접 입력할게요))</li> </ul>"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "신고 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReportResponse.class))),
