@@ -5,6 +5,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
@@ -13,6 +14,7 @@ import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -55,8 +57,15 @@ public class GetRoomService {
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
-        String myParticipatedRoomId = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString()).getRoomId();
-        boolean isParticipate = myParticipatedRoomId.equals(roomId.toString());
+        boolean isParticipate = false;
+
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString());
+
+        if (chatRoomMappingInfo != null) {
+            String myParticipatedRoomId = chatRoomMappingInfo.getRoomId();
+            isParticipate = myParticipatedRoomId.equals(roomId.toString());
+        }
+
         return RoomMapper.toDto(room, member, path, isParticipate);
     }
 
@@ -76,6 +85,12 @@ public class GetRoomService {
         List<SearchMapResponse> rooms = roomRepositoryDSL.findNearRoomsMap(spotId, checkTags(tags), isImminent, searchPoint, radius, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack));
         List<SearchRoomWithRadiusResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
         return new SearchRoomWithRadiusResponses(roomList);
+    }
+
+    public RoomPreviewResponse getRoomPreview(Long roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+        return RoomMapper.toDto(room);
     }
 
     private Integer checkTags(List<RoomTagBitMask> tags) {

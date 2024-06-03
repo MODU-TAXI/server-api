@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.room.dto;
 
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.mongodb.client.model.geojson.LineString;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -91,6 +92,30 @@ public class RoomResponseDto {
     }
 
     @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class RoomPreviewResponse {
+        @Schema(description = "택시팟 id")
+        private Long roomId;
+        @Schema(example = "12:00", description = "출발 시간")
+        private String departureTime;
+        @Schema(example = "센트리빌", description = "출발지 이름")
+        private String departureName;
+        @Schema(example = "주안역", description = "도착 거점 이름")
+        private String arrivalName;
+        @Schema(example = "모집 중", description = "현재 방 상태")
+        private RoomStatus roomStatus;
+        @Schema(example = "2", description = "현재 인원수")
+        private int currentHeadcount;
+        @Schema(example = "3", description = "목표 인원수")
+        private int wishHeadcount;
+        @Schema(example = "5000", description = "인당 예상 요금(목표 인원 다 찼을 때 기준)")
+        private int expectedChargePerPerson;
+        @Schema(example = "15000", description = "예상 요금")
+        private int expectedCharge;
+    }
+
+    @Getter
     @AllArgsConstructor
     public static class SearchRoomWithRadiusResponse {
         @Schema(example = "2", description = "방 id")
@@ -115,5 +140,12 @@ public class RoomResponseDto {
     public static class DeleteRoomResponse {
         @Schema(example = "true", description = "수행완료 여부")
         private Boolean isDeleted;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdateRoomResponse {
+        @Schema(example = "true", description = "수행완료 여부")
+        private Boolean isUpdated;
     }
 }
