@@ -89,7 +89,7 @@ public class RegisterRoomService {
         registerTaxiInfoService.savePath(room.getId(), path);
 
         chatSchedulerService.addTask(room.getId(), room.getDepartureTime());
-        return RoomMapper.toDto(room, member, path, true);
+        return RoomMapper.toDto(room, member, path, true, false);
     }
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {

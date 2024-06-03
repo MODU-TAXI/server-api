@@ -58,6 +58,7 @@ public class GetRoomService {
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
         boolean isParticipate = false;
+        boolean isWaiting = redisChatRoomRepository.findMemberInWaitingList(roomId.toString(), member.getId().toString());
 
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString());
 
@@ -66,7 +67,7 @@ public class GetRoomService {
             isParticipate = myParticipatedRoomId.equals(roomId.toString());
         }
 
-        return RoomMapper.toDto(room, member, path, isParticipate);
+        return RoomMapper.toDto(room, member, path, isParticipate, isWaiting);
     }
 
     public PageResponseDto<List<RoomSimpleResponse>> getRoomSimpleList(int page, int size, Long spotId, List<RoomTagBitMask> tags, Point point, Long radius, Boolean isImminent, RoomSortType sortType) {
