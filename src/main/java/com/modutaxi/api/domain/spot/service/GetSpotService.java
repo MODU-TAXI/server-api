@@ -23,7 +23,6 @@ import static com.modutaxi.api.common.exception.errorcode.SpotError.SPOT_ID_NOT_
 @Service
 public class GetSpotService {
     private final SpotRepository spotRepository;
-    private final int mapSearchLimit = 3;
 
     public Spot getSpot(Long id) {
         return spotRepository.findById(id).orElseThrow(
@@ -44,7 +43,7 @@ public class GetSpotService {
         return new GetSpotResponses(spotList);
     }
 
-    public SearchSpotWithRadiusResponses getRadiusSpots(Point searchPoint) {
+    public SearchSpotWithRadiusResponses getRadiusSpots(Point searchPoint, int mapSearchLimit) {
         List<SearchWithRadiusResponseInterface> spots = spotRepository.findNearSpotsInRadius(searchPoint, mapSearchLimit);
         List<SearchSpotWithRadiusResponse> spotList = spots.stream().map(SpotResponseMapper::toSearchWithRadiusResponse).toList();
         Double maxDistance = spots.stream().mapToDouble(v -> v.getDistance()).max().orElse(500.0);

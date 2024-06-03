@@ -128,13 +128,14 @@ public class GetSpotController {
         @ApiResponse(responseCode = "200", description = "거점 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SearchSpotWithRadiusResponses.class))),
     })
     public ResponseEntity<SearchSpotWithRadiusResponses> getRadiusSpots(
+        @Parameter(description = "검색 거점 개수") @RequestParam(defaultValue = "3") int count,
         @Parameter(description = "검색 기준 경도") @RequestParam Float searchLongitude,
         @Parameter(description = "검색 기준 위도") @RequestParam Float searchLatitude
     ) {
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate = new Coordinate(searchLongitude, searchLatitude);
         Point point = geometryFactory.createPoint(coordinate);
-        return ResponseEntity.ok(getSpotService.getRadiusSpots(point));
+        return ResponseEntity.ok(getSpotService.getRadiusSpots(point, count));
     }
 
     @GetMapping("/list")
