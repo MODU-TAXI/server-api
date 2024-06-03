@@ -11,6 +11,7 @@ public enum StompErrorCode implements SocketErrorCode {
     FAULT_ROOM_ID("SOCKET_003"),
     ALREADY_ROOM_IN("SOCKET_004"),
     FAULT_JWT("SOCKET_005"),
+    FAIL_SEND_MESSAGE("SOCKET_006"),
     ;
     private final String ErrorCode;
 
