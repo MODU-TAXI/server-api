@@ -43,10 +43,11 @@ public class GetSpotService {
         return new GetSpotResponses(spotList);
     }
 
-    public SearchSpotWithRadiusResponses getRadiusSpots(Point searchPoint, Long radius) {
-        List<SearchWithRadiusResponseInterface> spots = spotRepository.findNearSpotsInRadius(searchPoint, radius);
+    public SearchSpotWithRadiusResponses getRadiusSpots(Point searchPoint, int mapSearchLimit) {
+        List<SearchWithRadiusResponseInterface> spots = spotRepository.findNearSpotsInRadius(searchPoint, mapSearchLimit);
         List<SearchSpotWithRadiusResponse> spotList = spots.stream().map(SpotResponseMapper::toSearchWithRadiusResponse).toList();
-        return new SearchSpotWithRadiusResponses(spotList);
+        Double maxDistance = spots.stream().mapToDouble(v -> v.getDistance()).max().orElse(500.0);
+        return new SearchSpotWithRadiusResponses(maxDistance, spotList);
     }
 
     public GetSpotWithDistanceResponses getNearSpots(Member member, Point currentPoint, Point searchPoint, int page, int size) {
