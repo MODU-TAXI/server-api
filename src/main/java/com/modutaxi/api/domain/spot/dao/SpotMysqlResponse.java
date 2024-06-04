@@ -25,5 +25,7 @@ public class SpotMysqlResponse {
         String getAddress();
 
         Point getSpotPoint();
+
+        Double getDistance();
     }
 }

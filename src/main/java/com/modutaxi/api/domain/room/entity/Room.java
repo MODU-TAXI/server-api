@@ -87,6 +87,10 @@ public class Room extends BaseTime {
         this.durationMinutes = updateRoomDto.getDurationMinutes();
     }
 
+    public void roomStatusUpdate() {
+        this.roomStatus = RoomStatus.COMPLETE;
+    }
+
     public void plusCurrentHeadCount() {
         this.currentHeadcount++;
     }

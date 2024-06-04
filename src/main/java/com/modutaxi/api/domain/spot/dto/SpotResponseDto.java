@@ -93,6 +93,8 @@ public class SpotResponseDto {
     @Getter
     @AllArgsConstructor
     public static class SearchSpotWithRadiusResponses {
+        @Schema(example = "3204.821669916938", description = "최대 거리, 미터단위")
+        Double distance;
         @Schema(description = "거점 리스트")
         List<SearchSpotWithRadiusResponse> spots;
     }

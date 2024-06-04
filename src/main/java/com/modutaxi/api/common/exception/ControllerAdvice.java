@@ -1,6 +1,7 @@
 package com.modutaxi.api.common.exception;
 
 import com.modutaxi.api.common.exception.errorcode.GlobalErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class ControllerAdvice {
     /**
@@ -71,6 +73,15 @@ public class ControllerAdvice {
         System.out.println(e);
         String detailMessage = extractMessage(e.getBindingResult().getFieldErrors());
         return convert(GlobalErrorCode.NOT_VALID_ARGUMENT_ERROR, detailMessage);
+    }
+
+
+    /**
+     * CASE: 소켓 에러
+     */
+    @ExceptionHandler(StompException.class)
+    public ResponseEntity<StompException> handleBaseException(StompException e) {
+        return new ResponseEntity<>(new StompException(e.getErrorCode()), HttpStatus.BAD_REQUEST);
     }
 
 

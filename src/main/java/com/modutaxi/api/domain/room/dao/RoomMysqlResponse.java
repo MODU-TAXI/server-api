@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.room.dao;
 
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import lombok.Getter;
 import org.locationtech.jts.geom.Point;
 

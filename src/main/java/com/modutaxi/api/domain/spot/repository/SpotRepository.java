@@ -32,14 +32,13 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     List<Spot> findAreaSpotsByPolygon(@Param("polygon") Polygon polygon);
 
     @Query("SELECT " +
-        "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotPoint " +
+        "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotPoint, ST_DISTANCE_SPHERE(:point, s.spotPoint) distance " +
         "FROM Spot s " +
-        "WHERE " +
-        "ST_DISTANCE_SPHERE(:point, s.spotPoint) <= :radius " +
         "ORDER BY " +
-        "ST_DISTANCE_SPHERE(:point, s.spotPoint)"
+        "ST_DISTANCE_SPHERE(:point, s.spotPoint) " +
+        "ASC LIMIT :limit"
     )
-    List<SearchWithRadiusResponseInterface> findNearSpotsInRadius(@Param("point") Point point, @Param("radius") Long radius);
+    List<SearchWithRadiusResponseInterface> findNearSpotsInRadius(@Param("point") Point point, @Param("limit") int limit);
 
     @Query("SELECT " +
         "s.id AS id, s.name AS name, s.address AS address, s.spotPoint AS spotpoint, (CASE WHEN :currentPoint IS NULL THEN NULL ELSE ST_DISTANCE_SPHERE(:currentPoint, s.spotPoint) END) AS distance, (CASE WHEN l.member = :member THEN true ELSE false END) AS liked " +

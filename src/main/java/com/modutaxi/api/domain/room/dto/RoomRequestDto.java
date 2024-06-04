@@ -51,4 +51,22 @@ public class RoomRequestDto {
         @Schema(description = "목표 인원수")
         private int wishHeadcount;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UpdateRoomStatusRequest {
+        @Schema(description = "참여하지 않은 멤버 리스트")
+        private List<NonParticipant> nonParticipantList;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NonParticipant {
+        @Schema(description = "멤버 id")
+        private Long memberId;
+    }
 }

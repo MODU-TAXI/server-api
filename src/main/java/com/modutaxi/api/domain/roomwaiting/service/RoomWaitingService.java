@@ -6,7 +6,11 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
+import com.modutaxi.api.domain.chat.service.ChatService;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.member.service.GetMemberService;
@@ -15,6 +19,7 @@ import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +36,7 @@ public class RoomWaitingService {
     private final GetMemberService getMemberService;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
+    private final ChatService chatService;
 
     /**
      * 방 참가 신청
@@ -102,7 +108,19 @@ public class RoomWaitingService {
         //채팅방에 저장
         redisChatRoomRepositoryImpl.addRoomInMemberList(roomId, memberId);
 
+        //매핑 정보 저장
+        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, memberId);
+        redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
+
+        //fcm구독
+        fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
+        //참가 수락되었다는 메세지 본인에게 전송
         fcmService.sendPermitParticipate(participant, roomId);
+
+        //방 팀원들에게 참가했다는 메세지 보내기
+        chatService.sendChatMessage(new ChatMessageRequestDto(
+                Long.valueOf(roomId), MessageType.JOIN, memberId + "님이 들어왔습니다.",
+                chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now()));
 
         return new ApplyResponse(true);
     }
