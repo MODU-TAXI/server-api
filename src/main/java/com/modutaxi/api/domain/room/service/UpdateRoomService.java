@@ -11,8 +11,6 @@ import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
-import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
-import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
@@ -58,7 +56,6 @@ public class UpdateRoomService {
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
-    private final ChatMessageRepository chatMessageRepository;
 
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
@@ -302,9 +299,6 @@ public class UpdateRoomService {
                         ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now());
 
         chatService.sendChatMessage(chatMessageRequestDto);
-
-        //메세지 리퍼지토리에 저장
-        chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequestDto, room));
 
         return new UpdateRoomResponse(true);
     }

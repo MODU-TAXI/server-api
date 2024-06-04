@@ -5,6 +5,8 @@ import com.modutaxi.api.domain.room.entity.Room;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,17 +22,26 @@ public class ChatMessage extends BaseTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long messageId;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
+    @NotNull
+    private Long roomId;
 
-    private MessageType messageType;
+    @NotNull
+    @Builder.Default
+    private MessageType messageType  = MessageType.CHAT;
 
-    private String content;
+    @NotNull
+    @Builder.Default
+    private String content = "";
 
-    private String sender;
+    @NotNull
+    @Builder.Default
+    private String sender = "모두의택시";
 
-    private String memberId;
+    @NotNull
+    @Builder.Default
+    private String memberId = "1";
 
-    private LocalDateTime dateTime;
+    @NotNull
+    @Builder.Default
+    private LocalDateTime dateTime = LocalDateTime.now();
 }

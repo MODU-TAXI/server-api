@@ -2,20 +2,14 @@ package com.modutaxi.api.domain.chat.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
-import com.modutaxi.api.common.exception.BaseException;
-import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
-import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.room.entity.Room;
-import com.modutaxi.api.domain.room.repository.RoomRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +30,7 @@ public class ChatController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
-    private final RoomRepository roomRepository;
     private final ChatService chatService;
-    private final ChatMessageRepository chatMessageRepository;
 
 
     // /pub/chat 으로 오는 메세지 핸들링
@@ -55,13 +47,6 @@ public class ChatController {
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);
-
-        // TODO: 5/2/24 mongoDB로 변경해야함 -> 시간 비교해서 리팩터링
-        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId()))
-                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-
-        //메세지 리퍼지토리에 저장
-        chatMessageRepository.save(ChatMessageMapper.toEntity(message, room));
     }
 
     @Operation(summary = "해당 모집방에 참여 가능한 지")

@@ -4,8 +4,6 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
-import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
-import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import lombok.AllArgsConstructor;
@@ -24,9 +22,6 @@ public class ChatSchedulerService {
 
     private final TaskScheduler taskScheduler;
     private final ChatService chatService;
-
-    // TODO: 6/4/24 전체적으로 메세지 저장로직을 전송 로직과 묶기
-    private final ChatMessageRepository chatMessageRepository;
     private final RoomRepository roomRepository;
 
     private static final long BEFORE_FIVE_MINUTES = 300;
@@ -39,7 +34,6 @@ public class ChatSchedulerService {
                 Long.valueOf(roomId), MessageType.CHAT_BOT, content,
                 "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now());
             chatService.sendChatMessage(message);
-            chatMessageRepository.save(ChatMessageMapper.toEntity(message, room));
             log.info("{}: {}", content, Thread.currentThread().getName());
         };
     }
