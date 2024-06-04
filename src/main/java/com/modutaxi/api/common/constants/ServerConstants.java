@@ -12,6 +12,7 @@ public final class ServerConstants {
     private String basicProfileImageUrl;
 
     public static String BASIC_PROFILE_IMAGE_URL;
+    public static final int REPORT_STANDARD = 5;
 
     @PostConstruct
     private void init() {
