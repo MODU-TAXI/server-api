@@ -46,16 +46,6 @@ public class UpdateMemberController {
         description = "Header에 refreshToken을 넣어보내주세요.<br>" +
             "key: refreshToken, value: ${refreshToken}."
     )
-    @ApiResponses({
-        @ApiResponse(responseCode = "409", description = "로그인 토큰 갱신 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
-            @ExampleObject(name = "MEMBER_010", description = "신고 누적으로 인해 임시 차단", value = """
-                {
-                    "errorCode": "MEMBER_010",
-                    "message": "임시 차단된 사용자입니다."
-                }
-                """),
-        })),
-    })
     @PatchMapping("/refresh")
     public ResponseEntity<TokenAndMemberResponse> refreshLogin(
         @CurrentMember Member member) {
