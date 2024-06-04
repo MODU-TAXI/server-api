@@ -29,47 +29,35 @@ public class ChatSchedulerService {
     private final ChatMessageRepository chatMessageRepository;
     private final RoomRepository roomRepository;
 
-    private static final long FIVE_MINUTES = 300;
+    private static final long BEFORE_FIVE_MINUTES = 300;
+    private static final int NO_DELAY = 0;
 
-    private Runnable matchingModal(Long roomId) {
+    private Runnable chatBotNotice(Long roomId, String content) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         return () -> {
             ChatMessageRequestDto message = new ChatMessageRequestDto(
-                    Long.valueOf(roomId), MessageType.CHAT_BOT, "매칭완료 하시겠습니까?",
-                    "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now());
+                Long.valueOf(roomId), MessageType.CHAT_BOT, content,
+                "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now());
             chatService.sendChatMessage(message);
             chatMessageRepository.save(ChatMessageMapper.toEntity(message, room));
-            log.info("매칭완료 알림이 실행되었습니다: {}", Thread.currentThread().getName());
-        };
-    }
-
-    private Runnable callTaxi(Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-        return () -> {
-            ChatMessageRequestDto message = new ChatMessageRequestDto(
-                    Long.valueOf(roomId), MessageType.CHAT_BOT, "택시 부르러 가볼까요?",
-                    "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now());
-            chatService.sendChatMessage(message);
-            chatMessageRepository.save(ChatMessageMapper.toEntity(message, room));
-            log.info("5분전 알림이 실행되었습니다: {}", Thread.currentThread().getName());
+            log.info("{}: {}", content, Thread.currentThread().getName());
         };
     }
 
 
     public void addTask(Long roomId, LocalDateTime departureTime) {
-        //매칭완료 알림 전송
         long delaySeconds = calculateDelaySeconds(LocalDateTime.now(), departureTime);
 
-        Runnable matchingModal = matchingModal(roomId);
+        Runnable matchingModal = chatBotNotice(roomId, "매칭완료 하시겠습니까?");
         taskScheduler.schedule(matchingModal, Instant.now().plusSeconds(delaySeconds));
 
-        Runnable callTaxiTask = callTaxi(roomId);
-        delaySeconds = delaySeconds > FIVE_MINUTES + 20 ? delaySeconds - FIVE_MINUTES : 0;
+        Runnable callTaxiTask = chatBotNotice(roomId, "택시 부르러 가볼까요?");
+        delaySeconds = delaySeconds > BEFORE_FIVE_MINUTES + 20 ? delaySeconds - BEFORE_FIVE_MINUTES : NO_DELAY;
         taskScheduler.schedule(callTaxiTask, Instant.now().plusSeconds(delaySeconds));
     }
 
     private long calculateDelaySeconds(LocalDateTime now, LocalDateTime targetDateTime) {
         Duration duration = Duration.between(now, targetDateTime);
-        return Math.max(0, duration.getSeconds());
+        return Math.max(NO_DELAY, duration.getSeconds());
     }
 }
