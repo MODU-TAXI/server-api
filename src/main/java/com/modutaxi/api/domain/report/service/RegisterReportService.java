@@ -29,8 +29,8 @@ public class RegisterReportService {
     private final SlackService slackService;
     private final MailServiceImpl mailService;
 
-    public ReportResponse register(Long reporterId, Long targetId, ReportType type,
-        String content) {
+    public ReportResponse register(
+        Long reporterId, Long targetId, Long roomId, ReportType type, String content) {
         // validation
         Member targetMember = memberRepository.findByIdAndStatusTrue(targetId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
@@ -43,7 +43,7 @@ public class RegisterReportService {
         }
 
         // 저장
-        Report report = toEntity(reporterId, targetId, type, content);
+        Report report = toEntity(reporterId, targetId, roomId, type, content);
         reportRepository.save(report);
 
         // 관리자 슬랙에 메시지 전송

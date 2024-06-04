@@ -12,6 +12,8 @@ public class ReportRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReportRequest {
+        @Schema(example = "1", description = "room Id")
+        private Long roomId;
         @Schema(example = "2", description = "신고 대상의 Id")
         private Long targetId;
         @Schema(example = "LATE", description = "신고 유형")
