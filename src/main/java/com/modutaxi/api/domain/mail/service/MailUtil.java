@@ -1,7 +1,17 @@
 package com.modutaxi.api.domain.mail.service;
 
+import static com.modutaxi.api.common.exception.errorcode.MailErrorCode.SES_SERVER_ERROR;
+
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.*;
+import com.amazonaws.services.simpleemail.model.Body;
+import com.amazonaws.services.simpleemail.model.Content;
+import com.amazonaws.services.simpleemail.model.Destination;
+import com.amazonaws.services.simpleemail.model.Message;
+import com.amazonaws.services.simpleemail.model.RawMessage;
+import com.amazonaws.services.simpleemail.model.SendEmailRequest;
+import com.amazonaws.services.simpleemail.model.SendEmailResult;
+import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
+import com.amazonaws.services.simpleemail.model.SendRawEmailResult;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.util.cert.CertificationCodeUtil;
 import com.modutaxi.api.domain.mail.vo.MailTemplate;
@@ -10,19 +20,19 @@ import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
-import jakarta.mail.internet.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Properties;
-
-import static com.modutaxi.api.common.exception.errorcode.MailErrorCode.SES_SERVER_ERROR;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -52,10 +62,10 @@ public class MailUtil {
     public void sendEmailCoolSmsBalanceMail(Long balance) {
         for (String bankerEmail : bankerEmailList) {
             sendSimpleEmailOnlyHtml(
-                    "[모두의 택시] Cool SMS 잔액 부족"
-                    , noReplySender
-                    , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
-                    , bankerEmail
+                "[모두의 택시] Cool SMS 잔액 부족"
+                , noReplySender
+                , String.format("Cool SMS의 잔액이 %s원 남았습니다. 요금을 충전하세요.", balance)
+                , bankerEmail
             );
         }
     }
@@ -71,21 +81,34 @@ public class MailUtil {
         }
     }
 
-    private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent, String receiver) {
+    public void sendBlockMemberNotificationMail(String receiver) {
+        sendSimpleEmailOnlyHtml(
+            "[모두의 택시] 신고 누적으로 인해 귀하의 계정이 임시 차단되었습니다."
+            , noReplySender
+            , MailTemplate.getTemporaryBlockMemberMailContent(receiver)
+            , receiver);
+    }
+
+    private SendEmailResult sendSimpleEmailOnlyHtml(String title, String sender, String htmlContent,
+        String receiver) {
         Message message = new Message();
         message.setSubject(new Content(title));
         message.setBody(new Body().withHtml(new Content(htmlContent)));
 
-        SendEmailRequest request = new SendEmailRequest(sender, new Destination().withToAddresses(receiver), message);
+        SendEmailRequest request = new SendEmailRequest(sender,
+            new Destination().withToAddresses(receiver), message);
         SendEmailResult result = amazonSimpleEmailService.sendEmail(request);
         if (result.getSdkHttpMetadata().getHttpStatusCode() != 200) {
-            throw new BaseException(SES_SERVER_ERROR, "메일 발송에 실패했습니다.\n" + result.getSdkHttpMetadata().toString());
+            throw new BaseException(SES_SERVER_ERROR,
+                "메일 발송에 실패했습니다.\n" + result.getSdkHttpMetadata().toString());
         }
         return result;
     }
 
     // full content mail
-    private SendRawEmailResult sendRawEmail(String title, String sender, String content, String receiver, String html, String fileRoot) throws MessagingException, IOException, NullPointerException {
+    private SendRawEmailResult sendRawEmail(String title, String sender, String content,
+        String receiver, String html, String fileRoot)
+        throws MessagingException, IOException, NullPointerException {
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(session);
 
@@ -96,7 +119,8 @@ public class MailUtil {
         message.setFrom(sender);
 
         // 메일 수신자 설정
-        message.setRecipients(jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(receiver));
+        message.setRecipients(jakarta.mail.Message.RecipientType.TO,
+            InternetAddress.parse(receiver));
         MimeMultipart messageBody = new MimeMultipart("alternative");
 
         // HTML, text wrapper 설정
@@ -132,7 +156,8 @@ public class MailUtil {
         // outputStream을 RawMessage로 변환
         RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
 
-        SendRawEmailResult result = amazonSimpleEmailService.sendRawEmail(new SendRawEmailRequest(rawMessage));
+        SendRawEmailResult result = amazonSimpleEmailService.sendRawEmail(
+            new SendRawEmailRequest(rawMessage));
         return result;
     }
 }

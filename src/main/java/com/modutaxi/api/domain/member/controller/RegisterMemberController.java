@@ -54,7 +54,28 @@ public class RegisterMemberController {
     /**
      * [POST] 소셜 로그인 /{type}/login
      */
-    @Operation(summary = "소셜 로그인")
+    @Operation(
+        summary = "소셜 로그인",
+        description = "type: KAKAO, APPLE<br>"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "409", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+            @ExampleObject(name = "MEMBER_001", description = "존재하지 않는 사용자", value = """
+                {
+                    "errorCode": "MEMBER_001",
+                    "message": "존재하지 않는 사용자입니다."
+                }
+                """),
+        })),
+        @ApiResponse(responseCode = "409", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+            @ExampleObject(name = "MEMBER_010", description = "신고 누적으로 인해 임시 차단", value = """
+                {
+                    "errorCode": "MEMBER_010",
+                    "message": "임시 차단된 사용자입니다."
+                }
+                """),
+        })),
+    })
     @PostMapping("/{type}/login")
     public ResponseEntity<TokenAndMemberResponse> login(
         @PathVariable(name = "type") SocialLoginType type,
