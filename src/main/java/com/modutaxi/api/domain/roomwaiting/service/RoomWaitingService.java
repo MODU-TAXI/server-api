@@ -119,7 +119,7 @@ public class RoomWaitingService {
 
         //방 팀원들에게 참가했다는 메세지 보내기
         chatService.sendChatMessage(new ChatMessageRequestDto(
-                Long.valueOf(roomId), MessageType.JOIN, memberId + "님이 들어왔습니다.",
+                Long.valueOf(roomId), MessageType.JOIN, participant.getNickname() + "님이 들어왔습니다.",
                 chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now()));
 
         return new ApplyResponse(true);
