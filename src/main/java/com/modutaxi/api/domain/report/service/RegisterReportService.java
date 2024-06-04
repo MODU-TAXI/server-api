@@ -36,8 +36,8 @@ public class RegisterReportService {
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         validateContentLength(content);
 
-        // 같은 날, 같은 멤버가, 같은 멤버를 신고한게 아니라면
-        if (!existsTodayDuplicateReport(reporterId, targetId)) {
+        // 카운팅 조건: 같은 roomId, reporterId, targetId 가 존재하지 않는다면
+        if (!existsDuplicateReport(roomId, reporterId, targetId)) {
             // 신고 횟수 카운팅
             targetMember.plusOneReportCount();
         }
@@ -62,12 +62,11 @@ public class RegisterReportService {
     }
 
     /**
-     * 24시간 이내, 같은 멤버를 신고한 이력이 있는지 확인하여 boolean을 반환합니다.
+     * 같은 택시팟에서, 같은 멤버를 신고한 이력이 있는지 확인하여 boolean을 반환합니다.
      */
-    private boolean existsTodayDuplicateReport(Long reporterId, Long targetId) {
-        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
-        return reportRepository.existsByCreatedAtAfter24AndReportedIdAndTargetId(
-            twentyFourHoursAgo, reporterId, targetId);
+    private boolean existsDuplicateReport(Long roomId, Long reporterId, Long targetId) {
+        return reportRepository.existsByRoomIdAndReporterIdAndTargetId(
+            roomId, reporterId, targetId);
 
     }
 
