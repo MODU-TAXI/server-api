@@ -109,7 +109,7 @@ public class RoomWaitingService {
         redisChatRoomRepositoryImpl.addRoomInMemberList(roomId, memberId);
 
         //매핑 정보 저장
-        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, member.getNickname());
+        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, participant.getNickname());
         redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
 
         //fcm구독
