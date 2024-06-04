@@ -36,6 +36,9 @@ public class UpdateMemberService {
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public TokenAndMemberResponse refreshAccessToken(Member member) {
+        if (member.isBlocked()) {
+            throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
+        }
         return new TokenAndMemberResponse(
             jwtTokenProvider.generateToken(member.getId()),
             MemberMapper.toDto(member)

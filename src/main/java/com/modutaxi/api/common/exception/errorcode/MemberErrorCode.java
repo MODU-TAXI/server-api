@@ -20,6 +20,8 @@ public enum MemberErrorCode implements ErrorCode {
     TOO_LONG_NICKNAME("MEMBER_008", "닉네임은 최대 12글자까지 가능해요!", HttpStatus.BAD_REQUEST),
     INAPPROPRIATE_WORD_NICKNAME("MEMBER_009", "비속어 혹은 부적절한 단어가 포함된 닉네임은 생성할 수 없어요!",
         HttpStatus.BAD_REQUEST),
+
+    BLOCKED_MEMBER("MEMBER_010", "임시 차단된 사용자입니다.", HttpStatus.UNAUTHORIZED),
     ;
 
     private final String errorCode;

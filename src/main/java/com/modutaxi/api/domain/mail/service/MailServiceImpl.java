@@ -5,11 +5,10 @@ import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.domain.mail.dao.CertCodeEntity;
 import com.modutaxi.api.domain.mail.repository.RedisMailCertCodeRepository;
 import com.modutaxi.api.domain.mail.vo.MailDomain;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,8 @@ public class MailServiceImpl implements MailService {
         CertCodeEntity certCodeEntity = redisMailCertCodeRepository.findById(memberId);
         if (certCodeEntity != null
             && certCodeEntity.getEmailAddress().equals(emailAddress)
-            && certCodeEntity.getCreatedAt().plusSeconds(certMailRestrictionSeconds).isAfter(LocalDateTime.now())
+            && certCodeEntity.getCreatedAt().plusSeconds(certMailRestrictionSeconds)
+            .isAfter(LocalDateTime.now())
         ) {
             throw new BaseException(MailErrorCode.TOO_MANY_CERTIFICATION_CODE_REQUEST);
         }
@@ -59,5 +59,10 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendAligoRemainSmsMessage(String smsCnt) {
         mailUtil.sendAligoRemainSmsMail(smsCnt);
+    }
+
+    @Override
+    public void sendTemporaryBlockMemberMail(String emailAddress) {
+        mailUtil.sendBlockMemberNotificationMail(emailAddress);
     }
 }
