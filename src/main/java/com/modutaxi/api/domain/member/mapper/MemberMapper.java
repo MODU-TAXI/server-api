@@ -27,6 +27,7 @@ public class MemberMapper {
             .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
             .imageUrl(member.getImageUrl())
+            .blocked(member.isBlocked())
             .build();
     }
 
