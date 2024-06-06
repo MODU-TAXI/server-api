@@ -49,9 +49,9 @@ public class StompExceptionHandler extends StompSubProtocolErrorHandler {
             errorCause = (cause.getCause() != null) ? cause.getCause().toString() : "Undefined exception";
         }
 
-        log.error(errorCause);
+        log.error("before setting message: {}",errorCause);
         String fullErrorMessage = extractErrorCode(errorCause);
-
+        log.error("after setting message: {}",fullErrorMessage);
         byte[] newPayload = fullErrorMessage.getBytes(StandardCharsets.UTF_8);
 
         return MessageBuilder.createMessage(newPayload, errorHeaderAccessor.getMessageHeaders());
