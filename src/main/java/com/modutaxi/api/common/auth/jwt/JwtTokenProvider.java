@@ -3,7 +3,9 @@ package com.modutaxi.api.common.auth.jwt;
 import com.modutaxi.api.common.auth.PrincipalDetails;
 import com.modutaxi.api.common.auth.PrincipalDetailsService;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.StompException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
+import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenResponse;
 import com.modutaxi.api.domain.member.repository.RedisATKRepositoryImpl;
 import com.modutaxi.api.domain.member.repository.RedisRTKRepositoryImpl;
@@ -17,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.net.SocketException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Objects;
@@ -124,6 +127,10 @@ public class JwtTokenProvider {
         validateToken(jwtSecretKey, token);
     }
 
+    public void socketValidateAccessToken(String token) {
+        socketValidateToken(jwtSecretKey, token);
+    }
+
     /**
      * RefreshToken 을 검증하는 함수
      */
@@ -151,6 +158,23 @@ public class JwtTokenProvider {
             throw new BaseException(AuthErrorCode.UNSUPPORTED_JWT);
         } catch (IllegalArgumentException e) {
             throw new BaseException(AuthErrorCode.EMPTY_JWT);
+        }
+    }
+
+    public void socketValidateToken(String key, String token) {
+        try {
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+            if (validateBlacklist(token)) {
+                throw new StompException(StompErrorCode.LOGOUT_JWT);
+            }
+        } catch (SecurityException | MalformedJwtException e) {
+            throw new StompException(StompErrorCode.INVALID_JWT);
+        } catch (ExpiredJwtException e) {
+            throw new StompException(StompErrorCode.EXPIRED_MEMBER_JWT);
+        } catch (UnsupportedJwtException | SignatureException e) {
+            throw new StompException(StompErrorCode.UNSUPPORTED_JWT);
+        } catch (IllegalArgumentException e) {
+            throw new StompException(StompErrorCode.EMPTY_JWT);
         }
     }
 

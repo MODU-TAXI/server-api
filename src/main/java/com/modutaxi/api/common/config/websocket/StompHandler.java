@@ -2,7 +2,9 @@ package com.modutaxi.api.common.config.websocket;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
+import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.StompException;
+import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -17,7 +19,6 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 
 import java.time.LocalDateTime;
 
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -47,16 +48,13 @@ public class StompHandler implements ChannelInterceptor {
 
         //웹소켓 연결 요청
         if (StompCommand.CONNECT == accessor.getCommand()) {
-
             String sessionId = accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
 
-            try {
-                String memberId = jwtTokenProvider.getMemberIdByToken(token);
-                redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
-            } catch (JwtException e) {
-                throw new StompException(StompErrorCode.FAULT_JWT);
-            }
+            jwtTokenProvider.socketValidateAccessToken(token);
+
+            String memberId = jwtTokenProvider.getMemberIdByToken(token);
+            redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
         }
 
         //구독 요청
