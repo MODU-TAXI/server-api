@@ -37,7 +37,9 @@ public class ChatController {
     @MessageMapping("/chat")
     public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
 
+        jwtTokenProvider.validateRefreshToken(token);
         String memberId = jwtTokenProvider.getMemberIdByToken(token);
+        
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
         message.setSender(chatRoomMappingInfo.getNickname());
