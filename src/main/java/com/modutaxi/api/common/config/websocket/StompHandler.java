@@ -2,9 +2,7 @@ package com.modutaxi.api.common.config.websocket;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
-import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.StompException;
-import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -55,6 +53,7 @@ public class StompHandler implements ChannelInterceptor {
 
             String memberId = jwtTokenProvider.getMemberIdByToken(token);
             redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
+            log.info("Socket Connect");
         }
 
         //구독 요청
@@ -111,6 +110,7 @@ public class StompHandler implements ChannelInterceptor {
                 fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
                 chatService.sendChatMessage(joinMessage);
             }
+            log.info("Subscribe Complete");
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = accessor.getSessionId();
             // 세션에 대한 정보 삭제

@@ -13,17 +13,20 @@ import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.net.SocketException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
@@ -162,18 +165,24 @@ public class JwtTokenProvider {
     }
 
     public void socketValidateToken(String key, String token) {
+        log.info("socketValidateToken() 실행");
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             if (validateBlacklist(token)) {
+                log.error(StompErrorCode.LOGOUT_JWT.getErrorCode());
                 throw new StompException(StompErrorCode.LOGOUT_JWT);
             }
         } catch (SecurityException | MalformedJwtException e) {
+            log.error(StompErrorCode.INVALID_JWT.getErrorCode());
             throw new StompException(StompErrorCode.INVALID_JWT);
         } catch (ExpiredJwtException e) {
+            log.error(StompErrorCode.EXPIRED_MEMBER_JWT.getErrorCode());
             throw new StompException(StompErrorCode.EXPIRED_MEMBER_JWT);
         } catch (UnsupportedJwtException | SignatureException e) {
+            log.error(StompErrorCode.UNSUPPORTED_JWT.getErrorCode());
             throw new StompException(StompErrorCode.UNSUPPORTED_JWT);
         } catch (IllegalArgumentException e) {
+            log.error(StompErrorCode.EMPTY_JWT.getErrorCode());
             throw new StompException(StompErrorCode.EMPTY_JWT);
         }
     }
