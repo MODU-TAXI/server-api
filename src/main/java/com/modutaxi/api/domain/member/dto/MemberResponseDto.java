@@ -48,6 +48,7 @@ public class MemberResponseDto {
         private String phoneNumber;
         private String email;
         private String imageUrl;
+        private int matchingCount;
         private boolean blocked;
     }
 
@@ -65,6 +66,8 @@ public class MemberResponseDto {
         private Long id;
         @Schema(example = "헤일", description = "닉네임")
         private String nickname;
+        @Schema(example = "3", description = "이용 횟수")
+        private int matchingCount;
         @Schema(example = "true", description = "학생 인증 여부")
         private boolean isCertified;
         @Schema(example = "-", description = "프로필 이미지 S3 링크")
