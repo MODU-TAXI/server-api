@@ -12,6 +12,7 @@ import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
+import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
@@ -31,6 +32,7 @@ public class ChatService {
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final RoomRepository roomRepository;
     private final FcmService fcmService;
+    private final ChatMessageRepository chatMessageRepository;
 
     /**
      * 채팅방에 메시지 pub
@@ -40,6 +42,8 @@ public class ChatService {
                 ChatMessageMapper.toDto(chatMessageRequestDto));
 
         fcmService.sendChatMessage(chatMessageRequestDto);
+
+        chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequestDto));
     }
 
     /**

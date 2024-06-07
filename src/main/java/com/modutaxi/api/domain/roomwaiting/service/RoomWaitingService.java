@@ -113,7 +113,7 @@ public class RoomWaitingService {
         redisChatRoomRepositoryImpl.addRoomInMemberList(roomId, memberId);
 
         //매핑 정보 저장
-        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, memberId);
+        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, participant.getNickname());
         redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
 
         //fcm구독
@@ -123,7 +123,7 @@ public class RoomWaitingService {
 
         //방 팀원들에게 참가했다는 메세지 보내기
         chatService.sendChatMessage(new ChatMessageRequestDto(
-                Long.valueOf(roomId), MessageType.JOIN, memberId + "님이 들어왔습니다.",
+                Long.valueOf(roomId), MessageType.JOIN, participant.getNickname() + "님이 들어왔습니다.",
                 chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now()));
 
         return new ApplyResponse(true);

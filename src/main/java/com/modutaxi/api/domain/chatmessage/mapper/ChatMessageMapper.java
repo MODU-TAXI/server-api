@@ -3,13 +3,12 @@ package com.modutaxi.api.domain.chatmessage.mapper;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.ChatMessageResponse;
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
-import com.modutaxi.api.domain.room.entity.Room;
 
 public class ChatMessageMapper {
 
-    public static ChatMessage toEntity(ChatMessageRequestDto messageRequestDto, Room room){
+    public static ChatMessage toEntity(ChatMessageRequestDto messageRequestDto){
         return ChatMessage.builder()
-                .room(room)
+                .roomId(messageRequestDto.getRoomId())
                 .messageType(messageRequestDto.getType())
                 .content(messageRequestDto.getContent())
                 .sender(messageRequestDto.getSender())
@@ -20,7 +19,7 @@ public class ChatMessageMapper {
 
     public static ChatMessageResponse toDto(ChatMessage chatMessage) {
         return ChatMessageResponse.builder()
-            .roomId(chatMessage.getRoom().getId())
+            .roomId(chatMessage.getRoomId())
             .messageType(chatMessage.getMessageType())
             .content(chatMessage.getContent())
             .sender(chatMessage.getSender())

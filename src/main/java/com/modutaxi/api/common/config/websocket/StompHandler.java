@@ -2,9 +2,7 @@ package com.modutaxi.api.common.config.websocket;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
-import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.StompException;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -73,7 +71,7 @@ public class StompHandler implements ChannelInterceptor {
 
             String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
             Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
-                    () -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+                    () -> new StompException(StompErrorCode.EMPTY_MEMBER));
 
             ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
@@ -96,12 +94,12 @@ public class StompHandler implements ChannelInterceptor {
                 throw new StompException(StompErrorCode.ALREADY_ROOM_IN);
             }
 
-            String nickName = member.getNickname();
-
             if (room.getCurrentHeadcount() >= FULL_MEMBER) {
                 log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
                 throw new StompException(StompErrorCode.FULL_CHAT_ROOM);
             }
+
+            String nickName = member.getNickname();
 
             if (chatRoomMappingInfo == null) {
                 chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
