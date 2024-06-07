@@ -1,12 +1,18 @@
 package com.modutaxi.api.domain.roomwaiting.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.RoomWaitingResponseList;
 import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +26,16 @@ public class RoomWaitingController {
     private final RoomWaitingService roomWaitingService;
 
     @Operation(summary = "방 입장 요청")
+    @ApiResponses({
+        @ApiResponse(responseCode = "409", description = "방 입장 불가", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+            @ExampleObject(name = "MEMBER_010", description = "신고 누적으로 인해 임시 차단", value = """
+                {
+                    "errorCode": "MEMBER_010",
+                    "message": "임시 차단된 사용자입니다."
+                }
+                """),
+        })),
+    })
     @PostMapping("/api/rooms/{roomId}/apply")
     public ResponseEntity<ApplyResponse> applyForParticipate(@CurrentMember Member member,
                                                              @PathVariable String roomId) {

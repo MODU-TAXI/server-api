@@ -75,9 +75,6 @@ public class RegisterMemberService {
         String snsId = getSnsIdByAccessToken(type, accessToken);
         Member member = memberRepository.findBySnsIdAndStatusTrue(snsId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-        if (member.isBlocked()) {
-            throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
-        }
         // FCM 토큰 저장
         saveFcmToken(member.getId(), fcmToken);
         return generateMemberToken(member);

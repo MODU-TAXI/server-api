@@ -76,6 +76,10 @@ public class RegisterReportController {
         @RequestBody ReportRequest request
     ) {
         return ResponseEntity.ok(registerReportService.register(
-            member.getId(), request.getTargetId(), request.getType(), request.getContent()));
+            member.getId(),
+            request.getTargetId(),
+            request.getRoomId(),
+            request.getType(),
+            request.getContent()));
     }
 }

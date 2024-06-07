@@ -21,14 +21,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
         @Param("reporterId") Long reporterId,
         @Param("targetId") Long targetId);
 
-
-    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END "
-        + "FROM Report r "
-        + "WHERE r.createdAt > :dateTime "
-        + "AND r.reporterId = :reporterId "
-        + "AND r.targetId = :targetId")
-    boolean existsByCreatedAtAfter24AndReportedIdAndTargetId(
-        @Param("dateTime") LocalDateTime dateTime,
+    boolean existsByRoomIdAndReporterIdAndTargetId(
+        @Param("roomId") Long roomId,
         @Param("reporterId") Long reporterId,
         @Param("targetId") Long targetId);
 }
