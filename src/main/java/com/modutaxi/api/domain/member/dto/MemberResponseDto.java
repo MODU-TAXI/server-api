@@ -48,6 +48,8 @@ public class MemberResponseDto {
         private String phoneNumber;
         private String email;
         private String imageUrl;
+        private int matchingCount;
+        private boolean blocked;
     }
 
     @Getter
@@ -64,6 +66,8 @@ public class MemberResponseDto {
         private Long id;
         @Schema(example = "헤일", description = "닉네임")
         private String nickname;
+        @Schema(example = "3", description = "이용 횟수")
+        private int matchingCount;
         @Schema(example = "true", description = "학생 인증 여부")
         private boolean isCertified;
         @Schema(example = "-", description = "프로필 이미지 S3 링크")
@@ -73,10 +77,13 @@ public class MemberResponseDto {
     @Getter
     @AllArgsConstructor
     public static class UpdateProfileResponse {
-        @Schema(example = "헤일", description = "변경 완료한 닉네임")
-        private String nickname;
-        @Schema(example = "-",
-            description = "변경 완료한 프로필 이미지 S3 링크")
-        private String imageUrl;
+        @Schema(description = "변경한 이름")
+        private String name;
+        @Schema(description = "변경한 성별")
+        private Gender gender;
+        @Schema(description = "변경한 전화번호")
+        private String phoneNumber;
+        @Schema(description = "변경한 프로필 이미지의 S3 링크")
+        private String ImageUrl;
     }
 }

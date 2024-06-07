@@ -67,14 +67,6 @@ public class RegisterMemberController {
                 }
                 """),
         })),
-        @ApiResponse(responseCode = "409", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
-            @ExampleObject(name = "MEMBER_010", description = "신고 누적으로 인해 임시 차단", value = """
-                {
-                    "errorCode": "MEMBER_010",
-                    "message": "임시 차단된 사용자입니다."
-                }
-                """),
-        })),
     })
     @PostMapping("/{type}/login")
     public ResponseEntity<TokenAndMemberResponse> login(

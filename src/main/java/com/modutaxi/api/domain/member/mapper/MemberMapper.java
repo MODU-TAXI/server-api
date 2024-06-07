@@ -27,6 +27,8 @@ public class MemberMapper {
             .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
             .imageUrl(member.getImageUrl())
+            .matchingCount(member.getMatchingCount())
+            .blocked(member.isBlocked())
             .build();
     }
 
@@ -36,6 +38,7 @@ public class MemberMapper {
             .nickname(member.getNickname())
             .isCertified(member.isCertified())
             .imageUrl(member.getImageUrl())
+            .matchingCount(member.getMatchingCount())
             .build();
     }
 

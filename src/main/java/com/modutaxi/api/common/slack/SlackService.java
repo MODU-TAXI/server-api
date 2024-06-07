@@ -54,10 +54,11 @@ public class SlackService {
     public void sendReportMessage(Report report) {
         String title = "새로운 신고가 접수되었습니다!";
         HashMap<String, String> data = new HashMap<>();
-        data.put("0. 신고자 ID", Long.toString(report.getReporterId()));
-        data.put("1. 신고 대상자 ID", Long.toString(report.getTargetId()));
-        data.put("2. 신고 유형", report.getType().getMessage());
-        data.put("3. 신고 내용", report.getContent());
+        data.put("0. 택시팟 ID", Long.toString(report.getRoomId()));
+        data.put("1. 신고자 ID", Long.toString(report.getReporterId()));
+        data.put("2. 신고 대상자 ID", Long.toString(report.getTargetId()));
+        data.put("3. 신고 유형", report.getType().getMessage());
+        data.put("4. 신고 내용", report.getContent());
 
         sendMessage(reportSlackToken, title, data, Color.GREEN.getCode());
     }

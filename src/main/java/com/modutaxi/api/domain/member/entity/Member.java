@@ -47,6 +47,7 @@ public class Member extends BaseTime {
 
     private String imageUrl;
 
+    //TODO: 도착 확정 API에서 매칭 횟수와 노쇼 횟수 카운팅
     @NotNull
     @Builder.Default
     private int matchingCount = 0;  // 매칭 횟수
@@ -78,8 +79,10 @@ public class Member extends BaseTime {
         this.nickname = nickname;
     }
 
-    public void updateProfile(String nickname, String imageUrl) {
-        this.nickname = nickname;
+    public void updateProfile(String name, Gender gender, String phoneNumber, String imageUrl) {
+        this.name = name;
+        this.gender = gender;
+        this.phoneNumber = phoneNumber;
         this.imageUrl = imageUrl;
     }
 

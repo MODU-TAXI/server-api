@@ -42,6 +42,10 @@ public class RoomWaitingService {
      * 방 참가 신청
      */
     public ApplyResponse applyForParticipate(Member member, String roomId){
+        if (member.isBlocked()) {
+            throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
+        }
+
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 

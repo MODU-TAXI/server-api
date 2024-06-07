@@ -27,6 +27,9 @@ public class Report extends BaseTime {
     private ReportType type;
 
     @NotNull
+    private Long roomId;
+
+    @NotNull
     private Long reporterId;
 
     @NotNull

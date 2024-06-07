@@ -6,6 +6,7 @@ import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
@@ -31,22 +32,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class RegisterRoomService {
 
-    private final RoomRepository roomRepository;
-    private final SpotRepository spotRepository;
-    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
-
-    private final GetTaxiInfoService getTaxiInfoService;
-    private final RegisterTaxiInfoService registerTaxiInfoService;
-    private final ChatSchedulerService chatSchedulerService;
-
     private static final float MIN_LATITUDE = 33;
     private static final float MAX_LATITUDE = 40;
     private static final float MIN_LONGITUDE = 124;
     private static final float MAX_LONGITUDE = 132;
+    private final RoomRepository roomRepository;
+    private final SpotRepository spotRepository;
+    private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
+    private final GetTaxiInfoService getTaxiInfoService;
+    private final RegisterTaxiInfoService registerTaxiInfoService;
+    private final ChatSchedulerService chatSchedulerService;
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
-
+        if (member.isBlocked()) {
+            throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
+        }
         createRoomRequestValidator(member, createRoomRequest);
 
         //거점 찾기
@@ -85,7 +86,8 @@ public class RegisterRoomService {
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
         roomRepository.save(room);
-        redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(), member.getId().toString());
+        redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(),
+            member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
 
         chatSchedulerService.addTask(room.getId(), room.getDepartureTime());

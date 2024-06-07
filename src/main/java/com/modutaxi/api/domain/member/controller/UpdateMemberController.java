@@ -2,7 +2,6 @@ package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificationReqeust;
@@ -46,16 +45,6 @@ public class UpdateMemberController {
         description = "Header에 refreshToken을 넣어보내주세요.<br>" +
             "key: refreshToken, value: ${refreshToken}."
     )
-    @ApiResponses({
-        @ApiResponse(responseCode = "409", description = "로그인 토큰 갱신 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
-            @ExampleObject(name = "MEMBER_010", description = "신고 누적으로 인해 임시 차단", value = """
-                {
-                    "errorCode": "MEMBER_010",
-                    "message": "임시 차단된 사용자입니다."
-                }
-                """),
-        })),
-    })
     @PatchMapping("/refresh")
     public ResponseEntity<TokenAndMemberResponse> refreshLogin(
         @CurrentMember Member member) {
@@ -264,42 +253,11 @@ public class UpdateMemberController {
         summary = "멤버 프로필 변경",
         description = "멤버 프로필을 변경합니다.<br>" +
             "헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요!<br>" +
-            "등록한 프로필 사진을 삭제하고 싶다면 blank(\"\")를 보내주세요!"
+            "GENDER: MALE, FEMALE 중 1 입니다.<br>" +
+            "등록한 프로필 사진을 삭제하고 싶다면 blank(\"\")를 보내주세요!. 프로필 사진을 변경하지 않고 싶으면, 현재 프로필 사진 URL을 보내주세요."
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "프로필 변경 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UpdateProfileResponse.class))),
-        @ApiResponse(responseCode = "400", description = "프로필 변경 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
-            @ExampleObject(name = "MEMBER_003", description = "닉네임 중복", value = """
-                {
-                    "errorCode": "MEMBER_003",
-                    "message": "이미 있는 닉네임이에요!"
-                }
-                """),
-            @ExampleObject(name = "MEMBER_006", description = "공백, 특수문자 포함", value = """
-                {
-                    "errorCode": "MEMBER_006",
-                    "message": "공백, 특수문자는 사용할 수 없어요!"
-                }
-                """),
-            @ExampleObject(name = "MEMBER_007", description = "닉네임 최소 길이 제한", value = """
-                {
-                    "errorCode": "MEMBER_007",
-                    "message": "닉네임은 최소 2글자부터 가능해요!"
-                }
-                """),
-            @ExampleObject(name = "MEMBER_008", description = "닉네임 최대 길이 제한", value = """
-                {
-                    "errorCode": "MEMBER_008",
-                    "message": "닉네임은 최대 12글자까지 가능해요!"
-                }
-                """),
-            @ExampleObject(name = "MEMBER_009", description = "비속어 혹은 부적절한 단어", value = """
-                {
-                    "errorCode": "MEMBER_009",
-                    "message": "비속어 혹은 부적절한 단어가 포함된 닉네임은 생성할 수 없어요!"
-                }
-                """),
-        })),
     })
     @PatchMapping("")
     public ResponseEntity<UpdateProfileResponse> updateMemberProfile(
@@ -308,6 +266,7 @@ public class UpdateMemberController {
         @RequestBody UpdateProfileRequest request
     ) {
         return ResponseEntity.ok(updateMemberService.updateProfile(
-            member, request.getNickname(), request.getImageUrl()));
+            member, request.getName(), request.getGender(), request.getPhoneNumber(),
+            request.getImageUrl()));
     }
 }
