@@ -15,6 +15,7 @@ public class RoomWaitingMapper {
         private Long memberId;
         private String nickname;
         private String imageUrl;
+        private boolean isCertified;
         private int matchingCount;
         private boolean thisIsMe;
 
@@ -23,6 +24,7 @@ public class RoomWaitingMapper {
             return RoomWaitingResponse.builder()
                 .memberId(member.getId())
                 .nickname(member.getNickname())
+                .isCertified(member.isCertified())
                 .imageUrl(member.getImageUrl())
                 .matchingCount(member.getMatchingCount())
                 .thisIsMe(thisIsMe)
@@ -44,6 +46,7 @@ public class RoomWaitingMapper {
         private Long memberId;
         private String nickname;
         private String imageUrl;
+        private boolean isCertified;
         private int matchingCount;
         private boolean thisIsMe;
 
@@ -52,6 +55,7 @@ public class RoomWaitingMapper {
                 .memberId(member.getId())
                 .nickname(member.getNickname())
                 .imageUrl(member.getImageUrl())
+                .isCertified(member.isCertified())
                 .matchingCount(member.getMatchingCount())
                 .thisIsMe(thisIsMe)
                 .build();
