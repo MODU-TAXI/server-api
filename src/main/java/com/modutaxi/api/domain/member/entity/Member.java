@@ -79,8 +79,10 @@ public class Member extends BaseTime {
         this.nickname = nickname;
     }
 
-    public void updateProfile(String nickname, String imageUrl) {
-        this.nickname = nickname;
+    public void updateProfile(String name, Gender gender, String phoneNumber, String imageUrl) {
+        this.name = name;
+        this.gender = gender;
+        this.phoneNumber = phoneNumber;
         this.imageUrl = imageUrl;
     }
 

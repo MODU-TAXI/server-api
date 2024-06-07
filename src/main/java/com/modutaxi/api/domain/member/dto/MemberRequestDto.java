@@ -77,8 +77,12 @@ public class MemberRequestDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UpdateProfileRequest {
-        @Schema(description = "변경할 닉네임")
-        private String nickname;
+        @Schema(description = "변경할 이름")
+        private String name;
+        @Schema(description = "변경할 성별")
+        private Gender gender;
+        @Schema(description = "변경할 전화번호")
+        private String phoneNumber;
         @Schema(description = "변경할 프로필 이미지의 S3 링크")
         private String ImageUrl;
     }

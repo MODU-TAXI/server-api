@@ -11,6 +11,7 @@ import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.UpdateProfileResponse;
+import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
@@ -92,8 +93,8 @@ public class UpdateMemberService {
     }
 
     @Transactional
-    public UpdateProfileResponse updateProfile(Member member, String nickname, String imageUrl) {
-        checkNickname(nickname);
+    public UpdateProfileResponse updateProfile(Member member, String name, Gender gender,
+        String phoneNumber, String imageUrl) {
         // imageUrl == "" 로 들어오면 삭제 요청입니다.
         if (Objects.equals(imageUrl, "")) {
             if (member.existsNickname()) {   // 프로필 사진이 있었다면 s3에서 삭제
@@ -101,18 +102,10 @@ public class UpdateMemberService {
             }
             imageUrl = null;
         }
-        member.updateProfile(nickname, imageUrl);
+        member.updateProfile(name, gender, phoneNumber, imageUrl);
         memberRepository.save(member);
-        return new UpdateProfileResponse(member.getNickname(), member.getImageUrl());
-    }
-
-    private void checkNickname(String nickname) {
-        // 중복 체크
-        if (memberRepository.existsByNickname(nickname)) {
-            throw new BaseException(MemberErrorCode.DUPLICATE_NICKNAME);
-        }
-        // 그 외 필터링
-        NicknameValidator.validate(nickname);
+        return new UpdateProfileResponse(member.getName(), member.getGender(),
+            member.getPhoneNumber(), member.getImageUrl());
     }
 
 }

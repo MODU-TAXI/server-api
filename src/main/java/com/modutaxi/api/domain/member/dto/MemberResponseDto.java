@@ -77,10 +77,13 @@ public class MemberResponseDto {
     @Getter
     @AllArgsConstructor
     public static class UpdateProfileResponse {
-        @Schema(example = "헤일", description = "변경 완료한 닉네임")
-        private String nickname;
-        @Schema(example = "-",
-            description = "변경 완료한 프로필 이미지 S3 링크")
-        private String imageUrl;
+        @Schema(description = "변경한 이름")
+        private String name;
+        @Schema(description = "변경한 성별")
+        private Gender gender;
+        @Schema(description = "변경한 전화번호")
+        private String phoneNumber;
+        @Schema(description = "변경한 프로필 이미지의 S3 링크")
+        private String ImageUrl;
     }
 }
