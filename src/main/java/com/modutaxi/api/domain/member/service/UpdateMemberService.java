@@ -3,9 +3,7 @@ package com.modutaxi.api.domain.member.service;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
-import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
@@ -97,7 +95,7 @@ public class UpdateMemberService {
         String phoneNumber, String imageUrl) {
         // imageUrl == "" 로 들어오면 삭제 요청입니다.
         if (Objects.equals(imageUrl, "")) {
-            if (member.existsNickname()) {   // 프로필 사진이 있었다면 s3에서 삭제
+            if (member.existsImageUrl()) {   // 프로필 사진이 있었다면 s3에서 삭제
                 s3Service.deleteFile(member.getImageUrl());
             }
             imageUrl = null;
