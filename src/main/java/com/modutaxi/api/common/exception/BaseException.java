@@ -21,4 +21,8 @@ public class BaseException extends RuntimeException {
         this.status = code.getStatus();
     }
 
+    @Override
+    public String getLocalizedMessage() {
+        return this.errorCode;
+    }
 }

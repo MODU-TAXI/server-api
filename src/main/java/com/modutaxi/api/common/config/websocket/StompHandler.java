@@ -2,7 +2,7 @@ package com.modutaxi.api.common.config.websocket;
 
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
-import com.modutaxi.api.common.exception.StompException;
+import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -17,7 +17,6 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 
 import java.time.LocalDateTime;
 
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -51,12 +50,11 @@ public class StompHandler implements ChannelInterceptor {
             String sessionId = accessor.getSessionId();
             String token = accessor.getFirstNativeHeader("token");
 
-            try {
-                String memberId = jwtTokenProvider.getMemberIdByToken(token);
-                redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
-            } catch (JwtException e) {
-                throw new StompException(StompErrorCode.FAULT_JWT);
-            }
+            jwtTokenProvider.validateAccessToken(token);
+
+            String memberId = jwtTokenProvider.getMemberIdByToken(token);
+            redisChatRoomRepositoryImpl.setUserInfo(sessionId, memberId);
+            log.info("Socket Connect");
         }
 
         //구독 요청
@@ -71,7 +69,7 @@ public class StompHandler implements ChannelInterceptor {
 
             String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
             Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
-                    () -> new StompException(StompErrorCode.EMPTY_MEMBER));
+                    () -> new BaseException(StompErrorCode.EMPTY_MEMBER));
 
             ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
@@ -79,24 +77,24 @@ public class StompHandler implements ChannelInterceptor {
             //roomId가 안들어왔으면 에러
             if (roomId == null || roomId == "") {
                 log.error("구독요청 \"sub/chat/{roomId}\" 에서 roomId가 들어오지 않았습니다.");
-                throw new StompException(StompErrorCode.ROOM_ID_IS_NULL);
+                throw new BaseException(StompErrorCode.ROOM_ID_IS_NULL);
             }
 
             //없는 방 연결하려 할 때 에러
             Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
-                    () -> new StompException(StompErrorCode.FAULT_ROOM_ID));
+                    () -> new BaseException(StompErrorCode.FAULT_ROOM_ID));
 
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 에러
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
             if (chatRoomMappingInfo != null && !roomId.equals(chatRoomMappingInfo.getRoomId())) {
                 log.error("사용자 ID: {}님은 현재 {}번 방에 참여해 있지만, 참여요청이 들어온 방은 {}번방 입니다. ",
                         memberId, chatRoomMappingInfo.getRoomId(), roomId);
-                throw new StompException(StompErrorCode.ALREADY_ROOM_IN);
+                throw new BaseException(StompErrorCode.ALREADY_ROOM_IN);
             }
 
             if (room.getCurrentHeadcount() >= FULL_MEMBER) {
                 log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
-                throw new StompException(StompErrorCode.FULL_CHAT_ROOM);
+                throw new BaseException(StompErrorCode.FULL_CHAT_ROOM);
             }
 
             String nickName = member.getNickname();
@@ -113,6 +111,7 @@ public class StompHandler implements ChannelInterceptor {
                 fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
                 chatService.sendChatMessage(joinMessage);
             }
+            log.info("SUBSCRIBE");
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = accessor.getSessionId();
             // 세션에 대한 정보 삭제

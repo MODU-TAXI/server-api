@@ -1,23 +1,34 @@
 package com.modutaxi.api.common.exception.errorcode;
 
 
-import com.modutaxi.api.common.exception.SocketErrorCode;
+import com.modutaxi.api.common.exception.ErrorCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
-public enum StompErrorCode implements SocketErrorCode {
-    FULL_CHAT_ROOM("SOCKET_001"),
-    ROOM_ID_IS_NULL("SOCKET_002"),
-    FAULT_ROOM_ID("SOCKET_003"),
-    ALREADY_ROOM_IN("SOCKET_004"),
-    FAULT_JWT("SOCKET_005"),
-    FAIL_SEND_MESSAGE("SOCKET_006"),
-    EMPTY_MEMBER("SOCKET_007")
-    ;
-    private final String ErrorCode;
+@AllArgsConstructor
+public enum StompErrorCode implements ErrorCode {
+    FULL_CHAT_ROOM("SOCK_ROOM_001", "방이 꽉 차있습니다.", HttpStatus.BAD_REQUEST),
+    ROOM_ID_IS_NULL("SOCK_ROOM_002", "방 ID 가 null입니다.", HttpStatus.BAD_REQUEST),
+    FAULT_ROOM_ID("SOCK_ROOM_003", "잘못된 방 번호입니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_ROOM_IN("SOCK_ROOM_004", "당신은 이미 방에 참여한 상태입니다.", HttpStatus.BAD_REQUEST),
+    FAIL_SEND_MESSAGE("SOCK_MESSAGE_005","메세지 전송에 실패하였습니다.", HttpStatus.CONFLICT),
 
-    StompErrorCode(String ErrorCode) {
-        this.ErrorCode = ErrorCode;
-    }
+    EMPTY_MEMBER("SOCK_MEMBER_006","존재하지 않는 멤버입니다.", HttpStatus.BAD_REQUEST),
+
+    EMPTY_JWT("SOCK_AUTH_007", "JWT가 없습니다.", HttpStatus.UNAUTHORIZED),
+    INVALID_JWT("SOCK_AUTH_008", "유효하지 않은 JWT입니다.", HttpStatus.UNAUTHORIZED),
+    EXPIRED_MEMBER_JWT("SOCK_AUTH_009", "만료된 JWT입니다.", HttpStatus.GONE),
+    UNSUPPORTED_JWT("SOCK_AUTH_010", "지원하지 않는 JWT입니다.", HttpStatus.UNAUTHORIZED),
+    INVALID_SNS_ID_KEY("SOCK_AUTH_011", "유효하지 않은 snsId key입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_ACCESS_TOKEN("SOCK_AUTH_006", "유효하지 않은 ACCESS TOKEN입니다.", HttpStatus.BAD_REQUEST),
+    FAILED_SOCIAL_LOGIN("SOCK_AUTH_007", "소셜 로그인에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    LOGOUT_JWT("SOCK_AUTH_008", "로그아웃 처리된 JWT입니다.", HttpStatus.UNAUTHORIZED);
+    ;
+
+    private final String errorCode;
+    private final String message;
+    private final HttpStatus status;
 
 }
