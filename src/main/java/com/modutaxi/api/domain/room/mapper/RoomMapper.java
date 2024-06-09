@@ -4,12 +4,10 @@ import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertB
 
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.*;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.spot.entity.Spot;
 import com.mongodb.client.model.geojson.LineString;
@@ -76,6 +74,26 @@ public class RoomMapper {
             .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
             .expectedCharge(room.getExpectedCharge())
             .path(path)
+            .build();
+    }
+
+    public static SearchRoomIntegrationResponse toDto(SearchIntegrationResponse dao) {
+        return SearchRoomIntegrationResponse.builder()
+            .roomId(dao.getId())
+            .spotId(dao.getSpotId())
+            .arrivalTime(TimeFormatConverter.covertTimeToShortClockTime(
+                dao.getDepartureTime().plusMinutes(dao.getDurationMinutes())))
+            .arrivalName(dao.getSpotName())
+            .departureLongitude((float) dao.getDeparturePoint().getX())
+            .departureLatitude((float) dao.getDeparturePoint().getY())
+            .roomTagBitMaskList(convertBitMaskToRoomTagList(dao.getRoomTagBitMask()))
+            .departureTime(TimeFormatConverter.covertTimeToShortClockTime(dao.getDepartureTime()))
+            .departureName(dao.getDepartureName())
+            .currentHeadcount(dao.getCurrentHeadcount())
+            .wishHeadcount(dao.getWishHeadcount())
+            .durationMinutes(dao.getDurationMinutes())
+            .expectedChargePerPerson((dao.getExpectedCharge()) / (dao.getWishHeadcount() + 1))
+            .expectedCharge(dao.getExpectedCharge())
             .build();
     }
 

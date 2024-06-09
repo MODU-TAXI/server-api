@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.room.repository;
 
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.entity.QRoom;
@@ -52,17 +53,41 @@ public class RoomRepositoryDSLImpl implements RoomRepositoryDSL {
             .fetch();
     }
 
+    @Override
+    public List<SearchIntegrationResponse> findNearRoomsIntegration(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore, RoomSortType sortType) {
+        return queryFactory
+            .select(createSearchExpression(SearchIntegrationResponse.class))
+            .from(room)
+            .where(createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter, timeBefore))
+            .orderBy(createListOrderSpecifiers(point, sortType))
+            .fetch();
+    }
+
     private <T> Expression<T> createSearchExpression(Class<? extends T> type) {
+        if (type == SearchIntegrationResponse.class) {
+            return Projections.fields(
+                type
+                , room.id.as("id")
+                , room.spot.id.as("spotId")
+                , room.departureTime.as("departureTime")
+                , room.spot.name.as("spotName")
+                , room.roomTagBitMask.as("roomTagBitMask")
+                , room.departurePoint.as("departurePoint")
+                , room.departureName.as("departureName")
+                , room.currentHeadcount.as("currentHeadcount")
+                , room.wishHeadcount.as("wishHeadcount")
+                , room.durationMinutes.as("durationMinutes")
+                , room.expectedCharge.as("expectedCharge")
+            );
+        }
         if (type == SearchListResponse.class) {
             return Projections.fields(
                 type
                 , room.id.as("id")
                 , room.spot.id.as("spotId")
                 , room.departureTime.as("departureTime")
-                , room.spot.spotPoint.as("spotPoint")
                 , room.spot.name.as("spotName")
                 , room.roomTagBitMask.as("roomTagBitMask")
-                , room.departurePoint.as("departurePoint")
                 , room.departureName.as("departureName")
                 , room.currentHeadcount.as("currentHeadcount")
                 , room.wishHeadcount.as("wishHeadcount")
