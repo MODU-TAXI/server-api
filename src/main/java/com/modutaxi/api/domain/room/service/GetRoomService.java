@@ -8,13 +8,10 @@ import com.modutaxi.api.common.pagination.PageResponseDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomSimpleResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponse;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.SearchRoomWithRadiusResponses;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomPreviewResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.*;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -88,9 +85,18 @@ public class GetRoomService {
         return new SearchRoomWithRadiusResponses(roomList);
     }
 
+    public SearchRoomIntegrationResponses getRoomIntegration(Long spotId, List<RoomTagBitMask> tags, Point point, Long radius, Boolean isImminent, RoomSortType sortType) {
+        if (spotId != null)
+            getSpotService.getSpot(spotId);
+        LocalDateTime timeNow = LocalDateTime.now();
+        List<SearchIntegrationResponse> rooms = roomRepositoryDSL.findNearRoomsIntegration(spotId, checkTags(tags), isImminent, point, radius, timeNow.minusMinutes(imminentTimeFront), timeNow.plusMinutes(imminentTimeBack), sortType);
+        List<SearchRoomIntegrationResponse> roomList = rooms.stream().map(RoomMapper::toDto).toList();
+        return new SearchRoomIntegrationResponses(roomList);
+    }
+
     public RoomPreviewResponse getRoomPreview(Long roomId) {
         Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         return RoomMapper.toDto(room);
     }
 

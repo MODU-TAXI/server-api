@@ -150,4 +150,45 @@ public class RoomResponseDto {
         @Schema(example = "true", description = "수행완료 여부")
         private Boolean isUpdated;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class SearchRoomIntegrationResponse {
+        @Schema(description = "택시팟 id")
+        private Long roomId;
+        @Schema(description = "도착 거점 id")
+        private Long spotId;
+        @Schema(example = "14:00", description = "도착 시간")
+        private String arrivalTime;
+        @Schema(example = "주안역", description = "도착 거점 이름")
+        private String arrivalName;
+        @Schema(description = "택시팟 카테고리")
+        private List<RoomTagBitMask> roomTagBitMaskList;
+        @Schema(example = "12:00", description = "출발 시간")
+        private String departureTime;
+        @Schema(example = "센트리빌", description = "출발지 이름")
+        private String departureName;
+        @Schema(example = "126.65464", description = "출발지 경도")
+        private Float departureLongitude;
+        @Schema(example = "37.45169", description = "출발지 위도")
+        private Float departureLatitude;
+        @Schema(example = "2", description = "현재 인원수")
+        private int currentHeadcount;
+        @Schema(example = "3", description = "목표 인원수")
+        private int wishHeadcount;
+        @Schema(example = "30", description = "이동 예상시간 (분)")
+        private long durationMinutes;
+        @Schema(example = "5000", description = "인당 예상 요금(목표 인원 다 찼을 때 기준)")
+        private int expectedChargePerPerson;
+        @Schema(example = "15000", description = "예상 요금")
+        private int expectedCharge;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class SearchRoomIntegrationResponses {
+        @Schema(description = "방 리스트")
+        private List<SearchRoomIntegrationResponse> rooms;
+    }
 }
