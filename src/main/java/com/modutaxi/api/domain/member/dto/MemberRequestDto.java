@@ -84,6 +84,6 @@ public class MemberRequestDto {
         @Schema(description = "변경할 전화번호")
         private String phoneNumber;
         @Schema(description = "변경할 프로필 이미지의 S3 링크")
-        private String ImageUrl;
+        private String imageUrl;
     }
 }
