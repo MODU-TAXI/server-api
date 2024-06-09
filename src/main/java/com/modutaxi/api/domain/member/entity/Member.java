@@ -94,8 +94,8 @@ public class Member extends BaseTime {
         return this.role == Role.ROLE_MEMBER;
     }
 
-    public boolean existsNickname() {
-        return this.nickname != null;
+    public boolean existsImageUrl() {
+        return this.imageUrl != null;
     }
 
     public void plusOneReportCount() {

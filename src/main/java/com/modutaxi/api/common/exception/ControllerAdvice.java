@@ -76,15 +76,6 @@ public class ControllerAdvice {
     }
 
 
-    /**
-     * CASE: 소켓 에러
-     */
-    @ExceptionHandler(StompException.class)
-    public ResponseEntity<StompException> handleBaseException(StompException e) {
-        return new ResponseEntity<>(new StompException(e.getErrorCode()), HttpStatus.BAD_REQUEST);
-    }
-
-
     private String extractMessage(List<FieldError> fieldErrors) {
         StringBuilder builder = new StringBuilder();
         fieldErrors.forEach((error) -> builder.append(error.getDefaultMessage()));

@@ -2,7 +2,7 @@ package com.modutaxi.api.domain.chat.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modutaxi.api.common.exception.StompException;
+import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class RedisSubscriber {
             messageSendingOperations.convertAndSend("/sub/chat/" + chatMessageResponse.getRoomId(),
                     chatMessageResponse);
         } catch (JsonProcessingException e) {
-            throw new StompException(StompErrorCode.FAIL_SEND_MESSAGE);
+            throw new BaseException(StompErrorCode.FAIL_SEND_MESSAGE);
         }
     }
 }

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class NicknameValidator {
 
-    private static final Pattern VALID_PATTERN = Pattern.compile("^[a-zA-Z가-힣]+$");
+    private static final Pattern VALID_PATTERN = Pattern.compile(
+        "^(?=.*[a-zA-Z가-힣])[a-zA-Z가-힣0-9]+$");
+
 
     public static void validate(String nickname) {
         // 아무것도 입력되지 않았을 때, 2자 미만일 때
