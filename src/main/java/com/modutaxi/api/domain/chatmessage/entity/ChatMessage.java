@@ -47,6 +47,7 @@ public class ChatMessage extends BaseTime {
     @Builder.Default
     private LocalDateTime dateTime = LocalDateTime.now();
 
+    @Column(name = "image_url", length = 1024)
     @Builder.Default
     private String imageUrl = ServerConstants.BASIC_PROFILE_IMAGE_URL;
 }
