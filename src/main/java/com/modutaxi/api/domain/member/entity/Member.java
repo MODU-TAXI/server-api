@@ -3,15 +3,19 @@ package com.modutaxi.api.domain.member.entity;
 import static com.modutaxi.api.common.constants.ServerConstants.BASIC_PROFILE_IMAGE_URL;
 
 import com.modutaxi.api.common.entity.BaseTime;
+import com.modutaxi.api.domain.account.entity.Account;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -60,6 +64,9 @@ public class Member extends BaseTime {
     @Builder.Default
     private Role role = Role.ROLE_VISITOR;
 
+    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<Account> accounts;
+
     @NotNull
     @Builder.Default
     private int reportCount = 0;
@@ -77,6 +84,10 @@ public class Member extends BaseTime {
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void addAccount(Account account) {
+        this.accounts.add(account);
     }
 
     public void updateProfile(String name, Gender gender, String phoneNumber, String imageUrl) {
