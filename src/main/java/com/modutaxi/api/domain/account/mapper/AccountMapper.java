@@ -16,6 +16,6 @@ public class AccountMapper {
     }
 
     public static AccountResponse toDto(Account account) {
-        return new AccountResponse(account.getAccountNumber(), account.getBank());
+        return new AccountResponse(account.getId(), account.getAccountNumber(), account.getBank());
     }
 }

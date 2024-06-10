@@ -10,6 +10,7 @@ public class AccountResponseDto {
     @Getter
     @AllArgsConstructor
     public static class AccountResponse {
+        private Long id;
         private String accountNumber;
         private Bank bank;
     }
