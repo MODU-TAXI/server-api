@@ -18,4 +18,5 @@ public class ChatMessageRequestDto {
     private String sender;
     private String memberId;
     private LocalDateTime dateTime;
+    private String imageUrl;
 }

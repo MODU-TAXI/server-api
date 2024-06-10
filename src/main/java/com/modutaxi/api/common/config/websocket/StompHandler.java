@@ -100,13 +100,14 @@ public class StompHandler implements ChannelInterceptor {
             String nickName = member.getNickname();
 
             if (chatRoomMappingInfo == null) {
-                chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
+                chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName, member.getImageUrl());
                 redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
 
                 room.plusCurrentHeadCount();
+
                 ChatMessageRequestDto joinMessage = new ChatMessageRequestDto(
                         Long.valueOf(roomId), MessageType.JOIN, nickName + "님이 들어왔습니다.",
-                        chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now());
+                        chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now(), member.getImageUrl());
 
                 fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
                 chatService.sendChatMessage(joinMessage);

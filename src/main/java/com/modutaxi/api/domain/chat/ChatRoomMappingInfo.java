@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class ChatRoomMappingInfo implements Serializable {
     private String roomId;
     private String nickname;
+    private String imageUrl;
 }
