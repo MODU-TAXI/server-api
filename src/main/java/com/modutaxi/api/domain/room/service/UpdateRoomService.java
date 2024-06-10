@@ -1,11 +1,17 @@
 package com.modutaxi.api.domain.room.service;
 
 
+import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
-import com.modutaxi.api.common.exception.errorcode.*;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
+import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.exception.errorcode.SpotError;
+import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
@@ -15,10 +21,13 @@ import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.*;
-import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.NonParticipant;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
+import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomStatusRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
+import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
@@ -32,20 +41,21 @@ import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import static org.joda.time.DateTimeConstants.MILLIS_PER_MINUTE;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class UpdateRoomService {
 
+    private static final float MIN_LATITUDE = 33;
+    private static final float MAX_LATITUDE = 40;
+    private static final float MIN_LONGITUDE = 124;
+    private static final float MAX_LONGITUDE = 132;
     private final RoomRepository roomRepository;
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final SpotRepository spotRepository;
@@ -56,11 +66,6 @@ public class UpdateRoomService {
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
-
-    private static final float MIN_LATITUDE = 33;
-    private static final float MAX_LATITUDE = 40;
-    private static final float MIN_LONGITUDE = 124;
-    private static final float MAX_LONGITUDE = 132;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -297,6 +302,28 @@ public class UpdateRoomService {
         ChatMessageRequestDto chatMessageRequestDto =
                 new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
                         ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now());
+
+        chatService.sendChatMessage(chatMessageRequestDto);
+
+        return new UpdateRoomResponse(true);
+    }
+
+    @Transactional
+    public UpdateRoomResponse finishMatchingTest(Member manager, Long roomId) {
+        Room room = roomRepository.findById(roomId)
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
+        checkManager(room.getRoomManager().getId(), manager.getId());
+
+        if (!room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+            throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
+        }
+        //룸 상태 변경
+        room.roomStatusUpdate();
+
+        ChatMessageRequestDto chatMessageRequestDto =
+            new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
+                , "모두의 택시 봇", room.getRoomManager().getId().toString(), LocalDateTime.now());
 
         chatService.sendChatMessage(chatMessageRequestDto);
 
