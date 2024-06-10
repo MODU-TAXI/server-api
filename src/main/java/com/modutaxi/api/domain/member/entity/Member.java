@@ -113,6 +113,14 @@ public class Member extends BaseTime {
         this.reportCount++;
     }
 
+    public void plusOneMatchingCount() {
+        this.matchingCount++;
+    }
+
+    public void plusOneNoShowCount() {
+        this.noShowCount++;
+    }
+
     public void setBlockedTrue() {
         this.blocked = true;
     }
