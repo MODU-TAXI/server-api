@@ -13,6 +13,7 @@ import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
+import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -318,14 +319,33 @@ public class UpdateRoomService {
         if (!room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
             throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
         }
-        //룸 상태 변경
+
+        // 룸 상태 변경
         room.roomStatusUpdate();
+        // 정산 요청 메시지 전송
+        ChatMessageRequestDto matchingCompleteMessageRequestDto =
+            new ChatMessageRequestDto(
+                roomId, MessageType.PAYMENT_REQUEST,
+                "목적지에 도착했다면,\n정산하기를 눌러주세요.",
+                MessageType.PAYMENT_REQUEST.getSenderName(),
+                room.getRoomManager().getId().toString(),
+                LocalDateTime.now());
 
-        ChatMessageRequestDto chatMessageRequestDto =
-            new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
-                , "모두의 택시 봇", room.getRoomManager().getId().toString(), LocalDateTime.now());
+        // 택시 정보 메시지 전송
+        String taxiInfoMessageContent =
+            TimeFormatConverter.covertTimeToShortClockTime(
+                room.getDepartureTime().plusMinutes(room.getDurationMinutes())) +
+                "에 도착예정이에요,\n" + "예상 금액은 " + room.getExpectedCharge() + "원 이에요!";
+        ChatMessageRequestDto taxiInfoMessageRequestDto =
+            new ChatMessageRequestDto(
+                roomId, MessageType.CHAT_BOT,
+                taxiInfoMessageContent,
+                MessageType.CHAT_BOT.getSenderName(),
+                room.getRoomManager().getId().toString(),
+                LocalDateTime.now());
 
-        chatService.sendChatMessage(chatMessageRequestDto);
+        chatService.sendChatMessage(matchingCompleteMessageRequestDto);
+        chatService.sendChatMessage(taxiInfoMessageRequestDto);
 
         return new UpdateRoomResponse(true);
     }
