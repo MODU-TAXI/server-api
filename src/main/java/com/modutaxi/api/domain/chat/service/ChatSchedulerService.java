@@ -32,7 +32,7 @@ public class ChatSchedulerService {
         return () -> {
             ChatMessageRequestDto message = new ChatMessageRequestDto(
                 Long.valueOf(roomId), MessageType.CHAT_BOT, content,
-                "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now());
+                "모두의택시", room.getRoomManager().getId().toString(), LocalDateTime.now(), "");
             chatService.sendChatMessage(message);
             log.info("{}: {}", content, Thread.currentThread().getName());
         };

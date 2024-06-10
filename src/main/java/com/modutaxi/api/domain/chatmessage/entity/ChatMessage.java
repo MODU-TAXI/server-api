@@ -1,7 +1,9 @@
 package com.modutaxi.api.domain.chatmessage.entity;
 
+import com.modutaxi.api.common.constants.ServerConstants;
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.mongodb.lang.Nullable;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -44,4 +46,7 @@ public class ChatMessage extends BaseTime {
     @NotNull
     @Builder.Default
     private LocalDateTime dateTime = LocalDateTime.now();
+
+    @Builder.Default
+    private String imageUrl = ServerConstants.BASIC_PROFILE_IMAGE_URL;
 }

@@ -25,6 +25,7 @@ public class ChatMessageMapper {
             .sender(chatMessage.getSender())
             .memberId(chatMessage.getMemberId())
             .dateTime(chatMessage.getDateTime())
+            .imageUrl(chatMessage.getImageUrl())
             .build();
     }
 
@@ -36,6 +37,7 @@ public class ChatMessageMapper {
             .sender(chatMessageRequestDto.getSender())
             .memberId(chatMessageRequestDto.getMemberId())
             .dateTime(chatMessageRequestDto.getDateTime())
+            .imageUrl(chatMessageRequestDto.getImageUrl())
             .build();
     }
 }
