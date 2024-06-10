@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.account.dto;
 
 import com.modutaxi.api.domain.account.entity.Bank;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,5 +12,11 @@ public class AccountResponseDto {
     public static class AccountResponse {
         private String accountNumber;
         private Bank bank;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class AccountsResponse {
+        private List<AccountResponse> accounts;
     }
 }
