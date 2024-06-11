@@ -102,6 +102,7 @@ public class ScheduledMessageService {
         Runnable callTaxiTask = chatBotNotice(roomId, CALL_TAXI, callTaxiMessage.getId());
         delaySeconds = delaySeconds > BEFORE_FIVE_MINUTES + 20 ? delaySeconds - BEFORE_FIVE_MINUTES : NO_DELAY;
         taskScheduler.schedule(callTaxiTask, Instant.now().plusSeconds(delaySeconds));
+        log.info("{}번 방에 예약메시지가 설정되었습니다.", roomId);
     }
 
     private long calculateDelaySeconds(LocalDateTime now, LocalDateTime targetDateTime) {
