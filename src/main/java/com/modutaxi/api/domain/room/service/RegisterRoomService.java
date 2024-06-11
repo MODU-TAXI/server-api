@@ -10,7 +10,7 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
-import com.modutaxi.api.domain.chat.service.ChatSchedulerService;
+import com.modutaxi.api.domain.scheduledmessage.service.ScheduledMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
@@ -41,7 +41,7 @@ public class RegisterRoomService {
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final GetTaxiInfoService getTaxiInfoService;
     private final RegisterTaxiInfoService registerTaxiInfoService;
-    private final ChatSchedulerService chatSchedulerService;
+    private final ScheduledMessageService scheduledMessageService;
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
@@ -90,7 +90,7 @@ public class RegisterRoomService {
             member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
 
-        chatSchedulerService.addTask(room.getId(), room.getDepartureTime());
+        scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
         return RoomMapper.toDto(room, member, path, true, false);
     }
 
