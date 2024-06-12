@@ -55,27 +55,13 @@ public class UpdateRoomController {
     /**
      * [PATCH] 매칭 완료
      */
-    @Operation(summary = "매칭 완료", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.<br>방에는 참여해있지만 실제 동승하지 않은 유저의 ID를 리스트 형태로 보내주세요.<br>")
+    @Operation(summary = "매칭 완료", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.")
     @PatchMapping("/finish/matching/{id}")
     public ResponseEntity<UpdateRoomResponse> updateRoomStatus(
-        @CurrentMember Member member,
-        @PathVariable Long id,
-        @RequestBody UpdateRoomStatusRequest updateRoomStatusRequest
-    ) {
-        return ResponseEntity.ok(
-            updateRoomService.finishMatching(member, id, updateRoomStatusRequest));
-    }
-
-    /**
-     * [PATCH] 테스트 - 매칭 완료
-     */
-    @Operation(summary = "테스트용 매칭 완료", description = "모집방의 현재 상태를 매칭완료 상태로 변경합니다.")
-    @PatchMapping("/finish/matching/{id}/test")
-    public ResponseEntity<UpdateRoomResponse> updateRoomStatusTest(
         @CurrentMember Member member,
         @PathVariable Long id
     ) {
         return ResponseEntity.ok(
-            updateRoomService.finishMatchingTest(member, id));
+            updateRoomService.finishMatching(member, id));
     }
 }

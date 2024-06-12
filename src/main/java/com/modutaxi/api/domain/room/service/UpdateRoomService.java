@@ -266,54 +266,7 @@ public class UpdateRoomService {
     }
 
     @Transactional
-    public UpdateRoomResponse finishMatching(Member manager, Long roomId,
-        UpdateRoomStatusRequest updateRoomStatusRequest) {
-
-        Room room = roomRepository.findById(roomId)
-            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-
-        checkManager(room.getRoomManager().getId(), manager.getId());
-
-        if (!room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
-            throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
-        }
-        //룸 상태 변경
-        room.roomStatusUpdate();
-
-        //request 조회
-        List<NonParticipant> memberList = updateRoomStatusRequest.getNonParticipantList();
-
-        //member 정당성 확인
-        List<Member> nonParticipantList = memberList.stream()
-            .map(nonParticipant -> {
-                Member member = memberRepository.findByIdAndStatusTrue(nonParticipant.getMemberId())
-                    .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-
-                boolean isInRoom = redisChatRoomRepositoryImpl.findMemberInRoomInList
-                    (roomId.toString(), nonParticipant.toString());
-
-                if (!isInRoom) {
-                    throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
-                }
-
-                return member;
-            }).toList();
-
-        // TODO: 5/27/24 실제로 참여하지 않은 애들 처리
-        // ex) redisChatRoomRepositoryImpl.removeFromRoomInList(roomId.toString(), nonParticipant.getUserId().toString());
-        // ex) 새로운 저장공간에 실제 참여한 리스트 저장 -> 이 방향이 요구사항에 적합할듯
-
-        ChatMessageRequestDto chatMessageRequestDto =
-            new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
-                , "모두의 택시 봇", room.getRoomManager().getId().toString(), LocalDateTime.now());
-
-        chatService.sendChatMessage(chatMessageRequestDto);
-
-        return new UpdateRoomResponse(true);
-    }
-
-    @Transactional
-    public UpdateRoomResponse finishMatchingTest(Member manager, Long roomId) {
+    public UpdateRoomResponse finishMatching(Member manager, Long roomId) {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
