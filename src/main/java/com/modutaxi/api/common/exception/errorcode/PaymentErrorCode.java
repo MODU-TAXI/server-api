@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum PaymentErrorCode implements ErrorCode {
     INVALID_ACCOUNT("PAYMENT_001", "존재하지 않는 계좌입니다.", HttpStatus.CONFLICT),
+    INVALID_PAYMENT_ROOM("PAYMENT_002", "존재하지 않는 정산방입니다.", HttpStatus.CONFLICT),
     ;
 
     private final String errorCode;

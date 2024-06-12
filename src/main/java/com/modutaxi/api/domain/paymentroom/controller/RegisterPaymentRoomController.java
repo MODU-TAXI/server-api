@@ -2,7 +2,6 @@ package com.modutaxi.api.domain.paymentroom.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.ErrorCode;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomRequestDto.PaymentRoomRequest;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomResponseDto.RegisterPaymentRoomResponse;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "정산", description = "정산 요청 API")
-@RequestMapping("/api/payment-room")
+@RequestMapping("/api/payment-rooms")
 public class RegisterPaymentRoomController {
 
     private final RegisterPaymentRoomService registerPaymentRoomService;
@@ -38,6 +37,7 @@ public class RegisterPaymentRoomController {
         + "<br>이전 화면에서 계좌 등록 API를 실행하시고, 반환된 response에서 id를 받아와 accountId에 넣어주세요!"
     )
     @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "정산 요청 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RegisterPaymentRoomResponse.class))),
         @ApiResponse(responseCode = "400", description = "정산 요청 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorCode.class), examples = {
             @ExampleObject(name = "PRT_003", description = "탑승 list의 멤버 Id가 유효하지 않음", value = """
                 {
