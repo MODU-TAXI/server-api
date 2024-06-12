@@ -32,7 +32,9 @@ public class FcmService {
             FirebaseMessaging.getInstance()
                     .subscribeToTopic(
                             Collections.singletonList(fcmToken), Long.toString(roomId));
+            log.info("FCM SUBSCRIBE");
         } catch (FirebaseMessagingException e) {
+            log.error("FAIL FCM SUBSCRIBE");
             throw new BaseException(ChatErrorCode.FAIL_FCM_SUBSCRIBE);
         }
     }

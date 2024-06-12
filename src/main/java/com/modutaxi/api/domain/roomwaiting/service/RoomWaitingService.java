@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class RoomWaitingService {
     /**
      * 방 참가 신청
      */
+    @Transactional
     public ApplyResponse applyForParticipate(Member member, String roomId){
         if (member.isBlocked()) {
             throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
@@ -76,6 +78,7 @@ public class RoomWaitingService {
     /**
      * 방 참가 수락
      */
+    @Transactional
     public ApplyResponse acceptForParticipate(Member member, String roomId, String memberId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
