@@ -1,6 +1,6 @@
 package com.modutaxi.api.domain.paymentmember.service;
 
-import static com.modutaxi.api.domain.paymentmember.mapper.PaymentMemberMapper.toDto;
+import static com.modutaxi.api.domain.paymentmember.mapper.PaymentMemberMapper.toEntity;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.paymentmember.entity.PaymentMember;
@@ -19,7 +19,7 @@ public class RegisterPaymentMemberService {
     private final PaymentMemberRepository paymentMemberRepository;
 
     public void register(PaymentRoom paymentRoom, Member member, PaymentMemberStatus status) {
-        PaymentMember paymentMember = toDto(paymentRoom, member, status);
+        PaymentMember paymentMember = toEntity(paymentRoom, member, status);
         paymentMemberRepository.save(paymentMember);
     }
 }

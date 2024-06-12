@@ -21,13 +21,15 @@ public class GetPaymentRoomService {
     private final RoomRepository roomRepository;
 
     public PaymentRoomResponse getPaymentRoom(Long roomId) {
+        return toDto(getPaymentRoomByRoomId(roomId));
+    }
+
+    public PaymentRoom getPaymentRoomByRoomId(Long roomId) {
         // 1. 방 조회
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         // 2. 정산방 조회
-        PaymentRoom paymentRoom = paymentRoomRepository.findByRoomId(room.getId())
+        return paymentRoomRepository.findByRoomId(room.getId())
             .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_PAYMENT_ROOM));
-
-        return toDto(paymentRoom);
     }
 }
