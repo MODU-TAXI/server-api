@@ -12,14 +12,18 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "정산", description = "정산 멤버 조회 API")
+@RequestMapping("/api/payment-members")
 public class GetPaymentMemberController {
 
     private final GetPaymentMemberService getPaymentMemberService;
@@ -50,11 +54,10 @@ public class GetPaymentMemberController {
                 """),
         })),
     })
-    @GetMapping("/{roomId}")
+    @GetMapping("")
     public ResponseEntity<PaymentMemberListResponse> getPaymentMembers(
         @CurrentMember Member member,
-        @Parameter(description = "조회할 택시팟의 id")
-        @PathVariable("roomId") Long roomId
+        @Parameter(description = "조회할 택시팟의 id") @RequestParam("roomId") Long roomId
     ) {
         return ResponseEntity.ok(getPaymentMemberService.getPaymentMembers(member, roomId));
     }

@@ -16,6 +16,7 @@ public class PaymentRoomMapper {
 
     public static PaymentRoomResponse toDto(PaymentRoom paymentRoom) {
         return PaymentRoomResponse.builder()
+            .paymentRoomId(paymentRoom.getId())
             .accountNumber(paymentRoom.getAccount().getAccountNumber())
             .bank(paymentRoom.getAccount().getBank())
             .totalCharge(paymentRoom.getTotalCharge())
