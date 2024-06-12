@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class GePaymentMemberController {
+public class GetPaymentMemberController {
 
     private final GetPaymentMemberService getPaymentMemberService;
 
