@@ -9,7 +9,11 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
+import com.modutaxi.api.common.fcm.FcmService;
+import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
+import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.scheduledmessage.service.ScheduledMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -42,6 +46,7 @@ public class RegisterRoomService {
     private final GetTaxiInfoService getTaxiInfoService;
     private final RegisterTaxiInfoService registerTaxiInfoService;
     private final ScheduledMessageService scheduledMessageService;
+    private final FcmService fcmService;
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
@@ -91,6 +96,14 @@ public class RegisterRoomService {
         registerTaxiInfoService.savePath(room.getId(), path);
 
         scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
+
+        //매핑 정보 저장
+        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(room.getId().toString(), member.getNickname());
+        redisChatRoomRepositoryImpl.setUserEnterInfo(member.getId().toString(), chatRoomMappingInfo);
+
+        //fcm구독
+        fcmService.subscribe(member.getId(), room.getId());
+
         return RoomMapper.toDto(room, member, path, true, false);
     }
 
