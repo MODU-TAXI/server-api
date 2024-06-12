@@ -118,7 +118,7 @@ public class RoomWaitingService {
         room.plusCurrentHeadCount();
 
         //fcm구독
-        fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
+        fcmService.subscribe(participant.getId(), Long.valueOf(roomId));
         //참가 수락되었다는 메세지 본인에게 전송
         fcmService.sendPermitParticipate(participant, roomId);
 
