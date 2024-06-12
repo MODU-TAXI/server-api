@@ -95,14 +95,14 @@ public class RegisterRoomService {
             member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
 
-        scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
-
         //매핑 정보 저장
         ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(room.getId().toString(), member.getNickname());
         redisChatRoomRepositoryImpl.setUserEnterInfo(member.getId().toString(), chatRoomMappingInfo);
 
         //fcm구독
         fcmService.subscribe(member.getId(), room.getId());
+
+        scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
 
         return RoomMapper.toDto(room, member, path, true, false);
     }

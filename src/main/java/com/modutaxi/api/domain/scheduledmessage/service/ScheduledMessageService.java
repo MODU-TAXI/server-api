@@ -13,6 +13,7 @@ import com.modutaxi.api.domain.scheduledmessage.entity.ScheduledMessageStatus;
 import com.modutaxi.api.domain.scheduledmessage.mapper.ScheduledMessageMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.TaskScheduler;
@@ -30,6 +31,7 @@ import java.util.Objects;
 @Service
 public class ScheduledMessageService {
 
+    @Qualifier("taskScheduler")
     private final TaskScheduler taskScheduler;
     private final ChatService chatService;
     private final RoomRepository roomRepository;
