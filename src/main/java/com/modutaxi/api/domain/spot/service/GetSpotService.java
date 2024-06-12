@@ -26,13 +26,13 @@ public class GetSpotService {
 
     public Spot getSpot(Long id) {
         return spotRepository.findById(id).orElseThrow(
-                () -> new BaseException(SPOT_ID_NOT_FOUND)
+            () -> new BaseException(SPOT_ID_NOT_FOUND)
         );
     }
 
     public GetSpotWithDistanceResponse getSpot(Member member, Long id, Point point) {
         SpotWithDistanceResponseInterface spot = spotRepository.findByIdWithDistance(member, id, point).orElseThrow(
-                () -> new BaseException(SPOT_ID_NOT_FOUND)
+            () -> new BaseException(SPOT_ID_NOT_FOUND)
         );
         return SpotResponseMapper.toSpotWithDistanceResponse(spot);
     }
@@ -46,8 +46,8 @@ public class GetSpotService {
     public SearchSpotWithRadiusResponses getRadiusSpots(Point searchPoint, int mapSearchLimit) {
         List<SearchWithRadiusResponseInterface> spots = spotRepository.findNearSpotsInRadius(searchPoint, mapSearchLimit);
         List<SearchSpotWithRadiusResponse> spotList = spots.stream().map(SpotResponseMapper::toSearchWithRadiusResponse).toList();
-        Double maxDistance = spots.stream().mapToDouble(v -> v.getDistance()).max().orElse(500.0);
-        return new SearchSpotWithRadiusResponses(maxDistance, spotList);
+        Double[] startEndPoints = getStartEndPoints(searchPoint, spotList);
+        return new SearchSpotWithRadiusResponses(startEndPoints[0], startEndPoints[1], startEndPoints[2], startEndPoints[3], spotList);
     }
 
     public GetSpotWithDistanceResponses getNearSpots(Member member, Point currentPoint, Point searchPoint, int page, int size) {
@@ -55,5 +55,16 @@ public class GetSpotService {
         List<SpotWithDistanceResponseInterface> spots = spotRepository.findNearSpots(member, currentPoint, searchPoint, pageable);
         List<GetSpotWithDistanceResponse> spotList = spots.stream().map(SpotResponseMapper::toSpotWithDistanceResponse).toList();
         return new GetSpotWithDistanceResponses(spotList);
+    }
+
+    private Double[] getStartEndPoints(Point searchPoint, List<SearchSpotWithRadiusResponse> spotList) {
+        double minLongitude = searchPoint.getX(), maxLongitude = searchPoint.getX(), minLatitude = searchPoint.getY(), maxLatitude = searchPoint.getY();
+        for(SearchSpotWithRadiusResponse spot : spotList) {
+            minLongitude = minLongitude < spot.getLongitude() ? minLongitude : spot.getLongitude();
+            maxLongitude = maxLongitude > spot.getLongitude() ? maxLongitude : spot.getLongitude();
+            minLatitude = minLatitude < spot.getLatitude() ? minLatitude : spot.getLatitude();
+            maxLatitude = maxLatitude > spot.getLatitude() ? maxLatitude : spot.getLatitude();
+        }
+        return new Double[]{minLongitude, minLatitude, maxLongitude, maxLatitude};
     }
 }
