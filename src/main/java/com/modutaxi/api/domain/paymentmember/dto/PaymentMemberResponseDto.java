@@ -28,9 +28,15 @@ public class PaymentMemberResponseDto {
     }
 
     @Getter
-    @Builder
     @AllArgsConstructor
     public static class PaymentMemberListResponse {
         private List<PaymentMemberResponse> participantList;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class UpdatePaymentMemberResponse {
+        @Schema(example = "true", description = "수행완료 여부")
+        private boolean isUpdated;
     }
 }

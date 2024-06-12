@@ -15,7 +15,8 @@ public enum MessageType {
     MATCHING_COMPLETE("[방장에게 전송] 매칭 완료", "모두의 택시 봇"),
     PAYMENT_REQUEST("[방장에게 전송] 정산 요청", "모두의 택시 봇"),
     PAYMENT_REQUEST_COMPLETE("[방장이 모두에게 전송] 정산 요청", null),
-    PAYMENT_COMPLETE("[멤버가 돈 보낸 후 모두에게 전송] 정산 완료", null);
+    PAYMENT_COMPLETE("[멤버가 돈 보낸 후 모두에게 전송] 정산 완료", null),
+    PAYMENT_ALL_COMPLETE("[방장에게 전송] 모든 멤버 정산 완료", "모두의 택시 봇");
 
     private final String description;
     private final String senderName;

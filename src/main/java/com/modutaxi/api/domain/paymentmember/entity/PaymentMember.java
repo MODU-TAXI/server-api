@@ -36,4 +36,8 @@ public class PaymentMember extends BaseTime {
 
     @NotNull
     private PaymentMemberStatus status;
+
+    public void setStatusComplete() {
+        this.status = PaymentMemberStatus.COMPLETE;
+    }
 }
