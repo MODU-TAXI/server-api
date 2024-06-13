@@ -110,7 +110,7 @@ public class RegisterPaymentRoomService {
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         // 1. 방에 들어가있는지 확인
         boolean isInRoom = redisChatRoomRepositoryImpl.findMemberInRoomInList
-            (roomId.toString(), member.toString());
+            (roomId.toString(), member.getId().toString());
         if (!isInRoom) {
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
         }
