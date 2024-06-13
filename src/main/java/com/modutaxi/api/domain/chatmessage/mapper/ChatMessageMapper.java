@@ -12,20 +12,21 @@ public class ChatMessageMapper {
                 .messageType(messageRequestDto.getType())
                 .content(messageRequestDto.getContent())
                 .sender(messageRequestDto.getSender())
-                .memberId(messageRequestDto.getMemberId())
+                .memberId(Long.valueOf(messageRequestDto.getMemberId()))
                 .dateTime(messageRequestDto.getDateTime())
                 .build();
     }
 
-    public static ChatMessageResponse toDto(ChatMessage chatMessage) {
+
+    public static ChatMessageResponse toDto(ChatMessage chatMessage, String imageUrl) {
         return ChatMessageResponse.builder()
             .roomId(chatMessage.getRoomId())
             .messageType(chatMessage.getMessageType())
             .content(chatMessage.getContent())
             .sender(chatMessage.getSender())
-            .memberId(chatMessage.getMemberId())
+            .memberId(String.valueOf(chatMessage.getMemberId()))
             .dateTime(chatMessage.getDateTime())
-            .imageUrl(chatMessage.getImageUrl())
+            .imageUrl(imageUrl)
             .build();
     }
 
