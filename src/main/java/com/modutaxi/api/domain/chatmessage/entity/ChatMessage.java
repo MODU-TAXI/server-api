@@ -1,7 +1,6 @@
 package com.modutaxi.api.domain.chatmessage.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.room.entity.Room;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -26,6 +25,7 @@ public class ChatMessage extends BaseTime {
     private Long roomId;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Builder.Default
     private MessageType messageType  = MessageType.CHAT;
 
@@ -39,9 +39,10 @@ public class ChatMessage extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private String memberId = "1";
+    private Long memberId = 1L;
 
     @NotNull
     @Builder.Default
     private LocalDateTime dateTime = LocalDateTime.now();
+
 }

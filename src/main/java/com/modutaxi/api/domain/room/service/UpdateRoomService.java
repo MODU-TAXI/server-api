@@ -296,7 +296,7 @@ public class UpdateRoomService {
 
         ChatMessageRequestDto chatMessageRequestDto =
                 new ChatMessageRequestDto(roomId, MessageType.CHAT_BOT, "목적지에 도착했다면 정산하기를 눌러주세요."
-                        ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now());
+                        ,"모두의 택시 봇",room.getRoomManager().getId().toString(),LocalDateTime.now(), "");
 
         chatService.sendChatMessage(chatMessageRequestDto);
 

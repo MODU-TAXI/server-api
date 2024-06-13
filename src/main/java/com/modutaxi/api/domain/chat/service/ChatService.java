@@ -70,7 +70,7 @@ public class ChatService {
         ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(
                 chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
                 chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
-                chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now());
+                chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now(), "");
 
         sendChatMessage(leaveMessage);
 

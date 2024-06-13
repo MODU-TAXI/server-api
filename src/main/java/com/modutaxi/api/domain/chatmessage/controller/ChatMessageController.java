@@ -7,8 +7,6 @@ import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +25,7 @@ public class ChatMessageController {
     @GetMapping("/api/chats/rooms/{roomId}/messages")
     public ResponseEntity<ChatMessageResponseList> getChatMessage(@CurrentMember Member member,
                                                                   @PathVariable Long roomId) {
-        return ResponseEntity.ok(chatMessageService.chatMessageResponseDtoList(member, roomId));
+        return ResponseEntity.ok(chatMessageService.chatMessageResponseDtoList(roomId));
     }
 
     @Operation(summary = "오갔던 채팅 메세지 전부 삭제")
