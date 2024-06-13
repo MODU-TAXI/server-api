@@ -5,6 +5,8 @@ import static com.modutaxi.api.domain.paymentroom.mapper.PaymentRoomMapper.toDto
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.PaymentErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.domain.account.entity.Account;
+import com.modutaxi.api.domain.account.repository.AccountRepository;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomResponseDto.PaymentRoomResponse;
 import com.modutaxi.api.domain.paymentroom.entity.PaymentRoom;
 import com.modutaxi.api.domain.paymentroom.repository.PaymentRoomRepository;
@@ -19,9 +21,13 @@ public class GetPaymentRoomService {
 
     private final PaymentRoomRepository paymentRoomRepository;
     private final RoomRepository roomRepository;
+    private final AccountRepository accountRepository;
 
     public PaymentRoomResponse getPaymentRoom(Long roomId) {
-        return toDto(getPaymentRoomByRoomId(roomId));
+        PaymentRoom paymentRoom = getPaymentRoomByRoomId(roomId);
+        Account account = accountRepository.findById(paymentRoom.getAccountId())
+            .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
+        return toDto(paymentRoom, account);
     }
 
     public PaymentRoom getPaymentRoomByRoomId(Long roomId) {

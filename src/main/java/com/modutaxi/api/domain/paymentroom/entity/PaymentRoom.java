@@ -1,12 +1,10 @@
 package com.modutaxi.api.domain.paymentroom.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.account.entity.Account;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,13 +25,13 @@ public class PaymentRoom extends BaseTime {
 
     @NotNull
     private Long roomId;
-    
+
+    @NotNull
+    private Long accountId;
+
     @Builder.Default
     private PaymentStatus status = PaymentStatus.INCOMPLETE;
 
     @NotNull
     private int totalCharge;
-
-    @OneToOne
-    private Account account;
 }

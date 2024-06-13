@@ -55,7 +55,8 @@ public class RegisterPaymentRoomService {
         Account account = accountRepository.findById(request.getAccountId())
             .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
         // 3. 정산 생성 완료
-        PaymentRoom paymentRoom = toEntity(request.getRoomId(), request.getTotalCharge(), account);
+        PaymentRoom paymentRoom = toEntity(request.getRoomId(), request.getTotalCharge(),
+            account.getId());
         paymentRoomRepository.save(paymentRoom);
         // 4. 정산 멤버 등록
         registerPaymentMemberList(room.getId(), room.getRoomManager().getId(), paymentRoom,

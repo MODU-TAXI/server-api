@@ -6,18 +6,18 @@ import com.modutaxi.api.domain.paymentroom.entity.PaymentRoom;
 
 public class PaymentRoomMapper {
 
-    public static PaymentRoom toEntity(Long roomId, int totalCharge, Account account) {
+    public static PaymentRoom toEntity(Long roomId, int totalCharge, Long accountId) {
         return PaymentRoom.builder()
             .roomId(roomId)
             .totalCharge(totalCharge)
-            .account(account)
+            .accountId(accountId)
             .build();
     }
 
-    public static PaymentRoomResponse toDto(PaymentRoom paymentRoom) {
+    public static PaymentRoomResponse toDto(PaymentRoom paymentRoom, Account account) {
         return PaymentRoomResponse.builder()
-            .accountNumber(paymentRoom.getAccount().getAccountNumber())
-            .bank(paymentRoom.getAccount().getBank())
+            .accountNumber(account.getAccountNumber())
+            .bank(account.getBank())
             .totalCharge(paymentRoom.getTotalCharge())
             .status(paymentRoom.getStatus())
             .build();
