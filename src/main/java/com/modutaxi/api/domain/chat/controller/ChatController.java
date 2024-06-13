@@ -35,9 +35,9 @@ public class ChatController {
 
     // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
-    public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
+    public void sendMessage(ChatMessageRequestDto message) {
 
-        String memberId = jwtTokenProvider.getMemberIdByToken(token);
+        String memberId = message.getMemberId();
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
         message.setSender(chatRoomMappingInfo.getNickname());
