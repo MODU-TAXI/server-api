@@ -14,7 +14,15 @@ public class PaymentRoomRequestDto {
         private Long roomId;                    // 방 ID
         private Long accountId;                 // 계좌 ID
         private int totalCharge;                // 총 금액
-        private List<Long> ParticipantList;     // 탄 사람
-        private List<Long> nonParticipantList;  // 안 탄 사람
+        private List<MemberId> participantList;     // 탄 사람
+        private List<MemberId> nonParticipantList;  // 안 탄 사람
     }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class MemberId {
+        private Long id;
+    }
+
 }

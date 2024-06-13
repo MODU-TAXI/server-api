@@ -17,6 +17,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.paymentmember.entity.PaymentMemberStatus;
 import com.modutaxi.api.domain.paymentmember.service.RegisterPaymentMemberService;
+import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomRequestDto.MemberId;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomRequestDto.PaymentRoomRequest;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomResponseDto.RegisterPaymentRoomResponse;
 import com.modutaxi.api.domain.paymentroom.entity.PaymentRoom;
@@ -83,18 +84,18 @@ public class RegisterPaymentRoomService {
      * PaymentMemberStatus: INCOMPLETE(정산 미완료), COMPLETE(정산 완료), DEACTIVATED(정산 대상 미포함)
      */
     private void registerPaymentMemberList(Long roomId, Long managerId, PaymentRoom paymentRoom,
-        List<Long> participantList, List<Long> nonParticipantList) {
+        List<MemberId> participantList, List<MemberId> nonParticipantList) {
         participantList.forEach(
-            participantId ->
-                registerPaymentMember(roomId, participantId, paymentRoom,
-                    Objects.equals(participantId, managerId)
+            participant ->
+                registerPaymentMember(roomId, participant.getId(), paymentRoom,
+                    (Objects.equals(participant.getId(), managerId))
                         ? PaymentMemberStatus.COMPLETE      // 방장이라면 정산 완료로 초기화
                         : PaymentMemberStatus.INCOMPLETE)   // 멤버라면 정산 미완료로 초기화
         );
 
         nonParticipantList.forEach(
-            nonParticipantId ->
-                registerPaymentMember(roomId, nonParticipantId, paymentRoom,
+            nonParticipant ->
+                registerPaymentMember(roomId, nonParticipant.getId(), paymentRoom,
                     PaymentMemberStatus.DEACTIVATED)
         );
     }
