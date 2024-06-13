@@ -51,7 +51,7 @@ public class UpdatePaymentMemberService {
                 "정산 완료했어요!",
                 member.getNickname(),
                 member.getId().toString(),
-                LocalDateTime.now());
+                LocalDateTime.now(), "");
         chatService.sendChatMessage(paymentCompleteMessageRequestDto);
 
         // 모든 멤버 정산 완료 시 메시지 전송
@@ -82,15 +82,15 @@ public class UpdatePaymentMemberService {
             Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        // 방장에게 모든 정산 완료를 알리는 메시지 전송
-        ChatMessageRequestDto paymentCompleteMessageRequestDto =
-            new ChatMessageRequestDto(
-                roomId, MessageType.PAYMENT_ALL_COMPLETE,
-                "모든 정산이 완료됐어요!",
-                MessageType.PAYMENT_ALL_COMPLETE.getSenderName(),
-                room.getRoomManager().getId().toString(),
-                LocalDateTime.now());
-        chatService.sendChatMessage(paymentCompleteMessageRequestDto);
+            // 방장에게 모든 정산 완료를 알리는 메시지 전송
+            ChatMessageRequestDto paymentCompleteMessageRequestDto =
+                new ChatMessageRequestDto(
+                    roomId, MessageType.PAYMENT_ALL_COMPLETE,
+                    "모든 정산이 완료됐어요!",
+                    MessageType.PAYMENT_ALL_COMPLETE.getSenderName(),
+                    room.getRoomManager().getId().toString(),
+                    LocalDateTime.now(), "");
+            chatService.sendChatMessage(paymentCompleteMessageRequestDto);
         }
     }
 }

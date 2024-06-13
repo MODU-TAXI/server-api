@@ -67,7 +67,7 @@ public class RegisterPaymentRoomService {
         ChatMessageRequestDto chatMessageRequestDto =
             new ChatMessageRequestDto(room.getId(), MessageType.PAYMENT_REQUEST_COMPLETE, content,
                 room.getRoomManager().getNickname(), room.getRoomManager().getId().toString(),
-                LocalDateTime.now());
+                LocalDateTime.now(), room.getRoomManager().getImageUrl());
 
         chatService.sendChatMessage(chatMessageRequestDto);
 

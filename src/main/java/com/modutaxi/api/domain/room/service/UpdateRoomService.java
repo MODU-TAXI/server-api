@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
-import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
-import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
@@ -23,9 +21,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.NonParticipant;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomStatusRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
@@ -43,7 +39,6 @@ import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -285,7 +280,7 @@ public class UpdateRoomService {
                 "목적지에 도착했다면,\n정산하기를 눌러주세요.",
                 MessageType.PAYMENT_REQUEST.getSenderName(),
                 room.getRoomManager().getId().toString(),
-                LocalDateTime.now());
+                LocalDateTime.now(), "");
 
         // 택시 정보 메시지 전송
         String taxiInfoMessageContent =
@@ -298,7 +293,7 @@ public class UpdateRoomService {
                 taxiInfoMessageContent,
                 MessageType.CHAT_BOT.getSenderName(),
                 room.getRoomManager().getId().toString(),
-                LocalDateTime.now());
+                LocalDateTime.now(), "");
 
         chatService.sendChatMessage(matchingCompleteMessageRequestDto);
         chatService.sendChatMessage(taxiInfoMessageRequestDto);

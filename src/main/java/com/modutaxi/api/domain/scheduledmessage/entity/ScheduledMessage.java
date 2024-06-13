@@ -1,11 +1,18 @@
 package com.modutaxi.api.domain.scheduledmessage.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import jakarta.persistence.*;
+import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
@@ -28,6 +35,9 @@ public class ScheduledMessage extends BaseTime {
 
     @NotNull
     private ScheduledMessageStatus status;
+
+    @NotNull
+    private MessageType type;
 
     public void scheduledMessageStatusUpdate() {
         this.status = ScheduledMessageStatus.COMPLETE;
