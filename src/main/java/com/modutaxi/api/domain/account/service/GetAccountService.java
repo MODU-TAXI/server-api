@@ -4,6 +4,7 @@ import static com.modutaxi.api.domain.account.mapper.AccountMapper.toDto;
 
 import com.modutaxi.api.domain.account.dto.AccountResponseDto.AccountResponse;
 import com.modutaxi.api.domain.account.dto.AccountResponseDto.AccountsResponse;
+import com.modutaxi.api.domain.account.entity.Account;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import java.util.ArrayList;
@@ -18,14 +19,11 @@ public class GetAccountService {
     private final AccountRepository accountRepository;
 
     public AccountsResponse getAccounts(Member member) {
-        List<AccountResponse> accounts = new ArrayList<>();
-        member.getAccounts().forEach(
-            account -> {
-                if (account.isStatus()) {    // 계좌가 삭제 되지 않았다면 응답에 추가
-                    accounts.add(toDto(account));
-                }
-            }
+        List<Account> accounts = accountRepository.findAllByMemberAndStatusTrue(member);
+        List<AccountResponse> accountResponses = new ArrayList<>();
+        accounts.forEach(
+            account -> accountResponses.add(toDto(account))
         );
-        return new AccountsResponse(accounts);
+        return new AccountsResponse(accountResponses);
     }
 }
