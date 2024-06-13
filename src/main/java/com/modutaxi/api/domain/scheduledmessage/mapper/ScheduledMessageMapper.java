@@ -15,6 +15,7 @@ public class ScheduledMessageMapper {
             .content(content)
             .executeTime(dateTime)
             .status(ScheduledMessageStatus.PENDING)
+            .type(type)
             .build();
     }
 }
