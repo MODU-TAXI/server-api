@@ -1,45 +1,39 @@
-package com.modutaxi.api.domain.scheduledmessage.entity;
+package com.modutaxi.api.domain.account.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.member.entity.Member;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-@Builder
-public class ScheduledMessage extends BaseTime {
+public class Account extends BaseTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private Long roomId;
-
+    private String accountNumber;
     @NotNull
-    private String content;
+    private Bank bank;
 
-    @NotNull
-    private LocalDateTime executeTime;
+    @Builder.Default
+    private boolean status = true;
 
-    @NotNull
-    private ScheduledMessageStatus status;
-
-    @NotNull
-    private MessageType type;
-
-    public void scheduledMessageStatusUpdate() {
-        this.status = ScheduledMessageStatus.COMPLETE;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 }

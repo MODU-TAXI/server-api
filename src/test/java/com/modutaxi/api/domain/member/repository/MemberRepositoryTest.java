@@ -1,5 +1,8 @@
 package com.modutaxi.api.domain.member.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.modutaxi.api.domain.member.entity.Gender;
 import com.modutaxi.api.domain.member.entity.Member;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import static org.assertj.core.api.Assertions.*;
 
 
 @DataJpaTest
@@ -20,19 +21,20 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
 
     Member member1, member2;
+
     @BeforeEach
     void setUp() {
         member1 = Member.builder()
-                .snsId("123456")
-                .name("지수")
-                .gender(Gender.FEMALE)
-                .build();
+            .snsId("123456")
+            .name("지수")
+            .gender(Gender.FEMALE)
+            .build();
         member2 = Member.builder()
-                .snsId("123457")
-                .name("이름")
-                .status(false)
-                .gender(Gender.FEMALE)
-                .build();
+            .snsId("123457")
+            .name("이름")
+            .status(false)
+            .gender(Gender.FEMALE)
+            .build();
     }
 
     @Test
@@ -60,13 +62,13 @@ class MemberRepositoryTest {
         memberRepository.save(member1);
 
         // when
-        Member result1 = memberRepository.findBySnsId("123456").orElse(null);
-        Member result2 = memberRepository.findBySnsId("456789").orElse(null);
+        Member result1 = memberRepository.findBySnsIdAndStatusTrue("123456").orElse(null);
+        Member result2 = memberRepository.findBySnsIdAndStatusTrue("456789").orElse(null);
 
         // then
         assertThat(result1.getSnsId()).isEqualTo("123456");
         assertThatThrownBy(() ->
-                result2.getSnsId()).isInstanceOf(NullPointerException.class);
+            result2.getSnsId()).isInstanceOf(NullPointerException.class);
     }
 
     @Test
