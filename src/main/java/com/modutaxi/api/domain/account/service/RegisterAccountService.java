@@ -20,15 +20,16 @@ public class RegisterAccountService {
     private final MemberRepository memberRepository;
 
     public AccountResponse register(Member member, String accountNumber, Bank bank) {
+        Member loadedMember = memberRepository.findById(member.getId()).orElseThrow();
         Account account = accountRepository.findByMemberAndAccountNumberAndBank(
-            member, accountNumber, bank).orElse(null);
+            loadedMember, accountNumber, bank).orElse(null);
         // 계좌가 이미 존재하지 않는다면 등록
         if(account == null) {
-            account = toEntity(member, accountNumber, bank);
+            account = toEntity(loadedMember, accountNumber, bank);
             accountRepository.save(account);
 
-            member.addAccount(account);
-            memberRepository.save(member);
+            loadedMember.addAccount(account);
+            memberRepository.save(loadedMember);
         }
         return toDto(account);
     }

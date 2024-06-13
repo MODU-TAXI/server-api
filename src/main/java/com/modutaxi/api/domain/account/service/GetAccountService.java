@@ -20,7 +20,11 @@ public class GetAccountService {
     public AccountsResponse getAccounts(Member member) {
         List<AccountResponse> accounts = new ArrayList<>();
         member.getAccounts().forEach(
-            account -> accounts.add(toDto(account))
+            account -> {
+                if (account.isStatus()) {    // 계좌가 삭제 되지 않았다면 응답에 추가
+                    accounts.add(toDto(account));
+                }
+            }
         );
         return new AccountsResponse(accounts);
     }

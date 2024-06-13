@@ -31,6 +31,9 @@ public class Account extends BaseTime {
     @NotNull
     private Bank bank;
 
+    @Builder.Default
+    private boolean status = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 }
