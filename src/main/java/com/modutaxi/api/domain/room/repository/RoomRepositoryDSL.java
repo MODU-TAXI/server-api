@@ -1,5 +1,6 @@
 package com.modutaxi.api.domain.room.repository;
 
+import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
 import com.modutaxi.api.domain.room.entity.RoomSortType;
@@ -14,4 +15,6 @@ public interface RoomRepositoryDSL {
     Slice<SearchListResponse> findNearRoomsList(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore, Pageable pageable, RoomSortType sortType);
 
     List<SearchMapResponse> findNearRoomsMap(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore);
+
+    List<SearchIntegrationResponse> findNearRoomsIntegration(Long spotId, Integer integer, Boolean isImminent, Point point, Long radius, LocalDateTime localDateTime, LocalDateTime localDateTime1, RoomSortType sortType);
 }
