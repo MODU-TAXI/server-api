@@ -106,7 +106,7 @@ public class StompHandler implements ChannelInterceptor {
                 room.plusCurrentHeadCount();
                 ChatMessageRequestDto joinMessage = new ChatMessageRequestDto(
                         Long.valueOf(roomId), MessageType.JOIN, nickName + "님이 들어왔습니다.",
-                        chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now());
+                        chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now(), "");
 
                 fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
                 chatService.sendChatMessage(joinMessage);

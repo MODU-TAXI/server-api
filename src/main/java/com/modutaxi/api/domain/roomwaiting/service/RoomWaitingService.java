@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class RoomWaitingService {
     /**
      * 방 참가 신청
      */
+    @Transactional
     public ApplyResponse applyForParticipate(Member member, String roomId){
         if (member.isBlocked()) {
             throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
@@ -76,6 +78,7 @@ public class RoomWaitingService {
     /**
      * 방 참가 수락
      */
+    @Transactional
     public ApplyResponse acceptForParticipate(Member member, String roomId, String memberId){
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
@@ -115,16 +118,17 @@ public class RoomWaitingService {
         //매핑 정보 저장
         ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, participant.getNickname());
         redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
+        room.plusCurrentHeadCount();
 
         //fcm구독
-        fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
+        fcmService.subscribe(participant.getId(), Long.valueOf(roomId));
         //참가 수락되었다는 메세지 본인에게 전송
         fcmService.sendPermitParticipate(participant, roomId);
 
         //방 팀원들에게 참가했다는 메세지 보내기
         chatService.sendChatMessage(new ChatMessageRequestDto(
                 Long.valueOf(roomId), MessageType.JOIN, participant.getNickname() + "님이 들어왔습니다.",
-                chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now()));
+                chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now(), ""));
 
         return new ApplyResponse(true);
     }

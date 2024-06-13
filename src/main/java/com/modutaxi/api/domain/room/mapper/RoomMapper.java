@@ -126,7 +126,7 @@ public class RoomMapper {
             .departureTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime()))
             .departureName(room.getDepartureName())
             .currentHeadcount(room.getCurrentHeadcount())
-            .wishHeadcount(room.getWishHeadcount())
+            .wishHeadcount(room.getWishHeadcount()+1)
             .roomStatus(room.getRoomStatus())
             .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
             .expectedCharge(room.getExpectedCharge())
