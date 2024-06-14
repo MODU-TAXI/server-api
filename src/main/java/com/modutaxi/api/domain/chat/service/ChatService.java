@@ -104,4 +104,13 @@ public class ChatService {
         }
         return new ChatMappingResponse(chatInfo.getRoomId(), member.getId().toString());
     }
+
+    public DeleteResponse deleteMapping(Member member) {
+        ChatRoomMappingInfo chatInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
+        if (chatInfo == null) {
+            throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
+        }
+        redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(member.getId().toString());
+        return new DeleteResponse(true);
+    }
 }

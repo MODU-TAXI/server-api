@@ -67,6 +67,12 @@ public class ChatController {
         return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
     }
 
+    // TODO: 6/14/24 매핑정보 삭제 에러 이슈로 만든 TEST API
 
+    @Operation(summary = "매핑정보 삭제", description = "매핑정보 삭제 에러 이슈로 만든 TEST API")
+    @DeleteMapping("/api/mapping/info")
+    public ResponseEntity<DeleteResponse> deleteMappingInfo(@CurrentMember Member member) {
+        return ResponseEntity.ok(chatService.deleteMapping(member));
+    }
 
 }
