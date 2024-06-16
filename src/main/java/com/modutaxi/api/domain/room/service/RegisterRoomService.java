@@ -91,6 +91,10 @@ public class RegisterRoomService {
         LineString path = NaverMapConverter.jsonNodeToLineString(taxiInfo.get("path"));
 
         roomRepository.save(room);
+
+        //fcm구독
+        fcmService.subscribe(member.getId(), room.getId());
+
         redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(),
             member.getId().toString());
         registerTaxiInfoService.savePath(room.getId(), path);
@@ -99,13 +103,10 @@ public class RegisterRoomService {
         ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(room.getId().toString(), member.getNickname());
         redisChatRoomRepositoryImpl.setUserEnterInfo(member.getId().toString(), chatRoomMappingInfo);
 
-        //fcm구독
-        fcmService.subscribe(member.getId(), room.getId());
-
         scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
 
         return RoomMapper.toDto(room, member, path, true, false);
-    }
+    }//순서 -> FCM 구독 -> 매핑 정보 저장 -> 메시지 전송
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {
         if (roomRepository.existsRoomByRoomManagerId(member.getId())) {

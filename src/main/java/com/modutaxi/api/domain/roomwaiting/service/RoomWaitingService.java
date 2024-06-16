@@ -110,6 +110,9 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 
+        //fcm구독
+        fcmService.subscribe(participant.getId(), Long.valueOf(roomId));
+
         //대기열에서 제거
         redisChatRoomRepositoryImpl.removeFromWaitingList(roomId, memberId);
         //채팅방에 저장
@@ -120,8 +123,6 @@ public class RoomWaitingService {
         redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
         room.plusCurrentHeadCount();
 
-        //fcm구독
-        fcmService.subscribe(participant.getId(), Long.valueOf(roomId));
         //참가 수락되었다는 메세지 본인에게 전송
         fcmService.sendPermitParticipate(participant, roomId);
 
