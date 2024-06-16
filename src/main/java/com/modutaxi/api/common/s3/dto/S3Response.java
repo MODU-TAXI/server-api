@@ -7,7 +7,7 @@ public class S3Response {
     @Getter
     @AllArgsConstructor
     public static class S3UploadResponse {
-        private String imgUrl;
+        private String imageUrl;
         private String fileName;
     }
 
