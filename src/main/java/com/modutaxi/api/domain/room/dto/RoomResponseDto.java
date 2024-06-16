@@ -59,6 +59,14 @@ public class RoomResponseDto {
         private int expectedChargePerPerson;
         @Schema(example = "15000", description = "예상 요금")
         private int expectedCharge;
+        @Schema(example = "125.68557", description = "최소 경도")
+        private double minLongitude;
+        @Schema(example = "36.46761", description = "최소 위도")
+        private double minLatitude;
+        @Schema(example = "126.68557", description = "최대 경도")
+        private double maxLongitude;
+        @Schema(example = "37.46761", description = "최대 위도")
+        private double maxLatitude;
         @Schema(description = "경로")
         private LineString path;
     }

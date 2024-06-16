@@ -2,6 +2,8 @@ package com.modutaxi.api.domain.room.mapper;
 
 import static com.modutaxi.api.common.converter.RoomTagBitMaskConverter.convertBitMaskToRoomTagList;
 
+import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
@@ -74,6 +76,10 @@ public class RoomMapper {
             .expectedChargePerPerson((room.getExpectedCharge()) / (room.getWishHeadcount() + 1))
             .expectedCharge(room.getExpectedCharge())
             .path(path)
+            .minLongitude(path.getCoordinates().stream().mapToDouble(coordinate -> coordinate.getValues().get(0)).min().orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO)))
+            .minLatitude(path.getCoordinates().stream().mapToDouble(coordinate -> coordinate.getValues().get(1)).min().orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO)))
+            .maxLongitude(path.getCoordinates().stream().mapToDouble(coordinate -> coordinate.getValues().get(0)).max().orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO)))
+            .maxLatitude(path.getCoordinates().stream().mapToDouble(coordinate -> coordinate.getValues().get(1)).max().orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO)))
             .build();
     }
 
