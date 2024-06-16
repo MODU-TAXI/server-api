@@ -6,6 +6,7 @@ import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.scheduledmessage.entity.ScheduledMessage;
 import com.modutaxi.api.domain.scheduledmessage.entity.ScheduledMessageStatus;
@@ -85,14 +86,16 @@ public class ScheduledMessageService {
         return () -> {
             Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-            updateScheduledMessageStatus(scheduledMessageId);
+            if(room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+                updateScheduledMessageStatus(scheduledMessageId);
 
-            ChatMessageRequestDto message = new ChatMessageRequestDto(
-                roomId, type, content,
-                type.getSenderName(), room.getRoomManager().getId().toString(), LocalDateTime.now(),
-                "");
-            chatService.sendChatMessage(message);
-            log.info("{}: {}", content, Thread.currentThread().getName());
+                ChatMessageRequestDto message = new ChatMessageRequestDto(
+                    roomId, type, content,
+                    type.getSenderName(), room.getRoomManager().getId().toString(), LocalDateTime.now(),
+                    "");
+                chatService.sendChatMessage(message);
+                log.info("{}: {}", content, Thread.currentThread().getName());
+            }
         };
     }
 
