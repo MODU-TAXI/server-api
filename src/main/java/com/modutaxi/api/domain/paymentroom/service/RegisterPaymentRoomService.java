@@ -13,6 +13,7 @@ import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.history.entity.History;
 import com.modutaxi.api.domain.history.mapper.HistoryMapper;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -31,8 +32,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -66,14 +69,14 @@ public class RegisterPaymentRoomService {
             request.getParticipantList(), request.getNonParticipantList());
 
         // 5. 이용 내역 저장
-        request.getParticipantList().stream()
-            .map(participant -> historyRepository.save(
-                HistoryMapper.toEntity(room, memberRepository.findById(participant.getId()).orElseThrow(
-                        () -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT)
-                    ),
-                    paymentRoom.getTotalCharge(),
-                    paymentRoom.getTotalCharge()/request.getParticipantList().size())));
-
+        request.getParticipantList().forEach(participant -> {
+            Member participantMember = memberRepository.findById(participant.getId())
+                .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
+            History history = HistoryMapper.toEntity(room, participantMember, paymentRoom.getTotalCharge(),
+                paymentRoom.getTotalCharge() / request.getParticipantList().size());
+            historyRepository.save(history);
+            log.info("{}번 ID Member 이용내역 저장", participantMember.getId());
+        });
 
         // 6. 방장의 이름으로 정산 해주세요~ 메시지 전송
         String content = "목적지에 도착했어요,\n'정산하기'를 눌러주세요!";
