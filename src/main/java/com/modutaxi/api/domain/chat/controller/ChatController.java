@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 @Tag(name = "pub/sub 관련 API")
 public class ChatController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatService chatService;
 
@@ -65,13 +64,4 @@ public class ChatController {
     public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
         return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
     }
-
-    // TODO: 6/14/24 매핑정보 삭제 에러 이슈로 만든 TEST API
-
-    @Operation(summary = "매핑정보 삭제", description = "매핑정보 삭제 에러 이슈로 만든 TEST API")
-    @DeleteMapping("/api/mapping/info")
-    public ResponseEntity<DeleteResponse> deleteMappingInfo(@CurrentMember Member member) {
-        return ResponseEntity.ok(chatService.deleteMapping(member));
-    }
-
 }
