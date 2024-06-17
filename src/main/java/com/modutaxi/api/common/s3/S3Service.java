@@ -10,6 +10,7 @@ import com.modutaxi.api.common.s3.dto.S3Response.S3UploadResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +27,7 @@ import java.util.List;
 public class S3Service {
 
     private final AmazonS3Client amazonS3Client;
+    private final Environment environment;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -57,7 +59,7 @@ public class S3Service {
         }
         ObjectTagging objectTagging = new ObjectTagging(tagList);
 
-        fileName = (System.getProperty("spring.profiles.active") == null ? "local" : System.getProperty("spring.profiles.active")) + "/" + fileName;
+        fileName = (environment.getProperty("spring.profiles.active") == null ? "local" : environment.getProperty("spring.profiles.active")) + "/" + fileName;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(
