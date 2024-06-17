@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.modutaxi.api.common.constants.ServerConstants.BASIC_PROFILE_IMAGE_URL;
+
 @Service
 @AllArgsConstructor
 public class ChatMessageService {
@@ -31,6 +33,7 @@ public class ChatMessageService {
                 .map(iter -> {
                     ChatMessage cm = (ChatMessage) iter[CHAT_MASSAGE];
                     String imageUrl = (String) iter[IMAGE_URL];
+                    if(imageUrl == null) imageUrl = BASIC_PROFILE_IMAGE_URL;
                     return ChatMessageMapper.toDto(cm, imageUrl);
                 })
                 .toList();
