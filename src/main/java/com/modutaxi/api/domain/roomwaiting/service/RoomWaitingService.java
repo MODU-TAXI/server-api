@@ -39,6 +39,8 @@ public class RoomWaitingService {
     private final MemberRepository memberRepository;
     private final ChatService chatService;
 
+    private static final int FULL_MEMBER = 4;
+
     /**
      * 방 참가 신청
      */
@@ -108,6 +110,10 @@ public class RoomWaitingService {
         //이미 유저가 해당 방에 존재할 때
         if(redisChatRoomRepositoryImpl.findMemberInRoomInList(roomId, memberId)){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
+        }
+
+        if(room.getCurrentHeadcount() == FULL_MEMBER){
+            throw new BaseException(ParticipateErrorCode.ROOM_IS_FULL);
         }
 
         //fcm구독
