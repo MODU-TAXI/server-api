@@ -23,13 +23,19 @@ public class HistoryMapper {
 
     public static HistoryMonthlyResponse toDto(int year, int month,
                                                int accumulateTotalCharge, int accumulatePortionCharge,
-                                               List<HistorySimpleResponse> historySimpleResponseList) {
+        List<HistorySimpleResponse> historySimpleListResponse) {
         return HistoryMonthlyResponse.builder()
             .year(year)
             .month(month)
             .accumulateTotalCharge(accumulateTotalCharge)
             .accumulatePortionCharge(accumulatePortionCharge)
-            .historySimpleResponseList(historySimpleResponseList)
+            .historySimpleListResponse(historySimpleListResponse)
+            .build();
+    }
+
+    public static HistorySimpleListResponse toDto(List<HistorySimpleResponse> historySimpleListResponse) {
+        return HistorySimpleListResponse.builder()
+            .historySimpleListResponse(historySimpleListResponse)
             .build();
     }
 

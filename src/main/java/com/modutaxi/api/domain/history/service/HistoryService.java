@@ -55,19 +55,19 @@ public class HistoryService {
 
         List<History> historyList = historyRepository.findByMemberIdAndDepartureDate(member.getId(), year, month);
 
-        List<HistorySimpleResponse> historySimpleResponseList = historyList.stream()
+        List<HistorySimpleResponse> historySimpleListResponse = historyList.stream()
             .map(HistoryMapper::toDto)
             .toList();
 
-        return HistoryMapper.toDto(year, month, accumulateTotalCharge, accumulatePortionCharge, historySimpleResponseList);
+        return HistoryMapper.toDto(year, month, accumulateTotalCharge, accumulatePortionCharge, historySimpleListResponse);
     }
 
-    public List<HistorySimpleResponse> getSimpleHistoryList(Member member) {
+    public HistorySimpleListResponse getSimpleHistoryList(Member member) {
         List<History> historyList = historyRepository.findAllByMemberOrderByRoomDepartureTimeDesc(member);
 
-        return historyList.stream()
+        return HistoryMapper.toDto(historyList.stream()
             .map(HistoryMapper::toDto)
-            .toList();
+            .toList());
     }
 
 

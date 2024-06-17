@@ -54,6 +54,14 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    public static class HistorySimpleListResponse {
+        @Schema(description = "이용내역 SimpleList")
+        List<HistorySimpleResponse> historySimpleListResponse;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
     public static class HistoryMonthlyResponse {
         @Schema(description = "년")
         private int year;
@@ -64,6 +72,6 @@ public class HistoryResponseDto {
         @Schema(example = "10000", description = "누적 정산 금액(인당 요금)")
         private int accumulatePortionCharge;
         @Schema(description = "HistorySimpleResponse List")
-        private List<HistorySimpleResponse> historySimpleResponseList;
+        private List<HistorySimpleResponse> historySimpleListResponse;
     }
 }
