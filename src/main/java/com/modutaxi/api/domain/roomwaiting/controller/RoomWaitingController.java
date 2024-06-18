@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.roomwaiting.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
@@ -63,5 +64,20 @@ public class RoomWaitingController {
         @PathVariable String roomId,
         @PathVariable String memberId) {
         return ResponseEntity.ok(roomWaitingService.acceptForParticipate(member, roomId, memberId));
+    }
+
+
+    @Operation(summary = "현재 내가 참여해있는 방 퇴장", description = "채팅방 퇴장, ChatRoomMappingInfo 제거")
+    @DeleteMapping("/api/rooms")
+    public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
+        return ResponseEntity.ok(roomWaitingService.leaveRoomAndDeleteChatRoomInfo(member));
+    }
+
+    @Operation(summary = "대기열에서 퇴장")
+    @DeleteMapping("/api/rooms/{roomId}/waiting")
+    public ResponseEntity<DeleteResponse> leaveRoomWaiting(
+        @CurrentMember Member member,
+        @PathVariable String roomId) {
+        return ResponseEntity.ok(roomWaitingService.leaveRoomWaiting(member.getId(), roomId));
     }
 }

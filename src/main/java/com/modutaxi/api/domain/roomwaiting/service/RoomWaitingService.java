@@ -7,6 +7,7 @@ import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
+import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -104,7 +105,7 @@ public class RoomWaitingService {
 
         // 대기열에 특정 사용자가 존재하지 않으면 에러
         if(!redisChatRoomRepositoryImpl.findMemberInWaitingList(roomId, memberId)){
-            throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
+            throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM_WAITING);
         }
 
         //이미 유저가 해당 방에 존재할 때
@@ -173,5 +174,58 @@ public class RoomWaitingService {
             waitingUserList.stream()
                 .map(iter -> RoomWaitingResponse.toDto(iter, iter.getId().equals(member.getId())))
                 .collect(Collectors.toList()));
+    }
+
+    /**
+     * 퇴장 로직
+     */
+    public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Member member) {
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
+
+        if (chatRoomMappingInfo == null) {
+            throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
+        }
+
+        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow(
+            () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
+        );
+
+        if (room.getRoomManager().equals(member)) {
+            throw new BaseException(RoomErrorCode.MANAGER_CAN_ONLY_DELETE);
+        }
+        // 현재 인원 감소
+        room.minusCurrentHeadCount();
+
+        // 클라이언트 퇴장 메시지 발송한다.
+        ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(
+            chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
+            chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
+            chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now(), "");
+
+        chatService.sendChatMessage(leaveMessage);
+
+        redisChatRoomRepositoryImpl.removeFromRoomInList(room.getId().toString(), member.getId().toString());
+        redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(member.getId().toString());
+
+        fcmService.unsubscribe(member.getId(), room.getId());
+        return new DeleteResponse(true);
+    }
+
+    public DeleteResponse leaveRoomWaiting(Long memberId, String roomId) {
+        Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+        Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(()
+            -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
+        Set<String> memberIdSet = redisChatRoomRepositoryImpl.findWaitingList(roomId);
+
+        // 대기 리스트에 멤버 ID가 없는 경우 예외
+        if(!memberIdSet.contains(member.getId().toString())) {
+            throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM_WAITING);
+        }
+
+        redisChatRoomRepositoryImpl.removeFromWaitingList(roomId, member.getId().toString());
+        return new DeleteResponse(true);
     }
 }

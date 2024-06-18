@@ -58,10 +58,4 @@ public class ChatController {
     public ResponseEntity<ChatMappingResponse> getChatRoomMappingInfo(@CurrentMember Member member){
         return ResponseEntity.ok(chatService.getChatRoomInfo(member));
     }
-
-    @Operation(summary = "퇴장!! 채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
-    @DeleteMapping("/api/chats/info")
-    public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
-        return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
-    }
 }

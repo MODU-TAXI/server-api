@@ -46,41 +46,6 @@ public class ChatService {
         chatMessageRepository.save(ChatMessageMapper.toEntity(chatMessageRequestDto));
     }
 
-    /**
-     * 퇴장 로직
-     */
-    public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Member member) {
-        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
-
-        if (chatRoomMappingInfo == null) {
-            throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
-        }
-
-        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow(
-                () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
-        );
-
-        if (room.getRoomManager().equals(member)) {
-            throw new BaseException(RoomErrorCode.MANAGER_CAN_ONLY_DELETE);
-        }
-        // 현재 인원 감소
-        room.minusCurrentHeadCount();
-
-        // 클라이언트 퇴장 메시지 발송한다.
-        ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(
-                chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
-                chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
-                chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now(), "");
-
-        sendChatMessage(leaveMessage);
-
-        redisChatRoomRepositoryImpl.removeFromRoomInList(room.getId().toString(), member.getId().toString());
-        redisChatRoomRepositoryImpl.removeUserByMemberIdEnterInfo(member.getId().toString());
-
-        fcmService.unsubscribe(member.getId(), room.getId());
-        return new DeleteResponse(true);
-    }
-
     public EnterableResponse chatRoomEnterPossible(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new BaseException(
                 RoomErrorCode.EMPTY_ROOM));
