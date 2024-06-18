@@ -2,13 +2,10 @@ package com.modutaxi.api.domain.roomwaiting.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
-import com.modutaxi.api.common.exception.errorcode.HistoryErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
-import com.modutaxi.api.common.exception.errorcode.PaymentErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
-import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistoryDetailResponse;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
