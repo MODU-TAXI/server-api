@@ -179,6 +179,7 @@ public class RoomWaitingService {
     /**
      * 퇴장 로직
      */
+    @Transactional
     public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Member member) {
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
 
@@ -211,6 +212,7 @@ public class RoomWaitingService {
         return new DeleteResponse(true);
     }
 
+    @Transactional
     public DeleteResponse leaveRoomWaiting(Long memberId, String roomId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
             -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
