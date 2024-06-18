@@ -6,13 +6,12 @@ import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.DeleteResp
 import com.modutaxi.api.domain.chatmessage.entity.ChatMessage;
 import com.modutaxi.api.domain.chatmessage.mapper.ChatMessageMapper;
 import com.modutaxi.api.domain.chatmessage.repository.ChatMessageRepository;
-import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.member.repository.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static com.modutaxi.api.common.constants.ServerConstants.BASIC_PROFILE_IMAGE_URL;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +30,7 @@ public class ChatMessageService {
                 .map(iter -> {
                     ChatMessage cm = (ChatMessage) iter[CHAT_MASSAGE];
                     String imageUrl = (String) iter[IMAGE_URL];
+                    if(imageUrl == null) imageUrl = BASIC_PROFILE_IMAGE_URL;
                     return ChatMessageMapper.toDto(cm, imageUrl);
                 })
                 .toList();

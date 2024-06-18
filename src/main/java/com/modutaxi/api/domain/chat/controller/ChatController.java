@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,16 +27,15 @@ import java.time.LocalDateTime;
 @Tag(name = "pub/sub 관련 API")
 public class ChatController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatService chatService;
 
 
     // /pub/chat 으로 오는 메세지 핸들링
     @MessageMapping("/chat")
-    public void sendMessage(ChatMessageRequestDto message, @Header("token") String token ) {
+    public void sendMessage(ChatMessageRequestDto message) {
 
-        String memberId = jwtTokenProvider.getMemberIdByToken(token);
+        String memberId = message.getMemberId();
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
         message.setSender(chatRoomMappingInfo.getNickname());
@@ -66,7 +64,4 @@ public class ChatController {
     public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
         return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
     }
-
-
-
 }

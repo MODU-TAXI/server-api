@@ -13,6 +13,9 @@ import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.history.entity.History;
+import com.modutaxi.api.domain.history.mapper.HistoryMapper;
+import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.paymentmember.entity.PaymentMemberStatus;
@@ -29,8 +32,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -41,6 +46,7 @@ public class RegisterPaymentRoomService {
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
+    private final HistoryRepository historyRepository;
 
     private final RegisterPaymentMemberService registerPaymentMemberService;
     private final ChatService chatService;
@@ -62,7 +68,17 @@ public class RegisterPaymentRoomService {
         registerPaymentMemberList(room.getId(), room.getRoomManager().getId(), paymentRoom,
             request.getParticipantList(), request.getNonParticipantList());
 
-        // 5. 방장의 이름으로 정산 해주세요~ 메시지 전송
+        // 5. 이용 내역 저장
+        request.getParticipantList().forEach(participant -> {
+            Member participantMember = memberRepository.findById(participant.getId())
+                .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
+            History history = HistoryMapper.toEntity(room, participantMember, paymentRoom.getTotalCharge(),
+                paymentRoom.getTotalCharge() / request.getParticipantList().size());
+            historyRepository.save(history);
+            log.info("{}번 ID Member 이용내역 저장", participantMember.getId());
+        });
+
+        // 6. 방장의 이름으로 정산 해주세요~ 메시지 전송
         String content = "목적지에 도착했어요,\n'정산하기'를 눌러주세요!";
         ChatMessageRequestDto chatMessageRequestDto =
             new ChatMessageRequestDto(room.getId(), MessageType.PAYMENT_REQUEST_COMPLETE, content,

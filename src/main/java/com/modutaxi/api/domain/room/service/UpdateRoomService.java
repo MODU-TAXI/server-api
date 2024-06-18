@@ -17,8 +17,8 @@ import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
+import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
@@ -60,7 +60,7 @@ public class UpdateRoomService {
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
-    private final MemberRepository memberRepository;
+    private final HistoryRepository historyRepository;
     private final ChatService chatService;
 
     @Transactional
@@ -108,6 +108,10 @@ public class UpdateRoomService {
 
         //메세지 삭제
         chatMessageService.deleteChatMessage(roomId);
+
+        //이용 내역 삭제
+        historyRepository.deleteAllByRoom(room);
+
         //방 삭제
         roomRepository.delete(room);
 
