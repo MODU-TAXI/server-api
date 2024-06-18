@@ -180,8 +180,11 @@ public class RoomWaitingService {
      * 퇴장 로직
      */
     @Transactional
-    public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Member member) {
-        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
+    public DeleteResponse leaveRoomAndDeleteChatRoomInfo(Long memberId) {
+        Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId.toString());
 
         if (chatRoomMappingInfo == null) {
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_OUT);
@@ -191,7 +194,7 @@ public class RoomWaitingService {
             () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
         );
 
-        if (room.getRoomManager().equals(member)) {
+        if (room.getRoomManager().getId().equals(memberId)) {
             throw new BaseException(RoomErrorCode.MANAGER_CAN_ONLY_DELETE);
         }
         // 현재 인원 감소

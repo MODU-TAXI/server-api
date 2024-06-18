@@ -94,19 +94,19 @@ public class RoomWaitingController {
                 }
                 """, description = "존재하지 않는 방(택시팟)입니다.")
         })),
-        @ApiResponse(responseCode = "400", description = "룸 매니저는 퇴장할 수 없습니다. 룸 매니저는 오로지 삭제만 가능합니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
+        @ApiResponse(responseCode = "400", description = "방장은 퇴장할 수 없습니다. 방장은 오로지 삭제만 가능합니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
             @ExampleObject(name = "ROOM_008", value = """
                 {
                     "code": "ROOM_008",
-                    "message": "룸 매니저는 퇴장할 수 없습니다. 룸 매니저는 오로지 삭제만 가능합니다.",
+                    "message": 방장은 퇴장할 수 없습니다. 방장은 오로지 삭제만 가능합니다.",
                     "timeStamp": "2024-04-04T02:48:31.646102"
                 }
-                """, description = "방의 매니저는 퇴장할 수 업습니다. 오로지 삭제만 가능합니다")
+                """, description = "방장은 퇴장할 수 없습니다. 방장은 오로지 삭제만 가능합니다.")
         })),
     })
     @DeleteMapping("/api/rooms")
     public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
-        return ResponseEntity.ok(roomWaitingService.leaveRoomAndDeleteChatRoomInfo(member));
+        return ResponseEntity.ok(roomWaitingService.leaveRoomAndDeleteChatRoomInfo(member.getId()));
     }
 
     @Operation(summary = "대기열에서 퇴장")
