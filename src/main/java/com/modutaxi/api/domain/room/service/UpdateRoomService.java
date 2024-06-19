@@ -19,6 +19,7 @@ import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.participant.service.GetParticipantService;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
@@ -62,6 +63,7 @@ public class UpdateRoomService {
     private final FcmService fcmService;
     private final HistoryRepository historyRepository;
     private final ChatService chatService;
+    private final GetParticipantService getParticipantService;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -104,7 +106,7 @@ public class UpdateRoomService {
         Long deleteRoomId = room.getId();
 
         MemberRoomInResponseList memberRoomInResponseList
-            = roomWaitingService.getParticipateInRoom(member, deleteRoomId);
+            = getParticipantService.getParticipateInRoom(member, deleteRoomId);
 
         //메세지 삭제
         chatMessageService.deleteChatMessage(roomId);

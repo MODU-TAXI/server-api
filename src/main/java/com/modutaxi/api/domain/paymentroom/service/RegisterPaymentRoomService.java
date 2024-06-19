@@ -18,6 +18,7 @@ import com.modutaxi.api.domain.history.mapper.HistoryMapper;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.paymentmember.entity.PaymentMemberStatus;
 import com.modutaxi.api.domain.paymentmember.service.RegisterPaymentMemberService;
 import com.modutaxi.api.domain.paymentroom.dto.PaymentRoomRequestDto.MemberId;
@@ -27,6 +28,7 @@ import com.modutaxi.api.domain.paymentroom.entity.PaymentRoom;
 import com.modutaxi.api.domain.paymentroom.repository.PaymentRoomRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +49,8 @@ public class RegisterPaymentRoomService {
     private final RoomRepository roomRepository;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final HistoryRepository historyRepository;
-
+    private final RoomWaitingRepository roomWaitingRepository;
+    private final ParticipantRepository participantRepository;
     private final RegisterPaymentMemberService registerPaymentMemberService;
     private final ChatService chatService;
 
@@ -122,12 +125,15 @@ public class RegisterPaymentRoomService {
      */
     private void registerPaymentMember(Long roomId, Long memberId, PaymentRoom paymentRoom,
         PaymentMemberStatus status) {
-        // 0. member validation
+        // 0. member validation & room validation
         Member member = memberRepository.findByIdAndStatusTrue(memberId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+        Room room = roomRepository.findById(roomId)
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
         // 1. 방에 들어가있는지 확인
-        boolean isInRoom = redisChatRoomRepositoryImpl.findMemberInRoomInList
-            (roomId.toString(), member.getId().toString());
+        boolean isInRoom = participantRepository.existsByMemberAndRoom(member, room);
         if (!isInRoom) {
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM);
         }

@@ -1,6 +1,8 @@
 package com.modutaxi.api.domain.roomwaiting.mapper;
 
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.roomwaiting.entity.RoomWaiting;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -8,6 +10,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 public class RoomWaitingMapper {
+
+    public static RoomWaiting toEntity(Member member, Room room) {
+        return RoomWaiting.builder()
+                .member(member)
+                .room(room)
+                .build();
+    }
+
     @Getter
     @AllArgsConstructor
     @Builder
