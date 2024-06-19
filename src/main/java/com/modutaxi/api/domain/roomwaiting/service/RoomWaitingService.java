@@ -52,19 +52,20 @@ public class RoomWaitingService {
 
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
 
-        // 이미 해당 채팅방에 있을 때
-        if(chatRoomMappingInfo.getRoomId().equals(roomId)){
-            throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
+
+        if(chatRoomMappingInfo != null){
+            // 이미 해당 채팅방에 있을 때
+            if(chatRoomMappingInfo.getRoomId().equals(roomId)){
+                throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
+            }
+
+            // 자기 방이 아닌 다른 방에 들어가 있을 때
+            else throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
         }
 
         // 이미 해당 대기열에 있을 때
         if(roomWaitingRepository.existsByMemberAndRoom(member,  room)){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_WAITING_LIST);
-        }
-
-        // 자기 방이 아닌 다른 방에 들어가 있을 때
-        if(chatRoomMappingInfo.getRoomId() != null){
-            throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
         }
 
         // 방이 COMPLETE면 에러
