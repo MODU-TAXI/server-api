@@ -48,7 +48,7 @@ public class RegisterParticipantService {
         Member participant = memberRepository.findByIdAndStatusTrue(memberId)
                 .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
-        if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId.toString())!=null){
+        if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(participant.getId().toString())!=null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
         }
 
@@ -63,12 +63,12 @@ public class RegisterParticipantService {
         }
 
         // 대기열에 특정 사용자가 존재하지 않으면 에러
-        if(!roomWaitingRepository.existsByMemberAndRoom(member, room)){
+        if(!roomWaitingRepository.existsByMemberAndRoom(participant, room)){
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM_WAITING);
         }
 
         //이미 유저가 해당 방에 존재할 때
-        if(participantRepository.existsByMemberAndRoom(member, room)){
+        if(participantRepository.existsByMemberAndRoom(participant, room)){
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 
@@ -80,14 +80,14 @@ public class RegisterParticipantService {
         fcmService.subscribe(participant.getId(), roomId);
 
         //대기열에서 제거
-        roomWaitingRepository.deleteByMemberAndRoom(member, room);
+        roomWaitingRepository.deleteByMemberAndRoom(participant, room);
 
-        //채팅방에 저장
-        participantRepository.save(ParticipantMapper.toEntity(member,room));
+        //참가열에 저장
+        participantRepository.save(ParticipantMapper.toEntity(participant,room));
 
         //매핑 정보 저장
         ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(roomId.toString(), participant.getNickname());
-        redisChatRoomRepositoryImpl.setUserEnterInfo(memberId.toString(), chatRoomMappingInfo);
+        redisChatRoomRepositoryImpl.setUserEnterInfo(participant.getId().toString(), chatRoomMappingInfo);
         room.plusCurrentHeadCount();
 
         //참가 수락되었다는 메세지 본인에게 전송
