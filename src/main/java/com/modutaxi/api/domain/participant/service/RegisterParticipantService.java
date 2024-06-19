@@ -18,14 +18,17 @@ import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class RegisterParticipantService {
@@ -41,12 +44,14 @@ public class RegisterParticipantService {
      * 방 참가 수락
      */
     @Transactional
-    public RoomWaitingMapper.ApplyResponse acceptForParticipate(Member member, Long roomId, Long memberId){
+    public ApplyResponse acceptForParticipate(Member member, Long roomId, Long memberId){
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         Member participant = memberRepository.findByIdAndStatusTrue(memberId)
                 .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+        log.info("{}번 방에 {}번 참가자의 대기요청이 들어왔습니다.",roomId, participant.getId());
 
         if(redisChatRoomRepositoryImpl.findChatInfoByMemberId(participant.getId().toString())!=null){
             throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
@@ -59,16 +64,19 @@ public class RegisterParticipantService {
 
         //방 자체 상태가 COMPLETE면 에러
         if(room.getRoomStatus().equals(RoomStatus.COMPLETE)){
+            log.error("{}번 방은 매칭 완료된 방입니다.", roomId);
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
 
         // 대기열에 특정 사용자가 존재하지 않으면 에러
         if(!roomWaitingRepository.existsByMemberAndRoom(participant, room)){
+            log.error("{}번 사용자가 {}번 room 대기열에 존재하지 않습니다.", participant.getId(), room.getId());
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM_WAITING);
         }
 
         //이미 유저가 해당 방에 존재할 때
         if(participantRepository.existsByMemberAndRoom(participant, room)){
+            log.error("{}번 사용자가 {}번 room 참가자 리스트에 이미 존재합니다.", participant.getId(), room.getId());
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
         }
 

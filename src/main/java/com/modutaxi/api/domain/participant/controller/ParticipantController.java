@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -39,7 +40,7 @@ public class ParticipantController {
     }
 
     @Operation(summary = "특정 사용자 입장 수락")
-    @DeleteMapping("/api/rooms/{roomId}/members/{memberId}/approve")
+    @PostMapping("/api/rooms/{roomId}/members/{memberId}/approve")
     public ResponseEntity<RoomWaitingMapper.ApplyResponse> acceptForParticipate(
             @CurrentMember Member member,
             @PathVariable Long roomId,
