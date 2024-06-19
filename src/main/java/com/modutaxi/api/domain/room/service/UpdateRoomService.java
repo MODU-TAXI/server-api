@@ -19,6 +19,7 @@ import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.participant.service.GetParticipantService;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -57,13 +58,13 @@ public class UpdateRoomService {
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
-    private final RoomWaitingService roomWaitingService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
     private final HistoryRepository historyRepository;
     private final ChatService chatService;
     private final GetParticipantService getParticipantService;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -129,6 +130,8 @@ public class UpdateRoomService {
         });
 
         //참가자들의 매핑된 방 정보 삭제
+        participantRepository.deleteAllByRoom(room);
+        
         memberRoomInResponseList.getInList().forEach(item -> {
                 try {
                     log.info("{}번 유저 삭제하겠습니다.", item.getMemberId());

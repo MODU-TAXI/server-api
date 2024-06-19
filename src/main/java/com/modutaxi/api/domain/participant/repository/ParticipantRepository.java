@@ -14,6 +14,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findAllByRoom(Room room);
 
     void deleteParticipantByMemberAndRoom(Member member, Room room);
+    void deleteAllByRoom(Room room);
 
     boolean existsByMemberAndRoom(Member member, Room room);
 }
