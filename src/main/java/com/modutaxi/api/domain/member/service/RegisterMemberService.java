@@ -68,30 +68,22 @@ public class RegisterMemberService {
     }
 
     /**
-     * 존재하는 멤버에 대해 로그인
+     * 로그인
+     * 가입된 멤버 -> TokenAndMemberResponse
+     * 가입되지 않은 멤버 -> MembershipResponse
      */
-    public TokenAndMemberResponse login(SocialLoginType type, String accessToken, String fcmToken)
+    public <T> T login(SocialLoginType type, String accessToken, String fcmToken)
         throws IOException {
         String snsId = getSnsIdByAccessToken(type, accessToken);
-        Member member = memberRepository.findBySnsIdAndStatusTrue(snsId)
-            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-        // FCM 토큰 저장
-        saveFcmToken(member.getId(), fcmToken);
-        return generateMemberToken(member);
-    }
-
-    /**
-     * 가입 이력 확인
-     */
-    public MembershipResponse checkMembership(SocialLoginType type, String accessToken)
-        throws IOException {
-        String snsId = getSnsIdByAccessToken(type, accessToken);
-        // 해당 snsId를 가진 member가 있다면 true 반환
-        if (memberRepository.findBySnsIdAndStatusTrue(snsId).isPresent()) {
-            return new MembershipResponse(true, null);
+        Member member = memberRepository.findBySnsIdAndStatusTrue(snsId).orElse(null);
+        // 가입된 멤버라면
+        if (member != null) {
+            // FCM 토큰 저장
+            saveFcmToken(member.getId(), fcmToken);
+            return (T) generateMemberToken(member);
         } else {
             String key = redisSnsIdRepository.save(snsId);
-            return new MembershipResponse(false, key);
+            return (T) new MembershipResponse(key);
         }
     }
 
