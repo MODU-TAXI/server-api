@@ -2,8 +2,11 @@ package com.modutaxi.api.domain.chat.repository;
 
 import com.modutaxi.api.common.config.redis.BaseRedisRepository;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
+import com.modutaxi.api.domain.participant.entity.Participant;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import jakarta.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
@@ -17,8 +20,6 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
 
     // Redis CacheKeys
 
-    private static final String ROOM_IN_LIST = "ROOM_IN_LIST"; //채팅방 참여
-    private static final String ROOM_WAITING_LIST = "ROOM_WAITING_LIST"; // 대기열 저장
     public static final String ENTER_INFO = "ENTER_INFO"; // 채팅룸에 입장한 클라이언트의 sessionId와 채팅룸 id를 맵핑한 정보 저장
 
     private final RedisTemplate<String, String> redisTemplate;
@@ -26,8 +27,7 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
     private final RedisTemplate<String, ChatRoomMappingInfo> chatInfoRedisTemplate;
     private HashOperations<String, String, String> hashOperations;
     private HashOperations<String, String, ChatRoomMappingInfo> chatInfoHashOperations;
-    private SetOperations<String, String> waitOperations;
-    private SetOperations<String, String> roomInOperations;
+    private final ParticipantRepository participantRepository;
 
 
 
@@ -36,52 +36,7 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
         classInstance = RedisChatRoomRepositoryImpl.class;
         hashOperations = redisTemplate.opsForHash();
         chatInfoHashOperations = chatInfoRedisTemplate.opsForHash();
-        waitOperations = redisTemplate.opsForSet();
-        roomInOperations = redisTemplate.opsForSet();
     }
-
-
-    //대기열에 특정멤버 추가
-    public Long addToWaitingList(String roomId, String memberId) {
-        return waitOperations.add(ROOM_WAITING_LIST + "_" + roomId, memberId);
-    }
-
-    //대기열에서 특정 멤버 삭제
-    public Long removeFromWaitingList(String roomId, String memberId) {
-        return waitOperations.remove(ROOM_WAITING_LIST + "_" + roomId, memberId);
-    }
-
-    //대기열 멤버 목록 조회
-    public Set<String> findWaitingList(String roomId) {
-        return waitOperations.members(ROOM_WAITING_LIST + "_" + roomId);
-    }
-
-    //대기열 안에 특정 멤버가 있는 지 조회
-    public boolean findMemberInWaitingList(String roomId, String memberId) {
-        return waitOperations.members(ROOM_WAITING_LIST + "_" + roomId).contains(memberId);
-    }
-
-    //채팅방에 특정 멤버 추가
-    public Long addRoomInMemberList(String roomId, String memberId) {
-        return roomInOperations.add(ROOM_IN_LIST + "_" + roomId, memberId);
-    }
-
-    //채팅방에서 특정 멤버 삭제
-    public Long removeFromRoomInList(String roomId, String memberId) {
-        return waitOperations.remove(ROOM_IN_LIST + "_" + roomId, memberId);
-    }
-
-    //채팅방 안에 멤버 목록 조회
-    public Set<String> findRoomInList(String roomId) {
-        return waitOperations.members(ROOM_IN_LIST + "_" + roomId);
-    }
-
-    //채팅방 안에 특정 멤버가 있는 지 조회
-    public boolean findMemberInRoomInList(String roomId, String memberId) {
-        return waitOperations.members(ROOM_IN_LIST + "_" + roomId).contains(memberId);
-    }
-
-
 
 
     // -------------- 소켓 -----------------
@@ -90,7 +45,17 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
         if (memberId == null) {
             return null;
         }
-        return chatInfoHashOperations.get(ENTER_INFO, memberId);
+        ChatRoomMappingInfo chatRoomMappingInfo = chatInfoHashOperations.get(ENTER_INFO, memberId);
+        if(chatRoomMappingInfo == null){
+            Optional<Participant> participant
+                = participantRepository.findByMemberId(Long.valueOf(memberId));
+            if(participant.isEmpty()) return null;
+            chatRoomMappingInfo =
+                new ChatRoomMappingInfo(
+                    participant.get().getRoom().getId().toString(),
+                    participant.get().getMember().getNickname());
+        }
+        return chatRoomMappingInfo;
     }
 
     public String findMemberBySessionId(String sessionId) {

@@ -1,5 +1,7 @@
 package com.modutaxi.api.common.config.websocket;
 
+import static com.modutaxi.api.common.constants.ServerConstants.FULL_MEMBER;
+
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 
 import com.modutaxi.api.common.exception.BaseException;
@@ -37,8 +39,6 @@ public class StompHandler implements ChannelInterceptor {
     private final RoomRepository roomRepository;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
-
-    private static final int FULL_MEMBER = 4;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
