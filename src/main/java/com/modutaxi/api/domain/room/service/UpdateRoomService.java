@@ -19,6 +19,9 @@ import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.participant.dto.ParticipantResponseDto.MemberRoomInResponseList;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
+import com.modutaxi.api.domain.participant.service.GetParticipantService;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
@@ -30,8 +33,6 @@ import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.MemberRoomInResponseList;
-import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
@@ -56,12 +57,13 @@ public class UpdateRoomService {
     private final TaxiInfoMongoRepository taxiInfoMongoRepository;
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
-    private final RoomWaitingService roomWaitingService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
     private final HistoryRepository historyRepository;
     private final ChatService chatService;
+    private final GetParticipantService getParticipantService;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -104,16 +106,10 @@ public class UpdateRoomService {
         Long deleteRoomId = room.getId();
 
         MemberRoomInResponseList memberRoomInResponseList
-            = roomWaitingService.getParticipateInRoom(member, deleteRoomId);
+            = getParticipantService.getParticipateInRoom(member, deleteRoomId);
 
-        //메세지 삭제
-        chatMessageService.deleteChatMessage(roomId);
-
-        //이용 내역 삭제
-        historyRepository.deleteAllByRoom(room);
-
-        //방 삭제
-        roomRepository.delete(room);
+        //방 Soft Delete
+        room.roomStatusUpdateDelete();
 
         // 참가자들에게 방 삭제 알림 및 FCM 구독 해지
         memberRoomInResponseList.getInList().forEach(item -> {
@@ -127,6 +123,8 @@ public class UpdateRoomService {
         });
 
         //참가자들의 매핑된 방 정보 삭제
+        participantRepository.deleteAllByRoom(room);
+        
         memberRoomInResponseList.getInList().forEach(item -> {
                 try {
                     log.info("{}번 유저 삭제하겠습니다.", item.getMemberId());
@@ -139,9 +137,6 @@ public class UpdateRoomService {
             }
         );
 
-        //경로 정보 삭제
-        taxiInfoMongoRepository.deleteById(taxiInfo.getId());
-        log.info("taxiInfo정보가 삭제되었습니다.");
         return new DeleteRoomResponse(true);
     }
 

@@ -1,9 +1,7 @@
 package com.modutaxi.api.domain.chat.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
-import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.ChatMappingResponse;
-import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.EnterableResponse;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
@@ -15,7 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,11 +54,5 @@ public class ChatController {
     @GetMapping("/api/chats/info")
     public ResponseEntity<ChatMappingResponse> getChatRoomMappingInfo(@CurrentMember Member member){
         return ResponseEntity.ok(chatService.getChatRoomInfo(member));
-    }
-
-    @Operation(summary = "퇴장!! 채팅방 매핑정보 삭제", description = "해당 로직은 채팅방 퇴장 시 이루어진다.")
-    @DeleteMapping("/api/chats/info")
-    public ResponseEntity<DeleteResponse> deleteChatRoomInfo(@CurrentMember Member member) {
-        return ResponseEntity.ok(chatService.leaveRoomAndDeleteChatRoomInfo(member));
     }
 }

@@ -1,9 +1,14 @@
-package com.modutaxi.api.domain.participant.entity;
+package com.modutaxi.api.domain.roomwaiting.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
-public class Participant extends BaseTime {
+public class RoomWaiting extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

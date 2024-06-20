@@ -13,6 +13,7 @@ public final class ServerConstants {
 
     public static String BASIC_PROFILE_IMAGE_URL;
     public static final int REPORT_STANDARD = 5;
+    public static final int FULL_MEMBER = 4;
 
     @PostConstruct
     private void init() {

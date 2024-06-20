@@ -18,6 +18,7 @@ import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.room.repository.RoomRepositoryDSL;
+import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.spot.service.GetSpotService;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
 import com.mongodb.client.model.geojson.LineString;
@@ -45,6 +46,7 @@ public class GetRoomService {
     private final GetSpotService getSpotService;
     private final RoomRepositoryDSL roomRepositoryDSL;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepository;
+    private final RoomWaitingRepository roomWaitingRepository;
 
     public RoomDetailResponse getRoomDetail(Member member, Long roomId) {
         Room room = roomRepository.findById(roomId)
@@ -55,7 +57,7 @@ public class GetRoomService {
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 
         boolean isParticipate = false;
-        boolean isWaiting = redisChatRoomRepository.findMemberInWaitingList(roomId.toString(), member.getId().toString());
+        boolean isWaiting = roomWaitingRepository.existsByMemberAndRoom(member, room);
 
         ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepository.findChatInfoByMemberId(member.getId().toString());
 

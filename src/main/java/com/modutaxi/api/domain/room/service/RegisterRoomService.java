@@ -14,6 +14,9 @@ import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.participant.entity.Participant;
+import com.modutaxi.api.domain.participant.mapper.ParticipantMapper;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.scheduledmessage.service.ScheduledMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -47,6 +50,7 @@ public class RegisterRoomService {
     private final RegisterTaxiInfoService registerTaxiInfoService;
     private final ScheduledMessageService scheduledMessageService;
     private final FcmService fcmService;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
@@ -95,8 +99,9 @@ public class RegisterRoomService {
         //fcm구독
         fcmService.subscribe(member.getId(), room.getId());
 
-        redisChatRoomRepositoryImpl.addRoomInMemberList(room.getId().toString(),
-            member.getId().toString());
+
+        participantRepository.save(ParticipantMapper.toEntity(member, room));
+
         registerTaxiInfoService.savePath(room.getId(), path);
 
         //매핑 정보 저장
