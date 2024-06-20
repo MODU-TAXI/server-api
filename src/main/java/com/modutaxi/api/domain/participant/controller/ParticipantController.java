@@ -5,10 +5,11 @@ import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.participant.dto.ParticipantResponseDto.MemberRoomInResponseList;
 import com.modutaxi.api.domain.participant.service.GetParticipantService;
 import com.modutaxi.api.domain.participant.service.RegisterParticipantService;
 import com.modutaxi.api.domain.participant.service.UpdateParticipantService;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -36,7 +37,7 @@ public class ParticipantController {
 
     @Operation(summary = "특정 방 참가자 리스트 조회")
     @GetMapping("/api/rooms/{roomId}/members/in")
-    public ResponseEntity<RoomWaitingMapper.MemberRoomInResponseList> getParticipateInRoom(
+    public ResponseEntity<MemberRoomInResponseList> getParticipateInRoom(
         @CurrentMember Member member,
         @PathVariable String roomId) {
         return ResponseEntity.ok(
@@ -45,7 +46,7 @@ public class ParticipantController {
 
     @Operation(summary = "특정 사용자 입장 수락")
     @PostMapping("/api/rooms/{roomId}/members/{memberId}/approve")
-    public ResponseEntity<RoomWaitingMapper.ApplyResponse> acceptForParticipate(
+    public ResponseEntity<ApplyResponse> acceptForParticipate(
         @CurrentMember Member member,
         @PathVariable Long roomId,
         @PathVariable Long memberId) {
@@ -66,7 +67,7 @@ public class ParticipantController {
                 }
                 """, description = "이미 방에서 나간 상태이거나 다시 퇴장하려할 때 혹은 참여해있는 방이 존재하지 않을 때 생기는 에러입니다.")
         })),
-        @ApiResponse(responseCode = "400", description = "현재 내가 참여하고 있는 방 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
+        @ApiResponse(responseCode = "409", description = "현재 내가 참여하고 있는 방 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
             @ExampleObject(name = "ROOM_001", value = """
                 {
                     "code": "ROOM_001",

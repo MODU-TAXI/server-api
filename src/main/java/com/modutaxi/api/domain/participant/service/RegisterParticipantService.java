@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.participant.service;
 
+import static com.modutaxi.api.common.constants.ServerConstants.FULL_MEMBER;
+
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
@@ -18,9 +20,8 @@ import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,6 @@ public class RegisterParticipantService {
     private final RoomWaitingRepository roomWaitingRepository;
     private final FcmService fcmService;
     private final ChatService chatService;
-    private static final int FULL_MEMBER = 4;
 
     /**
      * 방 참가 수락
@@ -111,6 +111,6 @@ public class RegisterParticipantService {
             roomId, MessageType.JOIN, participant.getNickname() + "님이 들어왔습니다.",
             chatRoomMappingInfo.getNickname(), memberId.toString(), LocalDateTime.now(), ""));
 
-        return new RoomWaitingMapper.ApplyResponse(true);
+        return new ApplyResponse(true);
     }
 }

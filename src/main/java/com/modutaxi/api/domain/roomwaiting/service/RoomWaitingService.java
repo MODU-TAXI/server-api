@@ -7,7 +7,6 @@ import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
-import com.modutaxi.api.domain.chat.dto.ChatResponseDto;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -15,10 +14,11 @@ import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.RoomWaitingResponseList;
 import com.modutaxi.api.domain.roomwaiting.entity.RoomWaiting;
 import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,9 +96,9 @@ public class RoomWaitingService {
         List<Member> memberIdList = new ArrayList<>(waitingList).stream()
             .map(RoomWaiting::getMember).toList();
 
-        return new RoomWaitingMapper.RoomWaitingResponseList(
+        return new RoomWaitingResponseList(
             memberIdList.stream()
-                .map(iter -> RoomWaitingMapper.RoomWaitingResponse.toDto(iter,
+                .map(iter -> RoomWaitingMapper.toDto(iter,
                     iter.getId().equals(member.getId())))
                 .collect(Collectors.toList()));
     }
@@ -124,6 +124,6 @@ public class RoomWaitingService {
         }
 
         roomWaitingRepository.deleteByMemberAndRoom(member, room);
-        return new ChatResponseDto.DeleteResponse(true);
+        return new DeleteResponse(true);
     }
 }

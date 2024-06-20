@@ -6,8 +6,8 @@ import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.member.entity.Member;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.ApplyResponse;
-import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper.RoomWaitingResponseList;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
+import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.RoomWaitingResponseList;
 import com.modutaxi.api.domain.roomwaiting.service.RoomWaitingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,7 +54,7 @@ public class RoomWaitingController {
     @Operation(summary = "대기열에서 퇴장")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "대기열에서 퇴장 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeleteResponse.class))),
-        @ApiResponse(responseCode = "400", description = "대기열에서 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+        @ApiResponse(responseCode = "409", description = "대기열에서 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
             @ExampleObject(name = "MEMBER_001", value = """
                 {
                     "code": "MEMBER_001",
@@ -63,7 +63,7 @@ public class RoomWaitingController {
                 }
                 """, description = "존재하지 않는 사용자입니다.")
         })),
-        @ApiResponse(responseCode = "400", description = "대기열에서 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
+        @ApiResponse(responseCode = "409", description = "대기열에서 퇴장 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoomErrorCode.class), examples = {
             @ExampleObject(name = "ROOM_001", value = """
                 {
                     "code": "ROOM_001",
