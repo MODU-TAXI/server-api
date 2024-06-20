@@ -1,0 +1,109 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      targetServer:
+        type: choice
+        description: 배포할 서버를 선택하세요.
+        options:
+          - TestServer
+          - Develop
+
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+  GITHUB_ACTOR: ${{ github.actor }}
+
+jobs:
+  manualDeploy:
+    name: Deploy to Manual
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          submodules: recursive
+
+      - name: Git Submodule Update
+        run: |
+          git submodule update --remote --recursive
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_ACTOR }}
+          password: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: Select Server
+        run: |
+          if [ ${{ github.event.inputs.targetServer }} == "TestServer" ]; then
+            echo "SELECTED_SERVER_SSH_HOST=${{ secrets.TEST_SERVER_SSH_HOST }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_PORT=${{ secrets.TEST_SERVER_SSH_PORT }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_USERNAME=${{ secrets.TEST_SERVER_SSH_USERNAME }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_PRIVATE_KEY=${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}" >> ${GITHUB_ENV}
+            echo "SELECTED_APPLICATION_FILE=config/application-testserver.yml" >> ${GITHUB_ENV}
+            echo "SELECTED_DOCKER_COMPOSE_FILE=docker-compose.testserver.yml" >> ${GITHUB_ENV}
+            echo "SELECTED_PROFILE=testserver" >> ${GITHUB_ENV}
+          else
+            echo "SELECTED_SERVER_SSH_HOST=${{ secrets.DEVELOP_SERVER_SSH_HOST }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_PORT=${{ secrets.DEVELOP_SERVER_SSH_PORT }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_USERNAME=${{ secrets.DEVELOP_SERVER_SSH_USERNAME }}" >> ${GITHUB_ENV}
+            echo "SELECTED_SERVER_SSH_PRIVATE_KEY=${{ secrets.DEVELOP_SERVER_SSH_PRIVATE_KEY }}" >> ${GITHUB_ENV}
+            echo "SELECTED_APPLICATION_FILE=config/application-dev.yml" >> ${GITHUB_ENV}
+            echo "SELECTED_DOCKER_COMPOSE_FILE=docker-compose.dev.yml" >> ${GITHUB_ENV}
+            echo "SELECTED_PROFILE=dev" >> ${GITHUB_ENV}
+          fi
+
+      - name: lowercase the image tag & repository
+        run: |
+          echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
+      - name: Get Version
+        run: echo "VERSION=$(git tag --points-at)" >> ${GITHUB_ENV}
+
+      - name: Set Spring Image Environment Variable
+        run: |
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-${{ env.SELECTED_PROFILE }}:${{ env.VERSION }}" >> ${GITHUB_ENV}
+
+      - name: Write Version
+        run: |
+          echo -e "\nserver-version: ${{ env.VERSION }}" >> ${{ env.SELECTED_APPLICATION_FILE }}
+
+      - name: Build Image
+        run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-dev .
+
+      - name: Push
+        run: docker push ${{ env.SPRING_IMAGE }}
+
+      - name: Write Docker Image Tag Information to .env File
+        run: |
+          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/dockerEnv/dev.env
+
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.SELECTED_SERVER_SSH_HOST }}
+          port: ${{ env.SELECTED_SERVER_SSH_PORT }}
+          username: ${{ env.SELECTED_SERVER_SSH_USERNAME }}
+          key: ${{ env.SELECTED_SERVER_SSH_PRIVATE_KEY }}
+          source: "${{ env.SELECTED_DOCKER_COMPOSE_FILE }}, config/dockerEnv/dev.env"
+          target: /home/ubuntu
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SELECTED_SERVER_SSH_HOST }}
+          port: ${{ env.SELECTED_SERVER_SSH_PORT }}
+          username: ${{ env.SELECTED_SERVER_SSH_USERNAME }}
+          key: ${{ env.SELECTED_SERVER_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu
+            sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
+            sudo docker container stop spring
+            sudo docker container rm spring
+            sudo docker image rm ${{ env.SPRING_IMAGE }}
+            sudo docker-compose --env-file=config/dockerEnv/dev.env -f ${{ env.SELECTED_DOCKER_COMPOSE_FILE }} -p backend up -d
+            sudo docker image prune -af
