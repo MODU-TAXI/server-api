@@ -3,6 +3,8 @@ package com.modutaxi.api.domain.paymentmember.service;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.PaymentErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class UpdatePaymentMemberService {
 
     private final GetPaymentRoomService getPaymentRoomService;
+    private final RegisterAlarmService registerAlarmService;
     private final ChatService chatService;
 
     private final PaymentMemberRepository paymentMemberRepository;
@@ -91,6 +94,10 @@ public class UpdatePaymentMemberService {
                     room.getRoomManager().getId().toString(),
                     LocalDateTime.now(), "");
             chatService.sendChatMessage(paymentCompleteMessageRequestDto);
+
+            // 알림 저장
+            registerAlarmService.registerAlarm(AlarmType.PAYMENT_ALL_COMPLETE, roomId,
+                room.getRoomManager().getId());
         }
     }
 }

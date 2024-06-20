@@ -8,6 +8,8 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
@@ -22,12 +24,11 @@ import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class RegisterParticipantService {
     private final RoomWaitingRepository roomWaitingRepository;
     private final FcmService fcmService;
     private final ChatService chatService;
+    private final RegisterAlarmService registerAlarmService;
 
     /**
      * 방 참가 수락
@@ -103,8 +105,9 @@ public class RegisterParticipantService {
             chatRoomMappingInfo);
         room.plusCurrentHeadCount();
 
-        //참가 수락되었다는 메세지 본인에게 전송
+        //참가 수락되었다는 메세지 본인에게 전송 & 알림 남기기
         fcmService.sendPermitParticipate(participant, roomId.toString());
+        registerAlarmService.registerAlarm(AlarmType.MATCHING_SUCCESS, roomId, participant.getId());
 
         //방 팀원들에게 참가했다는 메세지 보내기
         chatService.sendChatMessage(new ChatMessageRequestDto(

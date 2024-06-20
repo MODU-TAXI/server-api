@@ -9,6 +9,8 @@ import com.modutaxi.api.common.exception.errorcode.PaymentErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.domain.account.entity.Account;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -53,6 +55,7 @@ public class RegisterPaymentRoomService {
     private final ParticipantRepository participantRepository;
     private final RegisterPaymentMemberService registerPaymentMemberService;
     private final ChatService chatService;
+    private final RegisterAlarmService registerAlarmService;
 
     public RegisterPaymentRoomResponse register(Member member, PaymentRoomRequest request) {
         // 0. 방 가져오기
@@ -75,7 +78,8 @@ public class RegisterPaymentRoomService {
         request.getParticipantList().forEach(participant -> {
             Member participantMember = memberRepository.findById(participant.getId())
                 .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
-            History history = HistoryMapper.toEntity(room, participantMember, paymentRoom.getTotalCharge(),
+            History history = HistoryMapper.toEntity(room, participantMember,
+                paymentRoom.getTotalCharge(),
                 paymentRoom.getTotalCharge() / request.getParticipantList().size());
             historyRepository.save(history);
             log.info("{}번 ID Member 이용내역 저장", participantMember.getId());
@@ -141,6 +145,9 @@ public class RegisterPaymentRoomService {
         countMatchingOrNoShow(member, status);
         // 3. 정산 멤버(PaymentMember) 등록
         registerPaymentMemberService.register(paymentRoom, member, status);
+        // 4. 알림 저장
+        registerAlarmService.registerAlarm(AlarmType.PAYMENT_REQUEST_COMPLETE, room.getId(),
+            memberId);
     }
 
     /**

@@ -12,6 +12,8 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.common.util.time.TimeFormatConverter;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
@@ -64,6 +66,7 @@ public class UpdateRoomService {
     private final ChatService chatService;
     private final GetParticipantService getParticipantService;
     private final ParticipantRepository participantRepository;
+    private final RegisterAlarmService registerAlarmService;
 
     @Transactional
     public RoomDetailResponse updateRoom(Member member, Long roomId,
@@ -124,7 +127,7 @@ public class UpdateRoomService {
 
         //참가자들의 매핑된 방 정보 삭제
         participantRepository.deleteAllByRoom(room);
-        
+
         memberRoomInResponseList.getInList().forEach(item -> {
                 try {
                     log.info("{}번 유저 삭제하겠습니다.", item.getMemberId());
@@ -295,6 +298,8 @@ public class UpdateRoomService {
                 LocalDateTime.now(), "");
 
         chatService.sendChatMessage(matchingCompleteMessageRequestDto);
+        registerAlarmService.registerAlarm(AlarmType.PAYMENT_REQUEST, roomId,
+            room.getRoomManager().getId());
         chatService.sendChatMessage(taxiInfoMessageRequestDto);
 
         return new UpdateRoomResponse(true);
