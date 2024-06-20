@@ -108,14 +108,8 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
             = getParticipantService.getParticipateInRoom(member, deleteRoomId);
 
-        //메세지 삭제
-        chatMessageService.deleteChatMessage(roomId);
-
-        //이용 내역 삭제
-        historyRepository.deleteAllByRoom(room);
-
-        //방 삭제
-        roomRepository.delete(room);
+        //방 Soft Delete
+        room.roomStatusUpdateDelete();
 
         // 참가자들에게 방 삭제 알림 및 FCM 구독 해지
         memberRoomInResponseList.getInList().forEach(item -> {
@@ -143,9 +137,6 @@ public class UpdateRoomService {
             }
         );
 
-        //경로 정보 삭제
-        taxiInfoMongoRepository.deleteById(taxiInfo.getId());
-        log.info("taxiInfo정보가 삭제되었습니다.");
         return new DeleteRoomResponse(true);
     }
 
