@@ -98,6 +98,6 @@ public class Room extends BaseTime {
     }
 
     public void minusCurrentHeadCount() {
-        this.currentHeadcount++;
+        this.currentHeadcount--;
     }
 }
