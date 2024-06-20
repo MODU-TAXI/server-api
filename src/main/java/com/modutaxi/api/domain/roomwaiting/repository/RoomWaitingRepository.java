@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RoomWaitingRepository extends JpaRepository<RoomWaiting, Long> {
+
     List<RoomWaiting> findAllByRoomId(Long roomId);
+
     boolean existsByMemberAndRoom(Member member, Room room);
 
     void deleteByMemberAndRoom(Member member, Room room);

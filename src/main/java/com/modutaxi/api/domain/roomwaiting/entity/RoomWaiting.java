@@ -22,13 +22,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RoomWaiting extends BaseTime {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  private Room room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Room room;
 }

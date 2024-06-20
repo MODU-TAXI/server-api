@@ -40,14 +40,14 @@ public class RoomWaitingController {
     })
     @PostMapping("/api/rooms/{roomId}/apply")
     public ResponseEntity<ApplyResponse> applyForParticipate(@CurrentMember Member member,
-                                                             @PathVariable String roomId) {
+        @PathVariable String roomId) {
         return ResponseEntity.ok(roomWaitingService.applyForParticipate(member.getId(), roomId));
     }
 
     @Operation(summary = "대기열 리스트 조회")
     @GetMapping("/api/rooms/{roomId}/members/waiting")
     public ResponseEntity<RoomWaitingResponseList> getWaitingList(@CurrentMember Member member,
-                                                                  @PathVariable Long roomId) {
+        @PathVariable Long roomId) {
         return ResponseEntity.ok(roomWaitingService.getWaitingList(member.getId(), roomId));
     }
 

@@ -25,21 +25,24 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Service
 public class UpdateParticipantService {
+
     private final MemberRepository memberRepository;
     private final RoomRepository roomRepository;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final ChatService chatService;
     private final FcmService fcmService;
     private final ParticipantRepository participantRepository;
+
     /**
      * 방 퇴장 로직
      */
     @Transactional
     public ChatResponseDto.DeleteResponse leaveRoomAndDeleteChatRoomInfo(Long memberId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
-                -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
-        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId.toString());
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(
+            memberId.toString());
 
         // 연결된 방이 없다면 에러
         if (chatRoomMappingInfo == null) {
@@ -47,9 +50,10 @@ public class UpdateParticipantService {
         }
 
         // 존재하는 방이 없다면 에러
-        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId())).orElseThrow(
+        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId()))
+            .orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
-        );
+            );
 
         // 퇴장하려는 대상이 방장인 경우 에러
         if (room.getRoomManager().getId().equals(memberId)) {
@@ -60,11 +64,10 @@ public class UpdateParticipantService {
 
         // 기존 방에 클라이언트 퇴장 메시지 발송
         ChatMessageRequestDto leaveMessage = new ChatMessageRequestDto(Long.valueOf(
-                chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
-                chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
-                chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now(), "");
+            chatRoomMappingInfo.getRoomId()), MessageType.LEAVE,
+            chatRoomMappingInfo.getNickname() + "님이 나갔습니다.",
+            chatRoomMappingInfo.getNickname(), member.getId().toString(), LocalDateTime.now(), "");
         chatService.sendChatMessage(leaveMessage);
-
 
         //참여자 정보 삭제
         participantRepository.deleteParticipantByMemberAndRoom(member, room);

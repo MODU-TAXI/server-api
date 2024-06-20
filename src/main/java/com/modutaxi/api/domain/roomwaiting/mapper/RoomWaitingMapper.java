@@ -13,15 +13,16 @@ public class RoomWaitingMapper {
 
     public static RoomWaiting toEntity(Member member, Room room) {
         return RoomWaiting.builder()
-                .member(member)
-                .room(room)
-                .build();
+            .member(member)
+            .room(room)
+            .build();
     }
 
     @Getter
     @AllArgsConstructor
     @Builder
     public static class RoomWaitingResponse {
+
         private Long memberId;
         private String nickname;
         private String imageUrl;
@@ -45,6 +46,7 @@ public class RoomWaitingMapper {
     @Getter
     @AllArgsConstructor
     public static class RoomWaitingResponseList {
+
         @Schema(description = "대기열 리스트")
         private List<RoomWaitingResponse> waitingList;
     }
@@ -53,6 +55,7 @@ public class RoomWaitingMapper {
     @AllArgsConstructor
     @Builder
     public static class MemberRoomInResponse {
+
         private Long memberId;
         private String nickname;
         private String imageUrl;
@@ -75,12 +78,14 @@ public class RoomWaitingMapper {
     @Getter
     @AllArgsConstructor
     public static class MemberRoomInResponseList {
+
         private List<MemberRoomInResponse> inList;
     }
 
     @Getter
     @AllArgsConstructor
     public static class ApplyResponse {
+
         private Boolean isApplied;
     }
 }

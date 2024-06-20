@@ -26,16 +26,19 @@ public class GetParticipantService {
     /**
      * 방 참가 인원리스트 조회
      */
-    public RoomWaitingMapper.MemberRoomInResponseList getParticipateInRoom(Member member, Long roomId){
+    public RoomWaitingMapper.MemberRoomInResponseList getParticipateInRoom(Member member,
+        Long roomId) {
         Room room = roomRepository.findById(roomId).orElseThrow(
-                () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<Participant> participantList = participantRepository.findAllByRoom(room);
-        List<Member> memberIdList = new ArrayList<>(participantList).stream().map(Participant::getMember).toList();
+        List<Member> memberIdList = new ArrayList<>(participantList).stream()
+            .map(Participant::getMember).toList();
 
         return new RoomWaitingMapper.MemberRoomInResponseList(
-                memberIdList.stream()
-                        .map(iter -> RoomWaitingMapper.MemberRoomInResponse.toDto(iter, iter.getId().equals(member.getId())))
-                        .collect(Collectors.toList()));
+            memberIdList.stream()
+                .map(iter -> RoomWaitingMapper.MemberRoomInResponse.toDto(iter,
+                    iter.getId().equals(member.getId())))
+                .collect(Collectors.toList()));
     }
 }

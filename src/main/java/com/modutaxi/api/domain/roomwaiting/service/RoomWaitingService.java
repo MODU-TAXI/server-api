@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class RoomWaitingService {
+
     private final RoomRepository roomRepository;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
     private final FcmService fcmService;
@@ -39,37 +40,39 @@ public class RoomWaitingService {
      * 방 참가 신청 - 대기열 등
      */
     @Transactional
-    public ApplyResponse applyForParticipate(Long memberId, String roomId){
+    public ApplyResponse applyForParticipate(Long memberId, String roomId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
-                -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
         if (member.isBlocked()) {
             throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
         }
 
         Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
-                () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(member.getId().toString());
+        ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(
+            member.getId().toString());
 
-
-        if(chatRoomMappingInfo != null){
+        if (chatRoomMappingInfo != null) {
             // 이미 해당 채팅방에 있을 때
-            if(chatRoomMappingInfo.getRoomId().equals(roomId)){
+            if (chatRoomMappingInfo.getRoomId().equals(roomId)) {
                 throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_ROOM);
             }
 
             // 자기 방이 아닌 다른 방에 들어가 있을 때
-            else throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
+            else {
+                throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
+            }
         }
 
         // 이미 해당 대기열에 있을 때
-        if(roomWaitingRepository.existsByMemberAndRoom(member,  room)){
+        if (roomWaitingRepository.existsByMemberAndRoom(member, room)) {
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_WAITING_LIST);
         }
 
         // 방이 COMPLETE면 에러
-        if(room.getRoomStatus().equals(RoomStatus.COMPLETE)){
+        if (room.getRoomStatus().equals(RoomStatus.COMPLETE)) {
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
 
@@ -82,20 +85,22 @@ public class RoomWaitingService {
     /**
      * 매칭 대기 인원리스트 조회
      */
-    public RoomWaitingResponseList getWaitingList(Long memberId, Long roomId){
+    public RoomWaitingResponseList getWaitingList(Long memberId, Long roomId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
-        -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         Room room = roomRepository.findById(roomId).orElseThrow(
-                () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<RoomWaiting> waitingList = roomWaitingRepository.findAllByRoomId(roomId);
 
-        List<Member> memberIdList = new ArrayList<>(waitingList).stream().map(RoomWaiting::getMember).toList();
+        List<Member> memberIdList = new ArrayList<>(waitingList).stream()
+            .map(RoomWaiting::getMember).toList();
 
         return new RoomWaitingMapper.RoomWaitingResponseList(
-                memberIdList.stream()
-                        .map(iter -> RoomWaitingMapper.RoomWaitingResponse.toDto(iter, iter.getId().equals(member.getId())))
-                        .collect(Collectors.toList()));
+            memberIdList.stream()
+                .map(iter -> RoomWaitingMapper.RoomWaitingResponse.toDto(iter,
+                    iter.getId().equals(member.getId())))
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -104,16 +109,15 @@ public class RoomWaitingService {
     @Transactional
     public DeleteResponse leaveRoomWaiting(Long memberId, Long roomId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
-                -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+            -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
         Room room = roomRepository.findById(roomId).orElseThrow(()
-                -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<RoomWaiting> waitingList = roomWaitingRepository.findAllByRoomId(roomId);
 
-
         boolean isMemberInWaitingList = waitingList.stream()
-                .anyMatch(waiting -> waiting.getMember().getId().equals(member.getId()));
+            .anyMatch(waiting -> waiting.getMember().getId().equals(member.getId()));
 
         if (!isMemberInWaitingList) {
             throw new BaseException(ParticipateErrorCode.USER_NOT_IN_ROOM_WAITING);

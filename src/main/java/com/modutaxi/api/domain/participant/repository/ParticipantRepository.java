@@ -9,11 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
+
     Optional<Participant> findByMemberId(Long memberId);
 
     List<Participant> findAllByRoom(Room room);
 
     void deleteParticipantByMemberAndRoom(Member member, Room room);
+
     void deleteAllByRoom(Room room);
 
     boolean existsByMemberAndRoom(Member member, Room room);
