@@ -6,6 +6,8 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.fcm.FcmService;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.dto.ChatResponseDto.DeleteResponse;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
@@ -17,8 +19,8 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.RoomWaitingResponseList;
 import com.modutaxi.api.domain.roomwaiting.entity.RoomWaiting;
-import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.roomwaiting.mapper.RoomWaitingMapper;
+import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class RoomWaitingService {
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
     private final RoomWaitingRepository roomWaitingRepository;
+    private final RegisterAlarmService registerAlarmService;
 
     /**
      * 방 참가 신청 - 대기열 등
@@ -77,7 +80,9 @@ public class RoomWaitingService {
         }
 
         roomWaitingRepository.save(RoomWaitingMapper.toEntity(member, room));
-        fcmService.sendNewParticipant(room.getRoomManager(), roomId);
+        fcmService.sendNewParticipant(room.getRoomManager(), roomId, member.getNickname());
+        registerAlarmService.registerAlarm(
+            AlarmType.PARTICIPATE_REQUEST, Long.valueOf(roomId), room.getRoomManager().getId());
         return new ApplyResponse(true);
     }
 

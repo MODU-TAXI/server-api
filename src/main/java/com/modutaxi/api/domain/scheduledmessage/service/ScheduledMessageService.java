@@ -2,6 +2,8 @@ package com.modutaxi.api.domain.scheduledmessage.service;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
@@ -39,6 +41,7 @@ public class ScheduledMessageService {
     @Qualifier("taskScheduler")
     private final TaskScheduler taskScheduler;
     private final ChatService chatService;
+    private final RegisterAlarmService registerAlarmService;
     private final RoomRepository roomRepository;
     private final ScheduledMessageRepository scheduledMessageRepository;
 
@@ -86,14 +89,21 @@ public class ScheduledMessageService {
         return () -> {
             Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-            if(room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+            if (room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
                 updateScheduledMessageStatus(scheduledMessageId);
 
                 ChatMessageRequestDto message = new ChatMessageRequestDto(
                     roomId, type, content,
-                    type.getSenderName(), room.getRoomManager().getId().toString(), LocalDateTime.now(),
+                    type.getSenderName(), room.getRoomManager().getId().toString(),
+                    LocalDateTime.now(),
                     "");
                 chatService.sendChatMessage(message);
+                // 타입이 매칭 완료라면 알림 저장
+                if (type == MessageType.MATCHING_COMPLETE) {
+                    registerAlarmService.registerAlarm(AlarmType.MATCHING_COMPLETE, roomId,
+                        room.getRoomManager().getId());
+                }
+
                 log.info("{}: {}", content, Thread.currentThread().getName());
             }
         };

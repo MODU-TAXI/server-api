@@ -7,6 +7,8 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.ReportErrorCode;
 import com.modutaxi.api.common.slack.SlackService;
+import com.modutaxi.api.domain.alarm.entity.AlarmType;
+import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.mail.service.MailServiceImpl;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
@@ -15,7 +17,6 @@ import com.modutaxi.api.domain.report.entity.Report;
 import com.modutaxi.api.domain.report.entity.ReportType;
 import com.modutaxi.api.domain.report.repository.ReportRepository;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class RegisterReportService {
     private final ReportRepository reportRepository;
     private final SlackService slackService;
     private final MailServiceImpl mailService;
+    private final RegisterAlarmService registerAlarmService;
 
     public ReportResponse register(
         Long reporterId, Long targetId, Long roomId, ReportType type, String content) {
@@ -45,6 +47,9 @@ public class RegisterReportService {
         // 저장
         Report report = toEntity(reporterId, targetId, roomId, type, content);
         reportRepository.save(report);
+
+        // 알림 저장
+        registerAlarmService.registerAlarm(AlarmType.REPORT_SUCCESS, 0L, reporterId);
 
         // 관리자 슬랙에 메시지 전송
         slackService.sendReportMessage(report);
