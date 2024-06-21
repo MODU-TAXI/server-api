@@ -4,6 +4,9 @@ import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
+import com.modutaxi.api.domain.account.repository.AccountRepository;
+import com.modutaxi.api.domain.alarm.repository.AlarmRepository;
+import com.modutaxi.api.domain.likedSpot.repository.LikedSpotRepository;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
@@ -32,6 +35,10 @@ public class UpdateMemberService {
     private final MailUtil mailUtil;
     private final SmsService smsService;
     private final S3Service s3Service;
+
+    private final AccountRepository accountRepository;
+    private final AlarmRepository alarmRepository;
+    private final LikedSpotRepository likedSpotRepository;
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public TokenAndMemberResponse refreshAccessToken(Member member) {
@@ -104,6 +111,18 @@ public class UpdateMemberService {
         memberRepository.save(member);
         return new UpdateProfileResponse(member.getName(), member.getGender(),
             member.getPhoneNumber(), member.getImageUrl());
+    }
+
+    @Transactional
+    public void deleteMember(Member member) {
+        // 멤버 soft delete
+        member.delete();
+        // 계좌 정보 hard delete
+        accountRepository.deleteByMember(member);
+        // 알림 hard delete
+        alarmRepository.deleteByMemberId(member.getId());
+        // 즐겨찾기 hard delete
+        likedSpotRepository.deleteByMember(member);
     }
 
 }

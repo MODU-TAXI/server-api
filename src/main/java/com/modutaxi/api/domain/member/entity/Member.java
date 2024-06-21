@@ -125,4 +125,9 @@ public class Member extends BaseTime {
         this.blocked = true;
     }
 
+    public void delete() {
+        this.status = false;
+        this.nickname = "(알 수 없음)";
+    }
+
 }

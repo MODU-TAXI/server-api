@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     Page<Alarm> findByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+
+    void deleteByMemberId(Long memberId);
 }
