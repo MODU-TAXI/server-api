@@ -13,6 +13,9 @@ public interface LikedSpotRepository extends JpaRepository<LikedSpot, Long> {
 
     void deleteByMemberAndSpotId(Member memberId, Long spotId);
 
+    void deleteByMember(Member member);
+
     @Query("SELECT l.spot.id as spotId, l.spot.name as spotName, l.spot.spotPoint as spotpoint FROM LikedSpot l WHERE l.member = :member ORDER BY l.createdAt DESC")
-    Slice<LikedSpotResponseInterface> findAllByOrderByCreatedAtDesc(Pageable pageable, Member member);
+    Slice<LikedSpotResponseInterface> findAllByOrderByCreatedAtDesc(Pageable pageable,
+        Member member);
 }

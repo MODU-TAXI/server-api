@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -268,5 +269,21 @@ public class UpdateMemberController {
         return ResponseEntity.ok(updateMemberService.updateProfile(
             member, request.getName(), request.getGender(), request.getPhoneNumber(),
             request.getImageUrl()));
+    }
+
+    /**
+     * [DELETE] 회원 탈퇴
+     */
+    @Operation(summary = "회원 탈퇴",
+        description = "회원 탈퇴입니다.<br>헤더에 반드시 Authorization 으로 accessToken 값을 넣어주세요!<br>"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공", content = @Content(mediaType = "application/json")),
+    })
+    @DeleteMapping("")
+    public ResponseEntity<Integer> deleteMember(
+        @CurrentMember Member member) {
+        updateMemberService.deleteMember(member);
+        return ResponseEntity.ok(200);
     }
 }
