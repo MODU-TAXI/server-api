@@ -56,20 +56,14 @@ public class RegisterMemberController {
      */
     @Operation(
         summary = "소셜 로그인",
-        description = "type: KAKAO, APPLE<br>"
+        description = "type: KAKAO, APPLE<br>로그인에 성공한 경우와 회원가입이 필요한 경우 둘 다 실제로는 200으로 내려가지만, 스웨거에서 응답을 구분하기 위해 201로 해두었습니다. 착오 없으시길 바랍니다!"
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "409", description = "로그인 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
-            @ExampleObject(name = "MEMBER_001", description = "존재하지 않는 사용자", value = """
-                {
-                    "errorCode": "MEMBER_001",
-                    "message": "존재하지 않는 사용자입니다."
-                }
-                """),
-        })),
+        @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenAndMemberResponse.class))),
+        @ApiResponse(responseCode = "201", description = "로그인 실패 회원가입 필요", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MembershipResponse.class))),
     })
     @PostMapping("/{type}/login")
-    public ResponseEntity<TokenAndMemberResponse> login(
+    public ResponseEntity<?> login(
         @PathVariable(name = "type") SocialLoginType type,
         @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
@@ -78,17 +72,6 @@ public class RegisterMemberController {
             loginRequest.getFcmToken()));
     }
 
-    /**
-     * [POST] 가입 여부 확인 /{type}/membership
-     */
-    @Operation(summary = "가입 여부 확인")
-    @PostMapping("/{type}/membership")
-    public ResponseEntity<MembershipResponse> checkMembership(
-        @PathVariable(name = "type") SocialLoginType type,
-        @Valid @RequestBody LoginRequest loginRequest) throws IOException {
-        return ResponseEntity.ok(registerMemberService.checkMembership(
-            type, loginRequest.getAccessToken()));
-    }
 
     /**
      * [POST] 로그아웃 /logout
