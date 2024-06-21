@@ -36,4 +36,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByIdIsInMemberIdListAndStatusTrue(List<Long> memberIdList);
 
     Boolean existsByNickname(String nickname);
+
+    @Query("SELECT m " +
+        "FROM Member m " +
+        "WHERE m.snsId = :snsId " +
+        "AND m.status = true")
+    Optional<Member> findByAppleSnsIdAndStatusTrue(@Param("snsId") String snsId);
 }

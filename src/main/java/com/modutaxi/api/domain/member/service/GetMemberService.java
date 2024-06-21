@@ -24,4 +24,9 @@ public class GetMemberService {
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
         return MemberMapper.toDto2(member);
     }
+
+    public Member getMemberByAppleSnsId(String snsId) {
+        return memberRepository.findByAppleSnsIdAndStatusTrue(snsId)
+            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+    }
 }

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonParser;
 import com.modutaxi.api.common.auth.oauth.client.AppleOauthClient;
+import com.modutaxi.api.common.auth.oauth.dto.AppleAuthServerRequest.IdTokenRequest;
+import com.modutaxi.api.common.auth.oauth.dto.AppleAuthServerResponse.AppleSocialTokenResponse;
 import com.modutaxi.api.common.auth.oauth.dto.AppleIdTokenPayload;
-import com.modutaxi.api.common.auth.oauth.dto.AppleSocialTokenResponse;
-import com.modutaxi.api.common.auth.oauth.dto.IdTokenRequest;
 import com.modutaxi.api.common.auth.oauth.vo.AppleOauthProperties;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
@@ -39,7 +39,7 @@ public class SocialLoginService {
         String requestUrl = "https://kapi.kakao.com/v2/user/me";
         StringBuilder result = getKaKaoResponse(accessToken, requestUrl);
         return new JsonParser().parse(result.toString()).
-                getAsJsonObject().get("id").getAsString();
+            getAsJsonObject().get("id").getAsString();
     }
 
     public StringBuilder getKaKaoResponse(String accessToken, String requestUrl) throws IOException {
