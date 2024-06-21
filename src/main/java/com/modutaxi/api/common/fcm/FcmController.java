@@ -33,9 +33,4 @@ public class FcmController {
         fcmService.unsubscribe(member.getId(), roomId);
     }
 
-    @Operation(summary = "FCM 테스트")
-    @GetMapping("/test")
-    public void testFcm(@CurrentMember Member member){
-        fcmService.testSend(member);
-    }
 }
