@@ -7,9 +7,11 @@ import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
+import com.modutaxi.api.domain.paymentroom.repository.PaymentRoomRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.room.service.UpdateRoomService;
 import com.modutaxi.api.domain.scheduledmessage.entity.ScheduledMessage;
 import com.modutaxi.api.domain.scheduledmessage.entity.ScheduledMessageStatus;
 import com.modutaxi.api.domain.scheduledmessage.mapper.ScheduledMessageMapper;
@@ -35,8 +37,12 @@ public class ScheduledMessageService {
 
     private static final String MATCHING_COMPLETE = "매칭완료 하시겠습니까?";
     private static final String CALL_TAXI = "택시 부르러 가볼까요?";
+
+    private static final String PAYMENT_RE_REQUEST = "정산 요청을 진행하세요.";
     private static final long BEFORE_FIVE_MINUTES = 300;
     private static final int NO_DELAY = 0;
+
+    private static final int ONE_HOUR_TO_SECONDS = 3600;
 
     @Qualifier("taskScheduler")
     private final TaskScheduler taskScheduler;
@@ -44,6 +50,8 @@ public class ScheduledMessageService {
     private final RegisterAlarmService registerAlarmService;
     private final RoomRepository roomRepository;
     private final ScheduledMessageRepository scheduledMessageRepository;
+    private final UpdateRoomService updateRoomService;
+    private final PaymentRoomRepository paymentRoomRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     public void initScheduledMessage() {
@@ -84,6 +92,16 @@ public class ScheduledMessageService {
         scheduledMessageRepository.save(scheduledMessage);
     }
 
+    private Runnable deleteRoom(Long roomId) {
+        return () -> {
+            Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            if (!room.getRoomStatus().equals(RoomStatus.DELETE)) {
+                updateRoomService.deleteRoom(room.getRoomManager(), roomId);
+            }
+        };
+    }
+
     private Runnable chatBotNotice(Long roomId, String content, Long scheduledMessageId,
         MessageType type) {
         return () -> {
@@ -91,6 +109,12 @@ public class ScheduledMessageService {
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
             if (room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
                 updateScheduledMessageStatus(scheduledMessageId);
+
+                if (type == MessageType.PAYMENT_RE_REQUEST) {
+                    if (paymentRoomRepository.findByRoomId(roomId).isPresent()) {
+                        return;
+                    }
+                }
 
                 ChatMessageRequestDto message = new ChatMessageRequestDto(
                     roomId, type, content,
@@ -113,6 +137,7 @@ public class ScheduledMessageService {
     public void addTask(Long roomId, LocalDateTime departureTime) {
         long delaySeconds = calculateDelaySeconds(LocalDateTime.now(), departureTime);
 
+        // 매칭완료 알림
         ScheduledMessage matchingCompleteMessage =
             ScheduledMessageMapper.toEntity(roomId, MATCHING_COMPLETE, departureTime,
                 MessageType.MATCHING_COMPLETE);
@@ -122,6 +147,7 @@ public class ScheduledMessageService {
             matchingCompleteMessage.getId(), MessageType.MATCHING_COMPLETE);
         taskScheduler.schedule(matchingModal, Instant.now().plusSeconds(delaySeconds));
 
+        // 택시 부르기 알림
         ScheduledMessage callTaxiMessage = ScheduledMessageMapper.toEntity(roomId, CALL_TAXI,
             departureTime, MessageType.CALL_TAXI);
         scheduledMessageRepository.save(callTaxiMessage);
@@ -131,6 +157,24 @@ public class ScheduledMessageService {
         delaySeconds =
             delaySeconds > BEFORE_FIVE_MINUTES + 20 ? delaySeconds - BEFORE_FIVE_MINUTES : NO_DELAY;
         taskScheduler.schedule(callTaxiTask, Instant.now().plusSeconds(delaySeconds));
+
+        // 정산 재요청 스케줄링
+        ScheduledMessage paymentReRequestMessage = ScheduledMessageMapper.toEntity(roomId,
+            PAYMENT_RE_REQUEST,
+            departureTime, MessageType.PAYMENT_RE_REQUEST);
+        scheduledMessageRepository.save(paymentReRequestMessage);
+
+        Runnable paymentReRequestTask = chatBotNotice(roomId, PAYMENT_RE_REQUEST,
+            paymentReRequestMessage.getId(),
+            MessageType.PAYMENT_RE_REQUEST);
+        taskScheduler.schedule(paymentReRequestTask,
+            Instant.now().plusSeconds(delaySeconds + ONE_HOUR_TO_SECONDS / 2));
+
+        // 방 삭제 스케줄링
+        Runnable deleteRoom = deleteRoom(roomId);
+        taskScheduler.schedule(deleteRoom,
+            Instant.now().plusSeconds(delaySeconds + ONE_HOUR_TO_SECONDS));
+
         log.info("{}번 방에 예약메시지가 설정되었습니다.", roomId);
     }
 
