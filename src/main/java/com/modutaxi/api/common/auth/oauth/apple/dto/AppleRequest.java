@@ -1,4 +1,4 @@
-package com.modutaxi.api.domain.apple;
+package com.modutaxi.api.common.auth.oauth.apple.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

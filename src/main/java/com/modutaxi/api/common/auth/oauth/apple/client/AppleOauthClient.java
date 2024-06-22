@@ -1,11 +1,13 @@
-package com.modutaxi.api.common.auth.oauth.client;
+package com.modutaxi.api.common.auth.oauth.apple.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.modutaxi.api.common.auth.oauth.dto.AppleAuthServerRequest.IdTokenRequest;
-import com.modutaxi.api.common.auth.oauth.dto.AppleAuthServerResponse.AppleSocialTokenResponse;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest.IdTokenRequest;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerResponse.AppleSocialTokenResponse;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class AppleOauthClient {
     public AppleSocialTokenResponse generateAndValidateToken(IdTokenRequest idTokenRequest) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -36,13 +39,15 @@ public class AppleOauthClient {
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            throw new BaseException(null);
+            log.error("Apple Token Request Body 인코딩 실패 : {}", idTokenRequest);
+            throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
         CloseableHttpResponse response;
         try {
             response = httpClient.execute(httpPost);
         } catch (IOException e) {
-            throw new BaseException(null);
+            log.error("Apple Token 요청 실패 : {}", idTokenRequest);
+            throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
         ObjectMapper objectMapper = new ObjectMapper()
             .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
@@ -51,7 +56,8 @@ public class AppleOauthClient {
         try {
             responseBody = objectMapper.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), AppleSocialTokenResponse.class);
         } catch (IOException e) {
-            throw new BaseException(null);
+            log.error("Apple Token Payload 디코딩 실패 : {}", idTokenRequest);
+            throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
         return responseBody;
     }

@@ -1,4 +1,4 @@
-package com.modutaxi.api.common.auth.oauth.vo;
+package com.modutaxi.api.common.auth.oauth.apple.vo;
 
 import lombok.Getter;
 import lombok.Setter;

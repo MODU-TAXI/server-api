@@ -1,4 +1,4 @@
-package com.modutaxi.api.common.auth.oauth.dto;
+package com.modutaxi.api.common.auth.oauth.apple.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

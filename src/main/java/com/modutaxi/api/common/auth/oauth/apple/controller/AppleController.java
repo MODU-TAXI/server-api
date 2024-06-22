@@ -1,15 +1,14 @@
-package com.modutaxi.api.domain.apple;
+package com.modutaxi.api.common.auth.oauth.apple.controller;
 
-import com.modutaxi.api.domain.apple.AppleRequest.StsPayload;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.StsPayload;
+import com.modutaxi.api.common.auth.oauth.apple.service.AppleService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/apple")
 @RequiredArgsConstructor
 public class AppleController {
     private final AppleService appleService;
@@ -21,7 +20,7 @@ public class AppleController {
      * @param payload
      */
     @Hidden
-    @PostMapping("/sts")
+    @PostMapping("/api/apple/sts")
     public void appleServerToServer(@RequestBody StsPayload payload) {
         appleService.appleServerToServer(payload);
     }
