@@ -145,7 +145,7 @@ jobs:
           host: ${{ secrets.TEST_SERVER_SSH_HOST }}
           port: ${{ secrets.TEST_SERVER_SSH_PORT }}
           username: ${{ secrets.TEST_SERVER_SSH_USERNAME }}
-          key: ${{ env.SELECTED_SERVER_SSH_PRIVATE_KEY }}
+          key: ${{ secrets.TEST_SERVER_SSH_PRIVATE_KEY }}
           source: "docker-compose.testserver.yml, config/dockerEnv/dev.env"
           target: /home/ubuntu
 
