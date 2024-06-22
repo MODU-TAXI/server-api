@@ -35,9 +35,10 @@ public class SecurityConfig {
             .authorizeHttpRequests((authorizeRequests) ->
                 authorizeRequests
                     .requestMatchers("/api/members/KAKAO/login",
-                            "api/members/APPLE/login",
-                            "/api/members/sign-up",
-                            "/swagger-ui/**").permitAll() // 허용된 주소
+                        "api/members/APPLE/login",
+                        "/api/members/sign-up",
+                        "/api/apple/sts",
+                        "/swagger-ui/**").permitAll() // 허용된 주소
                     .anyRequest().permitAll() // Authentication 필요한 주소
             )
             .exceptionHandling((exceptionConfig) ->

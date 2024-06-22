@@ -1,8 +1,10 @@
 package com.modutaxi.api.common.auth.oauth;
 
 import com.google.gson.JsonParser;
+import com.modutaxi.api.common.auth.oauth.apple.service.AppleService;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
@@ -13,13 +15,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 @Service
+@RequiredArgsConstructor
 public class SocialLoginService {
+    private final AppleService appleService;
 
     public String getKaKaoSnsId(String accessToken) throws IOException {
         String requestUrl = "https://kapi.kakao.com/v2/user/me";
         StringBuilder result = getKaKaoResponse(accessToken, requestUrl);
         return new JsonParser().parse(result.toString()).
-                getAsJsonObject().get("id").getAsString();
+            getAsJsonObject().get("id").getAsString();
     }
 
     public StringBuilder getKaKaoResponse(String accessToken, String requestUrl) throws IOException {
@@ -39,5 +43,9 @@ public class SocialLoginService {
         }
         br.close();
         return result;
+    }
+
+    public String getAppleSub(String authorizationCode) {
+        return appleService.getAppleIdTokenResponse(authorizationCode).getSub();
     }
 }

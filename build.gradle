@@ -101,6 +101,9 @@ dependencies {
 
     // Slack
     implementation 'com.slack.api:slack-api-client:1.30.0'
+
+    // apple oauth
+    implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
 }
 
 tasks.named('test') {

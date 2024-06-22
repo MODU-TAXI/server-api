@@ -113,8 +113,7 @@ public class RegisterMemberService {
         throws IOException {
         return switch (type) {
             case KAKAO -> socialLoginService.getKaKaoSnsId(accessToken);
-            // TODO: 애플 로그인 구현
-            case APPLE -> "";
+            case APPLE -> socialLoginService.getAppleSub(accessToken);
         };
     }
 
