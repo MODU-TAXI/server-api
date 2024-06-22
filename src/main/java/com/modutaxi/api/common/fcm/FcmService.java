@@ -10,7 +10,10 @@ import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.participant.entity.Participant;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FcmService {
 
     private final RedisFcmRepositoryImpl redisFcmRepository;
+    private final ParticipantRepository participantRepository;
 
     @Transactional
     public void subscribe(Long memberId, Long roomId) {
@@ -59,25 +63,62 @@ public class FcmService {
         }
     }
 
-    // TODO: 5/14/24 프론트 측 테스트를 위한 메서드입니다.
-    public void testSend(Member member) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
+    /**
+     * 채팅 메세지 전송(일반 채팅 & 채팅방 퇴장 & 채팅방 입장)
+     */
+    public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
+        MessageType messageType = chatMessageRequestDto.getType();
+
+        //일반적인 채팅, 참가, 퇴장, 이미지 전송
+        if (messageType.equals(MessageType.CHAT) || messageType.equals(MessageType.JOIN)
+            || messageType.equals(MessageType.LEAVE) || messageType.equals(MessageType.IMAGE)) {
+            sendMessageExcludeMe(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.CHAT_BOT)) {
+            sendMessageForEveryone(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.CALL_TAXI)) {
+            sendMessageForEveryone(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.MATCHING_COMPLETE)) {
+            sendMessageForManager(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.PAYMENT_REQUEST)) {
+            sendMessageForManager(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.PAYMENT_REQUEST_COMPLETE)) {
+            sendMessageExcludeMe(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.PAYMENT_COMPLETE)) {
+            sendMessageForEveryone(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.PAYMENT_ALL_COMPLETE)) {
+            sendMessageForManager(chatMessageRequestDto);
+
+        } else if (messageType.equals(MessageType.PAYMENT_RE_REQUEST)) {
+            sendMessageForEveryone(chatMessageRequestDto);
+        }
+    }
+
+    private void sendMessageForManager(ChatMessageRequestDto chatMessageRequestDto) {
+        String fcmToken = validateAndGetFcmToken(Long.valueOf(chatMessageRequestDto.getMemberId()));
         Message message = Message.builder()
-            .putData("messageType", "TEST")
-            .putData("message", "테스트메세지")
+            .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
+            .putData("messageType", chatMessageRequestDto.getType().toString())
+            .putData("message", chatMessageRequestDto.getContent())
+            .putData("sender", chatMessageRequestDto.getSender())
+            .putData("memberId", chatMessageRequestDto.getMemberId())
+            .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
             .setToken(fcmToken)
             .setNotification(Notification.builder()
                 .setTitle("모두의택시")
-                .setBody("테스트메세지")
+                .setBody(chatMessageRequestDto.getContent())
                 .build())
             .build();
         send(message);
     }
 
-    /**
-     * 채팅 메세지 전송(일반 채팅 & 채팅방 퇴장 & 채팅방 입장)
-     */
-    public void sendChatMessage(ChatMessageRequestDto chatMessageRequestDto) {
+    private void sendMessageForEveryone(ChatMessageRequestDto chatMessageRequestDto) {
         Message message = Message.builder()
             .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
             .putData("messageType", chatMessageRequestDto.getType().toString())
@@ -88,11 +129,36 @@ public class FcmService {
             .setTopic(chatMessageRequestDto.getRoomId().toString())
             .setNotification(Notification.builder()
                 .setTitle("모두의택시")
-                .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
-                    ? "사진" : chatMessageRequestDto.getContent())
+                .setBody(chatMessageRequestDto.getContent())
                 .build())
             .build();
         send(message);
+    }
+
+    private void sendMessageExcludeMe(ChatMessageRequestDto chatMessageRequestDto) {
+        List<Participant> participantList =
+            participantRepository.findAllByRoomId(chatMessageRequestDto.getRoomId());
+        participantList.stream()
+            .filter(participant -> !participant.getMember().getId()
+                .equals(chatMessageRequestDto.getMemberId()))
+            .forEach(participant -> {
+                String fcmToken = validateAndGetFcmToken(participant.getMember().getId());
+                Message message = Message.builder()
+                    .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
+                    .putData("messageType", chatMessageRequestDto.getType().toString())
+                    .putData("message", chatMessageRequestDto.getContent())
+                    .putData("sender", chatMessageRequestDto.getSender())
+                    .putData("memberId", chatMessageRequestDto.getMemberId())
+                    .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
+                    .setToken(fcmToken)
+                    .setNotification(Notification.builder()
+                        .setTitle("모두의택시")
+                        .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
+                            ? "사진" : chatMessageRequestDto.getContent())
+                        .build())
+                    .build();
+                send(message);
+            });
     }
 
     /**
@@ -132,44 +198,6 @@ public class FcmService {
         send(message);
     }
 
-    /**
-     * 매칭 완료 알림(전체 다에게)
-     */
-    // TODO: 5/12/24 아직 쓰는 곳 없음. API 만들어야 함.
-    public void sendSuccessMatching(Long managerId, Long roomId) {
-        Message message = Message.builder()
-            .putData("roomId", Long.toString(roomId))
-            .putData("messageType", "MATCHING_COMPLETE")
-            .putData("message", "방 매칭이 완료되었습니다.")
-            .putData("managerId", managerId.toString())
-            .setTopic(roomId.toString())
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody("방 매칭이 완료되었습니다.")
-                .build())
-            .build();
-        send(message);
-    }
-
-    /**
-     * 정산 요청
-     * TODO: 5/12/24 아직 쓰는 곳 없음. API 만들어야 함.
-     */
-    public void sendRequestPayment(Member member, Long roomId, int bill) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
-        Message message = Message.builder()
-            .putData("roomId", Long.toString(roomId))
-            .putData("messageType", "REMIT_REQUEST")
-            .putData("message", "정산해주세요.")
-            .putData("bill", String.valueOf(bill))
-            .setTopic(roomId.toString())
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody("정산해주세요.")
-                .build())
-            .build();
-        send(message);
-    }
 
     /**
      * 방 삭제 되었을 때
@@ -207,41 +235,6 @@ public class FcmService {
         send(message);
     }
 
-    /**
-     * 출발 시각이 되었을 때(스프링 스케줄러 cron식으로 보내기)
-     */
-    public void sendDepartureTime(Member member, Long roomId) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
-        Message message = Message.builder()
-            .putData("roomId", Long.toString(roomId))
-            .putData("messageType", "TIME_TO_DEPART")
-            .putData("message", "예정되어 있던 출발 시간이 되었습니다.")
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody("예정되어 있던 출발 시간이 되었습니다.")
-                .build())
-            .build();
-        send(message);
-    }
-
-    /**
-     * 출발 10(임시)분 전
-     */
-    public void send10MinutesBeforeDepartureTime(Member member, Long roomId) {
-        String fcmToken = validateAndGetFcmToken(member.getId());
-        Message message = Message.builder()
-            .putData("roomId", Long.toString(roomId))
-            .putData("messageType", "DEPART_10_MINUTES_AGO")
-            .putData("message", "출발 10분 전입니다.")
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody("출발 10분 전입니다.")
-                .build())
-            .build();
-        send(message);
-    }
 
     public String validateAndGetFcmToken(Long memberId) {
         String fcmToken = redisFcmRepository.findById(memberId);
