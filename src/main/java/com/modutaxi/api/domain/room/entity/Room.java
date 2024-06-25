@@ -34,7 +34,7 @@ public class Room extends BaseTime {
     @JoinColumn(name = "spot_id")
     private Spot spot;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "member_id")
     private Member roomManager;
 
