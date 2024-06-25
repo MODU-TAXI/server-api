@@ -74,4 +74,14 @@ public class HistoryResponseDto {
         @Schema(description = "HistorySimpleResponse List")
         private List<HistorySimpleResponse> historySimpleListResponse;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class HistoryDurationResponse {
+        @Schema(description = "시작일")
+        private LocalDateTime startDate;
+        @Schema(description = "월")
+        private LocalDateTime endDate;
+    }
 }

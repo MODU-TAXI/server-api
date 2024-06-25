@@ -13,6 +13,8 @@ import com.modutaxi.api.domain.paymentmember.service.GetPaymentMemberService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import jakarta.persistence.Tuple;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +70,13 @@ public class HistoryService {
         return HistoryMapper.toDto(historyList.stream()
             .map(HistoryMapper::toDto)
             .toList());
+    }
+
+    public HistoryDurationResponse getHistoryDuration(Member member) {
+        Tuple tuple = historyRepository.findStartDateAndEndDateByMemberId(member.getId());
+        LocalDateTime startDate = (LocalDateTime) tuple.get("startDate");
+        LocalDateTime endDate = (LocalDateTime) tuple.get("endDate");
+        return HistoryMapper.toDto(startDate, endDate);
     }
 
 

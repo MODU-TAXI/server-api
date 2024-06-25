@@ -5,10 +5,12 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.entity.Room;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.persistence.Tuple;
+import java.lang.reflect.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import org.springframework.security.core.parameters.P;
 
 public interface HistoryRepository extends JpaRepository<History, Long> {
     @Query("SELECT h FROM History h WHERE h.member.id = :memberId " +
@@ -23,4 +25,8 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
     List<History> findAllByMemberOrderByRoomDepartureTimeDesc(Member member);
 
     void deleteAllByRoom(Room room);
+
+    @Query("SELECT MIN(h.createdAt) as startDate, max (h.createdAt) as endDate " +
+        "FROM History h WHERE h.member.id = :memberId ")
+    Tuple findStartDateAndEndDateByMemberId(Long memberId);
 }
