@@ -12,9 +12,6 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.entity.MessageType;
-import com.modutaxi.api.domain.participant.entity.Participant;
 import com.modutaxi.api.domain.participant.mapper.ParticipantMapper;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
@@ -101,14 +98,15 @@ public class RegisterRoomService {
         //fcm구독
         fcmService.subscribe(member.getId(), room.getId());
 
-
         participantRepository.save(ParticipantMapper.toEntity(member, room));
 
         registerTaxiInfoService.savePath(room.getId(), path);
 
         //매핑 정보 저장
-        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(room.getId().toString(), member.getNickname());
-        redisChatRoomRepositoryImpl.setUserEnterInfo(member.getId().toString(), chatRoomMappingInfo);
+        ChatRoomMappingInfo chatRoomMappingInfo = new ChatRoomMappingInfo(room.getId().toString(),
+            member.getNickname());
+        redisChatRoomRepositoryImpl.setUserEnterInfo(member.getId().toString(),
+            chatRoomMappingInfo);
 
         scheduledMessageService.addTask(room.getId(), room.getDepartureTime());
 
@@ -117,12 +115,13 @@ public class RegisterRoomService {
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {
         List<Room> roomList = roomRepository.findAllByRoomManagerId(member.getId());
-        roomList.stream()
+        roomList
             .forEach(room -> {
                 if (!room.getRoomStatus().equals(RoomStatus.DELETE)) {
                     throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
                 }
             });
+
         if (convertRoomTagListToBitMask(createRoomRequest.getRoomTagBitMask())
             == RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue()) {
             throw new BaseException(RoomErrorCode.BOTH_GENDER);

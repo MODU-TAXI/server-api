@@ -13,6 +13,7 @@ import java.util.List;
 
 @Component
 public class HistoryMapper {
+
     public static History toEntity(
         Room room, Member member, int totalCharge, int portionCharge) {
         return History.builder()
@@ -24,7 +25,7 @@ public class HistoryMapper {
     }
 
     public static HistoryMonthlyResponse toDto(int year, int month,
-                                               int accumulateTotalCharge, int accumulatePortionCharge,
+        int accumulateTotalCharge, int accumulatePortionCharge,
         List<HistorySimpleResponse> historySimpleListResponse) {
         return HistoryMonthlyResponse.builder()
             .year(year)
@@ -35,7 +36,8 @@ public class HistoryMapper {
             .build();
     }
 
-    public static HistorySimpleListResponse toDto(List<HistorySimpleResponse> historySimpleListResponse) {
+    public static HistorySimpleListResponse toDto(
+        List<HistorySimpleResponse> historySimpleListResponse) {
         return HistorySimpleListResponse.builder()
             .historySimpleListResponse(historySimpleListResponse)
             .build();
