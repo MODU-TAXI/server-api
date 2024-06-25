@@ -17,6 +17,7 @@ import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.participant.entity.Participant;
 import com.modutaxi.api.domain.participant.mapper.ParticipantMapper;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.scheduledmessage.service.ScheduledMessageService;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.CreateRoomRequest;
@@ -32,6 +33,7 @@ import com.modutaxi.api.domain.taxiinfo.service.RegisterTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -114,10 +116,13 @@ public class RegisterRoomService {
     }//순서 -> FCM 구독 -> 매핑 정보 저장 -> 메시지 전송
 
     private void createRoomRequestValidator(Member member, CreateRoomRequest createRoomRequest) {
-        if (roomRepository.existsRoomByRoomManagerId(member.getId())) {
-            throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
-        }
-
+        List<Room> roomList = roomRepository.findAllByRoomManagerId(member.getId());
+        roomList.stream()
+            .forEach(room -> {
+                if (!room.getRoomStatus().equals(RoomStatus.DELETE)) {
+                    throw new BaseException(RoomErrorCode.ALREADY_MEMBER_IS_MANAGER);
+                }
+            });
         if (convertRoomTagListToBitMask(createRoomRequest.getRoomTagBitMask())
             == RoomTagBitMask.ONLY_WOMAN.getValue() + RoomTagBitMask.ONLY_MAN.getValue()) {
             throw new BaseException(RoomErrorCode.BOTH_GENDER);
