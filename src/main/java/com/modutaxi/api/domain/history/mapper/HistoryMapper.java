@@ -5,6 +5,8 @@ import com.modutaxi.api.domain.history.entity.History;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.paymentmember.dto.PaymentMemberResponseDto.PaymentMemberListResponse;
 import com.modutaxi.api.domain.room.entity.Room;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -61,6 +63,13 @@ public class HistoryMapper {
             .departureName(history.getRoom().getDepartureName())
             .arrivalName(history.getRoom().getSpot().getName())
             .portionCharge(history.getPortionCharge())
+            .build();
+    }
+
+    public static HistoryDurationResponse toDto(LocalDateTime startDate, LocalDateTime endDate) {
+        return HistoryDurationResponse.builder()
+            .startDate(startDate)
+            .endDate(endDate)
             .build();
     }
 

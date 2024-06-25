@@ -107,4 +107,20 @@ public class GetHistoryController {
         return ResponseEntity.ok(historyService.getSimpleHistoryList(member));
     }
 
+    /**
+     * [GET] 내 이용 내역 전체 조회
+     */
+    @Operation(
+        summary = "내가 생성했던 기록의 시작과 끝 날짜",
+        description = "내가 생성했던 기록의 시작과 끝 날짜<br>"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "내가 생성했던 기록의 시작과 끝 날짜", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HistoryDurationResponse.class))),
+    })
+    @GetMapping("/duration")
+    public ResponseEntity<HistoryDurationResponse> getHistoryDuration(@CurrentMember Member member) {
+        return ResponseEntity.ok(historyService.getHistoryDuration(member));
+    }
+
+
 }
