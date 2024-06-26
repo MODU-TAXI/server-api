@@ -29,4 +29,12 @@ public class Alarm extends BaseTime {
     private Long resourceId;    // 이동 대상의 id (ex. roomId)
 
     private Long memberId;      // 알림 주인 id
+
+    @Builder.Default
+    private boolean isChecked = false;
+
+
+    public void setCheckedTrue() {
+        this.isChecked = true;
+    }
 }

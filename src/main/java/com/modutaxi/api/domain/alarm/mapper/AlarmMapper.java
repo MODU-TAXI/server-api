@@ -22,6 +22,7 @@ public class AlarmMapper {
             .message(alarm.getType().getMessage())
             .resourceId(alarm.getResourceId())
             .dateTime(alarm.getCreatedAt())
+            .isChecked(alarm.isChecked())
             .build();
     }
 }

@@ -16,5 +16,6 @@ public class AlarmResponseDto {
         private String message;
         private Long resourceId;
         private LocalDateTime dateTime;
+        private boolean isChecked;
     }
 }
