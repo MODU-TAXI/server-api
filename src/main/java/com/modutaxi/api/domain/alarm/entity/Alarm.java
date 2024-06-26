@@ -31,10 +31,10 @@ public class Alarm extends BaseTime {
     private Long memberId;      // 알림 주인 id
 
     @Builder.Default
-    private boolean isChecked = false;
+    private boolean checked = false;
 
 
     public void setCheckedTrue() {
-        this.isChecked = true;
+        this.checked = true;
     }
 }
