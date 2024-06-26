@@ -45,9 +45,9 @@ public class RegisterMemberService {
         checkRegister(snsId);
         // member entity 생성
         Member member = MemberMapper.toEntity(snsId, name, gender, phoneNumber);
-        memberRepository.save(member);
         // FCM 토큰 저장
-        saveFcmToken(member.getId(), fcmToken);
+        saveFcmToken(member, fcmToken);
+        memberRepository.save(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }
@@ -79,7 +79,7 @@ public class RegisterMemberService {
         // 가입된 멤버라면
         if (member != null) {
             // FCM 토큰 저장
-            saveFcmToken(member.getId(), fcmToken);
+            saveFcmToken(member, fcmToken);
             return (T) generateMemberToken(member);
         } else {
             String key = redisSnsIdRepository.save(snsId);
@@ -130,8 +130,12 @@ public class RegisterMemberService {
     /**
      * FCM 토큰 저장 함수
      */
-    private void saveFcmToken(Long memberId, String fcmToken) {
-        redisFcmRepository.save(memberId, fcmToken);
+    @Transactional
+    public void saveFcmToken(Member member, String fcmToken) {
+        // db 저장
+        member.changeFcmToken(fcmToken);
+        // redis 캐싱
+        redisFcmRepository.save(member.getId(), fcmToken);
     }
 
 }
