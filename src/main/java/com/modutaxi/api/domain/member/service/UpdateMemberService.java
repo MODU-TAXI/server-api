@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.member.service;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
+import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
 import com.modutaxi.api.domain.alarm.repository.AlarmRepository;
@@ -18,11 +19,12 @@ import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.sms.service.SmsService;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -66,7 +68,7 @@ public class UpdateMemberService {
 
     @Transactional
     public CertificationResponse checkEmailCertificationCode(Long memberId,
-        String certificationCode) {
+                                                             String certificationCode) {
         String email = mailService.checkEmailCertificationCode(memberId, certificationCode);
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, email);
@@ -87,19 +89,35 @@ public class UpdateMemberService {
         throw new BaseException(MailErrorCode.USED_EMAIL);
     }
 
-    public CertificationResponse sendSmsCertification(String signupKey, String phoneNumber) {
-        return new CertificationResponse(smsService.sendCertificationCode(signupKey, phoneNumber));
+    public CertificationResponse sendSmsCertificationWithSignupKey(String signupKey, String phoneNumber) {
+        if (memberRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new BaseException(SmsErrorCode.ALREADY_USED_PHONE_NUMBER);
+        }
+        return new CertificationResponse(smsService.sendCertificationCodeWithSignupKey(signupKey, phoneNumber));
     }
 
-    public CertificationResponse checkSmsCertificationCode(String signupKey, String phoneNumber,
-        String certificationCode) {
+    public CertificationResponse sendSmsCertificationWithJwt(Long memberId, String phoneNumber) {
+        if (memberRepository.findByPhoneNumber(phoneNumber).isPresent()) {
+            throw new BaseException(SmsErrorCode.ALREADY_USED_PHONE_NUMBER);
+        }
+        return new CertificationResponse(smsService.sendCertificationCodeWithJwt(memberId.toString(), phoneNumber));
+    }
+
+    public CertificationResponse checkSmsCertificationCodeWithSignupKey(String signupKey, String phoneNumber,
+                                                                        String certificationCode) {
         return new CertificationResponse(
-            smsService.checkSmsCertificationCode(signupKey, phoneNumber, certificationCode));
+            smsService.checkSmsCertificationCodeWithSignupKey(signupKey, phoneNumber, certificationCode));
+    }
+
+    public CertificationResponse checkSmsCertificationCodeWithJwt(Long memberId, String phoneNumber,
+                                                           String certificationCode) {
+        return new CertificationResponse(
+            smsService.checkSmsCertificationCodeWithJwt(memberId.toString(), phoneNumber, certificationCode));
     }
 
     @Transactional
     public UpdateProfileResponse updateProfile(Member member, String name, Gender gender,
-        String phoneNumber, String imageUrl) {
+                                               String phoneNumber, String imageUrl) {
         // imageUrl == "" 로 들어오면 삭제 요청입니다.
         if (Objects.equals(imageUrl, "")) {
             if (member.existsImageUrl()) {   // 프로필 사진이 있었다면 s3에서 삭제
