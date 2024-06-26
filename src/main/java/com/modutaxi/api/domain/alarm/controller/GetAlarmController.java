@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.alarm.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.alarm.dto.AlarmResponseDto.AlarmCountsInfo;
 import com.modutaxi.api.domain.alarm.dto.AlarmResponseDto.AlarmInfo;
 import com.modutaxi.api.domain.alarm.service.GetAlarmService;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -30,7 +31,7 @@ public class GetAlarmController {
 
     @Operation(summary = "알림 목록 조회", description = "내 알림 목록을 조회합니다.<br>page와 size를 입력해주세요!")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AlarmInfo.class))),
+        @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공", content = @Content(mediaType = "application/json")),
     })
     @GetMapping("")
     public ResponseEntity<PageResponseDto<List<AlarmInfo>>> getAlarmList(
@@ -38,5 +39,14 @@ public class GetAlarmController {
         @Parameter(description = "조회할 page") @RequestParam int page,
         @Parameter(description = "조회할 page 단위") @RequestParam int size) {
         return ResponseEntity.ok(getAlarmService.getAlarmList(member, page, size));
+    }
+
+    @Operation(summary = "안 읽은 알림 수 조회", description = "내 안 읽은 알림 수를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "안 읽은 알림 수 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AlarmCountsInfo.class))),
+    })
+    @GetMapping("/counts")
+    public ResponseEntity<AlarmCountsInfo> getAlarmCounts(@CurrentMember Member member) {
+        return ResponseEntity.ok(getAlarmService.getAlarmCounts(member));
     }
 }

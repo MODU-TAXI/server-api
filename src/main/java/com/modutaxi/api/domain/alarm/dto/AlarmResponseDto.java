@@ -16,5 +16,13 @@ public class AlarmResponseDto {
         private String message;
         private Long resourceId;
         private LocalDateTime dateTime;
+        private boolean isChecked;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class AlarmCountsInfo {
+        private int counts;
     }
 }
