@@ -7,13 +7,16 @@ import com.google.firebase.messaging.Notification;
 import com.google.gson.Gson;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.ChatErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.participant.entity.Participant;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class FcmService {
 
     private final RedisFcmRepositoryImpl redisFcmRepository;
     private final ParticipantRepository participantRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void subscribe(Long memberId, Long roomId) {
@@ -237,9 +241,12 @@ public class FcmService {
 
 
     public String validateAndGetFcmToken(Long memberId) {
+        // 캐싱 조회 시도
         String fcmToken = redisFcmRepository.findById(memberId);
-        if (fcmToken == null) {
-            throw new BaseException(ChatErrorCode.INVALID_FCM_TOKEN);
+        if (fcmToken == null || Objects.equals(fcmToken, "")) {
+            Member member = memberRepository.findByIdAndStatusTrue(memberId)
+                .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+            fcmToken = member.getFcmToken();
         }
         return fcmToken;
     }
