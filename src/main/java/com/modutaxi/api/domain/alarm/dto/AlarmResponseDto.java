@@ -18,4 +18,11 @@ public class AlarmResponseDto {
         private LocalDateTime dateTime;
         private boolean isChecked;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class AlarmCountsInfo {
+        private int counts;
+    }
 }

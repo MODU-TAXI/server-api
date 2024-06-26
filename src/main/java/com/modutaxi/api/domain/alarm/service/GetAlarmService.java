@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.alarm.service;
 import static com.modutaxi.api.domain.alarm.mapper.AlarmMapper.toDto;
 
 import com.modutaxi.api.common.pagination.PageResponseDto;
+import com.modutaxi.api.domain.alarm.dto.AlarmResponseDto.AlarmCountsInfo;
 import com.modutaxi.api.domain.alarm.dto.AlarmResponseDto.AlarmInfo;
 import com.modutaxi.api.domain.alarm.entity.Alarm;
 import com.modutaxi.api.domain.alarm.repository.AlarmRepository;
@@ -35,5 +36,11 @@ public class GetAlarmService {
             }
         );
         return new PageResponseDto<>(page, alarms.hasNext(), alarmInfos);
+    }
+
+    public AlarmCountsInfo getAlarmCounts(Member member) {
+        return new AlarmCountsInfo(
+            alarmRepository.countByMemberIdAndCheckedFalse(member.getId())
+        );
     }
 }
