@@ -38,6 +38,7 @@ public class SecurityConfig {
                         "api/members/APPLE/login",
                         "/api/members/sign-up",
                         "/api/apple/sts",
+                        "/api/members/sms/certificate",
                         "/swagger-ui/**").permitAll() // 허용된 주소
                     .anyRequest().permitAll() // Authentication 필요한 주소
             )

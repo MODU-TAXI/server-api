@@ -27,10 +27,18 @@ public class SmsService {
     @Value("${sms.cert-sms-restriction-seconds}")
     private Integer certSmsRestrictionSeconds;
 
-    public Boolean sendCertificationCode(String signupKey, String phoneNumber) {
+    public Boolean sendCertificationCodeWithSignupKey(String signupKey, String phoneNumber) {
         checkSignupKey(signupKey);
+        return sendCertificationCode(signupKey, phoneNumber);
+    }
+
+    public Boolean sendCertificationCodeWithJwt(String memberId, String phoneNumber) {
+        return sendCertificationCode(memberId, phoneNumber);
+    }
+
+    private Boolean sendCertificationCode(String key, String phoneNumber) {
         phoneNumber = checkPhoneNumberPattern(phoneNumber);
-        SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
+        SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity != null) {
             smsAgencyUtil.getPrevMessage(sender, phoneNumber, smsCertCodeEntity.getMessageId());
             if (smsCertCodeEntity.getPhoneNumber().equals(phoneNumber) &&
@@ -40,7 +48,7 @@ public class SmsService {
         }
         String certificationCode = CertificationCodeUtil.generateCertificationCode(certCodeLength);
         String messageId = smsAgencyUtil.sendOne(sender, phoneNumber, String.format("[모두의택시] 인증번호는 [%s]입니다.", certificationCode));
-        redisSmsCertificationCodeRepository.save(signupKey, phoneNumber, certificationCode, messageId);
+        redisSmsCertificationCodeRepository.save(key, phoneNumber, certificationCode, messageId);
         smsAgencyUtil.checkBalance();
         return true;
     }
@@ -60,11 +68,19 @@ public class SmsService {
         }
     }
 
-    public Boolean checkSmsCertificationCode(String signupKey, String phoneNumber, String certificationCode) {
+    public Boolean checkSmsCertificationCodeWithSignupKey(String signupKey, String phoneNumber, String certificationCode) {
         checkSignupKey(signupKey);
+        return checkSmsCertificationCode(signupKey, phoneNumber, certificationCode);
+    }
+
+    public Boolean checkSmsCertificationCodeWithJwt(String memberId, String phoneNumber, String certificationCode) {
+        return checkSmsCertificationCode(memberId, phoneNumber, certificationCode);
+    }
+
+    public Boolean checkSmsCertificationCode(String key, String phoneNumber, String certificationCode) {
         phoneNumber = checkPhoneNumberPattern(phoneNumber);
         checkCertificationCodePattern(certificationCode);
-        SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(signupKey);
+        SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity == null) {
             throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_EXPIRED);
         }
@@ -74,7 +90,7 @@ public class SmsService {
         if (!smsCertCodeEntity.getCertificationCode().equals(certificationCode)) {
             throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_NOT_MATCH);
         }
-        redisSmsCertificationCodeRepository.findAndDeleteById(signupKey);
+        redisSmsCertificationCodeRepository.findAndDeleteById(key);
         return true;
     }
 

@@ -46,7 +46,7 @@ public class MemberRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class SendSmsCertificationRequest {
+    public static class SendSmsCertificationRequestWithSignupKey {
         @Schema(description = "회원가입 시 발급받은 키")
         private String key;
         @Schema(description = "인증번호를 받을 전화번호")
@@ -56,9 +56,27 @@ public class MemberRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class ConfirmSmsCertificationReqeust {
+    public static class SendSmsCertificationRequestWithJwt {
+        @Schema(description = "인증번호를 받을 전화번호")
+        private String phoneNumber;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConfirmSmsCertificationReqeustWithSignupKey {
         @Schema(description = "회원가입 시 발급받은 키")
         private String key;
+        @Schema(description = "인증번호를 받은 전화번호")
+        private String phoneNumber;
+        @Schema(description = "인증번호")
+        private String certificationCode;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ConfirmSmsCertificationReqeustWithJwt {
         @Schema(description = "인증번호를 받은 전화번호")
         private String phoneNumber;
         @Schema(description = "인증번호")

@@ -42,4 +42,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         "WHERE m.snsId = :snsId " +
         "AND m.status = true")
     Optional<Member> findByAppleSnsIdAndStatusTrue(@Param("snsId") String snsId);
+
+    Optional<Member> findByPhoneNumber(String phoneNumber);
 }
