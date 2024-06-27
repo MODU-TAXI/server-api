@@ -45,9 +45,9 @@ public class RegisterMemberService {
         checkRegister(snsId);
         // member entity 생성
         Member member = MemberMapper.toEntity(snsId, name, gender, phoneNumber);
+        memberRepository.save(member);
         // FCM 토큰 저장
         saveFcmToken(member, fcmToken);
-        memberRepository.save(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }
