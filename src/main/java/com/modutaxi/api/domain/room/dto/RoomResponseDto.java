@@ -107,6 +107,8 @@ public class RoomResponseDto {
     public static class RoomPreviewResponse {
         @Schema(description = "택시팟 id")
         private Long roomId;
+        @Schema(description = "매니저 id")
+        private Long managerId;
         @Schema(example = "12:00", description = "출발 시간")
         private String departureTime;
         @Schema(example = "센트리빌", description = "출발지 이름")

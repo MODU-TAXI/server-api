@@ -128,6 +128,7 @@ public class RoomMapper {
     public static RoomPreviewResponse toDto(Room room) {
         return RoomPreviewResponse.builder()
             .roomId(room.getId())
+            .managerId(room.getRoomManager().getId())
             .arrivalName(room.getSpot().getName())
             .departureTime(TimeFormatConverter.covertTimeToShortClockTime(room.getDepartureTime()))
             .departureName(room.getDepartureName())
