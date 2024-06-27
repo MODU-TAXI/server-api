@@ -15,6 +15,7 @@ public class HistoryResponseDto {
     @Builder
     @AllArgsConstructor
     public static class HistoryDetailResponse {
+
         @Schema(description = "매니저 id")
         private Long managerId;
         @Schema(description = "이용 기록 id")
@@ -39,6 +40,7 @@ public class HistoryResponseDto {
     @Builder
     @AllArgsConstructor
     public static class HistorySimpleResponse {
+
         @Schema(description = "이용내역 ID")
         private Long historyId;
         @Schema(example = "12:00", description = "출발 시간")
@@ -55,6 +57,7 @@ public class HistoryResponseDto {
     @Builder
     @AllArgsConstructor
     public static class HistorySimpleListResponse {
+
         @Schema(description = "이용내역 SimpleList")
         List<HistorySimpleResponse> historySimpleListResponse;
     }
@@ -63,6 +66,7 @@ public class HistoryResponseDto {
     @Builder
     @AllArgsConstructor
     public static class HistoryMonthlyResponse {
+
         @Schema(description = "년")
         private int year;
         @Schema(description = "월")
@@ -73,5 +77,16 @@ public class HistoryResponseDto {
         private int accumulatePortionCharge;
         @Schema(description = "HistorySimpleResponse List")
         private List<HistorySimpleResponse> historySimpleListResponse;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class HistoryDurationResponse {
+
+        @Schema(description = "시작일")
+        private LocalDateTime startDate;
+        @Schema(description = "월")
+        private LocalDateTime endDate;
     }
 }

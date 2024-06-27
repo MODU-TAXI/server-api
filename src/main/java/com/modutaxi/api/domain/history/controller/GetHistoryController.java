@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/histories")
@@ -69,7 +68,8 @@ public class GetHistoryController {
         })),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<HistoryDetailResponse> getHistoryDetail(@CurrentMember Member member, @PathVariable Long id) {
+    public ResponseEntity<HistoryDetailResponse> getHistoryDetail(@CurrentMember Member member,
+        @PathVariable Long id) {
         return ResponseEntity.ok(historyService.getDetailHistory(member, id));
     }
 
@@ -106,5 +106,22 @@ public class GetHistoryController {
     public ResponseEntity<HistorySimpleListResponse> getHistory(@CurrentMember Member member) {
         return ResponseEntity.ok(historyService.getSimpleHistoryList(member));
     }
+
+    /**
+     * [GET] 내가 생성했던 기록의 시작과 끝 날짜 조회
+     */
+    @Operation(
+        summary = "내가 생성했던 기록의 시작과 끝 날짜",
+        description = "내가 생성했던 기록의 시작과 끝 날짜<br>"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "내가 생성했던 기록의 시작과 끝 날짜", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HistoryDurationResponse.class))),
+    })
+    @GetMapping("/duration")
+    public ResponseEntity<HistoryDurationResponse> getHistoryDuration(
+        @CurrentMember Member member) {
+        return ResponseEntity.ok(historyService.getHistoryDuration(member));
+    }
+
 
 }
