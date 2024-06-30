@@ -21,4 +21,17 @@ public class AppleAuthServerRequest {
         @JsonProperty("redirect_uri")
         private String redirect_uri;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class RevokeTokenRequest {
+        @JsonProperty("client_id")
+        private String client_id;
+        @JsonProperty("client_secret")
+        private String client_secret;
+        @JsonProperty("token")
+        private String token;
+        @JsonProperty("token_type_hint")
+        private String token_type_hint;
+    }
 }

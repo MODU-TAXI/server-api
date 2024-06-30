@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
+import com.modutaxi.api.common.auth.oauth.apple.service.AppleService;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.*;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class UpdateMemberController {
 
     private final UpdateMemberService updateMemberService;
+    private final AppleService appleService;
 
     /**
      * [PATCH] 로그인 토큰 갱신
@@ -374,6 +376,7 @@ public class UpdateMemberController {
     public ResponseEntity<Integer> deleteMember(
         @CurrentMember Member member) {
         updateMemberService.deleteMember(member);
+        appleService.revokeToken(member.getSnsId());
         return ResponseEntity.ok(200);
     }
 }

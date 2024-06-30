@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modutaxi.api.common.auth.oauth.apple.client.AppleOauthClient;
-import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest.IdTokenRequest;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest.RevokeTokenRequest;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerResponse.AppleSocialTokenResponse;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleIdTokenPayload;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.Events;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.StsPayload;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.StsRequest;
+import com.modutaxi.api.common.auth.oauth.apple.entity.AppleRefreshToken;
+import com.modutaxi.api.common.auth.oauth.apple.repository.AppleRefreshTokenMongoRepository;
 import com.modutaxi.api.common.auth.oauth.apple.vo.AppleOauthProperties;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
@@ -28,6 +32,7 @@ import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
+import java.util.NoSuchElementException;
 
 
 @Slf4j
@@ -38,6 +43,7 @@ public class AppleService {
     private final GetMemberService getMemberService;
     private final AppleOauthClient appleOauthClient;
     private final AppleOauthProperties appleOauthProperties;
+    private final AppleRefreshTokenMongoRepository appleRefreshTokenMongoRepository;
 
     public void appleServerToServer(StsPayload payload) {
         try {
@@ -49,6 +55,7 @@ public class AppleService {
             }
             if (events.getType().equals("consent-revoked") || events.getType().equals("account-delete")) {
                 updateMemberService.deleteMember(getMemberService.getMemberByAppleSnsId(events.getSub()));
+                appleRefreshTokenMongoRepository.deleteById(events.getSub());
             }
         } catch (BaseException e) {
             log.error("Apple Server To Server Error : {}", e);
@@ -66,15 +73,19 @@ public class AppleService {
     }
 
     public AppleIdTokenPayload getAppleIdTokenResponse(String authorizationCode) {
-        return decodeUrlPayload(appleOauthClient.generateAndValidateToken(
-            new AppleAuthServerRequest.IdTokenRequest(
+        AppleSocialTokenResponse appleSocialTokenResponse = appleOauthClient.generateAndValidateToken(
+            new IdTokenRequest(
                 appleOauthProperties.getClient_id(),
                 generateClientSecret(),
                 authorizationCode,
                 "authorization_code",
                 null,
-                appleOauthProperties.getRedirect_uri()
-            )).getIdToken(), AppleIdTokenPayload.class);
+                null
+            ));
+        AppleIdTokenPayload appleIdTokenPayload = decodeUrlPayload(appleSocialTokenResponse.getIdToken(), AppleIdTokenPayload.class);
+        appleRefreshTokenMongoRepository.deleteById(appleIdTokenPayload.getSub());
+        appleRefreshTokenMongoRepository.save(new AppleRefreshToken(appleIdTokenPayload.getSub(), appleSocialTokenResponse.getRefreshToken()));
+        return appleIdTokenPayload;
     }
 
     private String generateClientSecret() {
@@ -109,6 +120,24 @@ public class AppleService {
         } catch (JsonProcessingException e) {
             log.error("Apple Id Token Payload 디코딩 실패 : {}", token);
             throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
+        }
+    }
+
+    public void revokeToken(String sub) {
+        if (appleRefreshTokenMongoRepository.existsById(sub)) {
+            try {
+                appleOauthClient.revokeToken(
+                    new RevokeTokenRequest(
+                        appleOauthProperties.getClient_id(),
+                        generateClientSecret(),
+                        appleRefreshTokenMongoRepository.findById(sub).get().getRefresh_token(),
+                        "refresh_token"
+                    ));
+            } catch (NoSuchElementException e) {
+                log.error("Mongo Database has No refresh token : {}", sub);
+                appleRefreshTokenMongoRepository.deleteById(sub);
+            }
+            appleRefreshTokenMongoRepository.deleteById(sub);
         }
     }
 }

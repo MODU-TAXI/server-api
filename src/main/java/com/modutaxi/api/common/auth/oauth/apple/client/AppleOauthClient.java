@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest.IdTokenRequest;
+import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerRequest.RevokeTokenRequest;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleAuthServerResponse.AppleSocialTokenResponse;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
@@ -60,5 +61,27 @@ public class AppleOauthClient {
             throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
         return responseBody;
+    }
+
+    public void revokeToken(RevokeTokenRequest revokeTokenRequest) throws BaseException{
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost("https://appleid.apple.com/auth/revoke");
+        List<NameValuePair> nvps = new ArrayList<>();
+        nvps.add(new BasicNameValuePair("client_id", revokeTokenRequest.getClient_id()));
+        nvps.add(new BasicNameValuePair("client_secret", revokeTokenRequest.getClient_secret()));
+        nvps.add(new BasicNameValuePair("token", revokeTokenRequest.getToken()));
+        nvps.add(new BasicNameValuePair("token_type_hint", revokeTokenRequest.getToken_type_hint()));
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            log.error("Apple Revoke Token Request Body 인코딩 실패 : {}", revokeTokenRequest);
+            throw new BaseException(AuthErrorCode.APPLE_REVOKE_ERROR);
+        }
+        try {
+            httpClient.execute(httpPost);
+        } catch (IOException e) {
+            log.error("Apple Revoke Token 요청 실패 : {}", revokeTokenRequest);
+            throw new BaseException(AuthErrorCode.APPLE_REVOKE_ERROR);
+        }
     }
 }
