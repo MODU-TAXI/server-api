@@ -59,7 +59,8 @@ public class RegisterParticipantService {
 
         if (redisChatRoomRepositoryImpl.findChatInfoByMemberId(participant.getId().toString())
             != null) {
-            throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
+            roomWaitingRepository.deleteByMemberAndRoom(participant, room);
+            throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_OTHER_ROOM);
         }
 
         //방 매니저가 아닌 사용자의 허락은 에러
