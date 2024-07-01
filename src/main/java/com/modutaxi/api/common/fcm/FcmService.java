@@ -144,7 +144,7 @@ public class FcmService {
             participantRepository.findAllByRoomId(chatMessageRequestDto.getRoomId());
         participantList.stream()
             .filter(participant -> !participant.getMember().getId()
-                .equals(chatMessageRequestDto.getMemberId()))
+                .equals(Long.valueOf(chatMessageRequestDto.getMemberId())))
             .forEach(participant -> {
                 String fcmToken = validateAndGetFcmToken(participant.getMember().getId());
                 Message message = Message.builder()
