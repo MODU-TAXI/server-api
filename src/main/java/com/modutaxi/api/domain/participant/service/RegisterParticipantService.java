@@ -87,6 +87,7 @@ public class RegisterParticipantService {
         }
 
         if (room.getCurrentHeadcount() == FULL_MEMBER) {
+            log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
             throw new BaseException(ParticipateErrorCode.ROOM_IS_FULL);
         }
 
