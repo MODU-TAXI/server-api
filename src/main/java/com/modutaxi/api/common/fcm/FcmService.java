@@ -156,7 +156,7 @@ public class FcmService {
                     .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
                     .setToken(fcmToken)
                     .setNotification(Notification.builder()
-                        .setTitle(participant.getMember().getNickname())
+                        .setTitle(chatMessageRequestDto.getSender() + "님")
                         .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
                             ? "사진" : chatMessageRequestDto.getContent())
                         .build())
