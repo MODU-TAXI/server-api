@@ -6,7 +6,6 @@ import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.LoginRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.NicknameRequest;
 import com.modutaxi.api.domain.member.dto.MemberRequestDto.SignUpRequest;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.MembershipResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.entity.Member;
@@ -56,14 +55,21 @@ public class RegisterMemberController {
      */
     @Operation(
         summary = "소셜 로그인",
-        description = "type: KAKAO, APPLE<br>로그인에 성공한 경우와 회원가입이 필요한 경우 둘 다 실제로는 200으로 내려가지만, 스웨거에서 응답을 구분하기 위해 201로 해두었습니다. 착오 없으시길 바랍니다!"
+        description = "type: KAKAO, APPLE<br>로그인에 성공한 경우 200으로 내려가며, 등록되지 않은 경우 400 에러로 내려갑니다!"
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenAndMemberResponse.class))),
-        @ApiResponse(responseCode = "201", description = "로그인 실패 회원가입 필요", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MembershipResponse.class))),
+        @ApiResponse(responseCode = "400", description = "로그인 실패 회원가입 필요", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberErrorCode.class), examples = {
+            @ExampleObject(name = "MEMBER_004", description = "등록되지 않은 계정입니다.", value = """
+                {
+                    "errorCode": "MEMBER_004",
+                    "message": "회원가입 때 필요한 key 값이 여기 내려갑니다."
+                }
+                """),
+        }))
     })
     @PostMapping("/{type}/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<TokenAndMemberResponse> login(
         @PathVariable(name = "type") SocialLoginType type,
         @Valid @RequestBody LoginRequest loginRequest) throws IOException {
         return ResponseEntity.ok(registerMemberService.login(
