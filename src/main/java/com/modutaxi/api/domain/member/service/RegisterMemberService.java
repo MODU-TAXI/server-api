@@ -8,7 +8,6 @@ import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.fcm.RedisFcmRepositoryImpl;
 import com.modutaxi.api.common.util.validator.NicknameValidator;
-import com.modutaxi.api.domain.member.dto.MemberResponseDto.MembershipResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.entity.Gender;
@@ -70,9 +69,9 @@ public class RegisterMemberService {
     /**
      * 로그인
      * 가입된 멤버 -> TokenAndMemberResponse
-     * 가입되지 않은 멤버 -> MembershipResponse
+     * 가입되지 않은 멤버 -> UN_REGISTERED_MEMBER & key
      */
-    public <T> T login(SocialLoginType type, String accessToken, String fcmToken)
+    public TokenAndMemberResponse login(SocialLoginType type, String accessToken, String fcmToken)
         throws IOException {
         String snsId = getSnsIdByAccessToken(type, accessToken);
         Member member = memberRepository.findBySnsIdAndStatusTrue(snsId).orElse(null);
@@ -80,10 +79,10 @@ public class RegisterMemberService {
         if (member != null) {
             // FCM 토큰 저장
             saveFcmToken(member, fcmToken);
-            return (T) generateMemberToken(member);
+            return generateMemberToken(member);
         } else {
             String key = redisSnsIdRepository.save(snsId);
-            return (T) new MembershipResponse(key);
+            throw new BaseException(MemberErrorCode.UN_REGISTERED_MEMBER, key);
         }
     }
 

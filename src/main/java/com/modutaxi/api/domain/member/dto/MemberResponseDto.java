@@ -31,12 +31,6 @@ public class MemberResponseDto {
     }
 
     @Getter
-    @AllArgsConstructor
-    public static class MembershipResponse {
-        private String key;
-    }
-
-    @Getter
     @Builder
     @AllArgsConstructor
     public static class MemberInfoResponse {
