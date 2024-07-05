@@ -18,6 +18,7 @@ public enum AuthErrorCode implements ErrorCode {
     FAILED_SOCIAL_LOGIN("AUTH_007", "소셜 로그인에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     LOGOUT_JWT("AUTH_008", "로그아웃 처리된 JWT입니다.", HttpStatus.UNAUTHORIZED),
     APPLE_LOGIN_ERROR("AUTH_009", "Apple 로그인에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    APPLE_REVOKE_ERROR("AUTH_010", "Apple 탈퇴에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String errorCode;

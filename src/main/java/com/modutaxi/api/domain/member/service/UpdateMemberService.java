@@ -110,7 +110,7 @@ public class UpdateMemberService {
     }
 
     public CertificationResponse checkSmsCertificationCodeWithJwt(Long memberId, String phoneNumber,
-                                                           String certificationCode) {
+                                                                  String certificationCode) {
         return new CertificationResponse(
             smsService.checkSmsCertificationCodeWithJwt(memberId.toString(), phoneNumber, certificationCode));
     }
