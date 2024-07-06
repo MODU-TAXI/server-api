@@ -18,8 +18,6 @@ import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
-import com.modutaxi.api.domain.chatmessage.service.ChatMessageService;
-import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.participant.dto.ParticipantResponseDto.MemberRoomInResponseList;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
@@ -60,9 +58,7 @@ public class UpdateRoomService {
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
-    private final ChatMessageService chatMessageService;
     private final FcmService fcmService;
-    private final HistoryRepository historyRepository;
     private final ChatService chatService;
     private final GetParticipantService getParticipantService;
     private final ParticipantRepository participantRepository;
@@ -101,6 +97,10 @@ public class UpdateRoomService {
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
+        if (room.getRoomStatus() == RoomStatus.DELETE) {
+            throw new BaseException(RoomErrorCode.EMPTY_ROOM);
+        }
+
         TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
@@ -125,9 +125,6 @@ public class UpdateRoomService {
             }
         });
 
-        //참가자들의 매핑된 방 정보 삭제
-        participantRepository.deleteAllByRoom(room);
-
         memberRoomInResponseList.getInList().forEach(item -> {
                 try {
                     log.info("{}번 유저 삭제하겠습니다.", item.getMemberId());
@@ -139,6 +136,9 @@ public class UpdateRoomService {
                 }
             }
         );
+
+        //참가자들의 매핑된 방 정보 삭제
+        participantRepository.deleteAllByRoom(room);
 
         return new DeleteRoomResponse(true);
     }
