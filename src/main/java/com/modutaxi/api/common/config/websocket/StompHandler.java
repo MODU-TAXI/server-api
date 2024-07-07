@@ -69,7 +69,10 @@ public class StompHandler implements ChannelInterceptor {
 
             String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
             Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
-                    () -> new BaseException(StompErrorCode.EMPTY_MEMBER));
+                    () -> {
+                        log.error("Member with ID {} not found", memberId);
+                        return new BaseException(StompErrorCode.EMPTY_MEMBER);
+                    });
 
             ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(memberId);
 
@@ -82,7 +85,10 @@ public class StompHandler implements ChannelInterceptor {
 
             //없는 방 연결하려 할 때 에러
             Room room = roomRepository.findById(Long.valueOf(roomId)).orElseThrow(
-                    () -> new BaseException(StompErrorCode.FAULT_ROOM_ID));
+                    () -> {
+                        log.error("Room with ID {} not found", roomId);
+                        return new BaseException(StompErrorCode.FAULT_ROOM_ID);
+                    });
 
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 에러
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
