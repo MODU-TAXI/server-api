@@ -1,7 +1,5 @@
 package com.modutaxi.api.common.config.websocket;
 
-import static com.modutaxi.api.common.constants.ServerConstants.FULL_MEMBER;
-
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
@@ -9,15 +7,11 @@ import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
 import com.modutaxi.api.domain.chat.service.ChatService;
-import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
-import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
-import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -68,18 +62,18 @@ public class StompHandler implements ChannelInterceptor {
                     : destination.substring(destination.lastIndexOf("/") + 1);
 
             //없는 방 연결하려 할 때 에러
-            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(Long.valueOf(roomId)).orElseThrow(
-                () -> {
-                    log.error("Room with ID {} not found", roomId);
-                    return new BaseException(StompErrorCode.FAULT_ROOM_ID);
-                });
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(Long.valueOf(roomId))
+                .orElseThrow(
+                    () -> {
+                        log.error("Room with ID {} not found", roomId);
+                        return new BaseException(StompErrorCode.FAULT_ROOM_ID);
+                    });
 
             //roomId가 안들어왔으면 에러
             if (roomId == null || roomId == "") {
                 log.error("구독요청 \"sub/chat/{roomId}\" 에서 roomId가 들어오지 않았습니다.");
                 throw new BaseException(StompErrorCode.ROOM_ID_IS_NULL);
             }
-
 
             String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
             Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
@@ -91,7 +85,7 @@ public class StompHandler implements ChannelInterceptor {
             ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(
                 memberId);
 
-            if( !participantRepository.existsByMemberAndRoom(member, room) ) {
+            if (!participantRepository.existsByMemberAndRoom(member, room)) {
                 throw new BaseException(StompErrorCode.YOUR_IS_NOT_PARTICIPANT);
             }
 

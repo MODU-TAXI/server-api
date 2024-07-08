@@ -89,10 +89,10 @@ public class UpdatePaymentMemberService {
 
             Member manager = room.getRoomManager();
 
-            updateRoomService.deleteRoom(manager, roomId);
-
             // 룸 상태 변경
             room.updateRoomStatusAfterPayment();
+
+            updateRoomService.deleteRoom(manager, roomId);
 
             // 방장에게 모든 정산 완료를 알리는 메시지 전송
             ChatMessageRequestDto paymentCompleteMessageRequestDto =
