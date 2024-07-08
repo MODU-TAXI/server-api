@@ -12,6 +12,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     boolean existsRoomByRoomManagerId(Long memberId);
 
-    @Query(value = "SELECT r FROM Room r WHERE r.id =: id AND r.roomStatus < 4")
+    @Query(value = "SELECT r FROM Room r WHERE r.id =:id AND r.roomStatus < 4")
     Optional<Room> findByIdAndRoomStatusIsNotDelete(Long id);
 }
