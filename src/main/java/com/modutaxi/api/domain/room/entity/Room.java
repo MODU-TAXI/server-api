@@ -1,15 +1,18 @@
 package com.modutaxi.api.domain.room.entity;
 
 import com.modutaxi.api.common.entity.BaseTime;
-import com.modutaxi.api.domain.spot.entity.Spot;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomInternalDto.InternalUpdateRoomDto;
+import com.modutaxi.api.domain.spot.entity.Spot;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +51,7 @@ public class Room extends BaseTime {
 
     @NotNull
     @Builder.Default
-    private RoomStatus roomStatus = RoomStatus.PROCEEDING;
+    private RoomStatus roomStatus = RoomStatus.BEFORE_MATCHING;
 
     @Nullable
     private int roomTagBitMask;
@@ -78,7 +81,8 @@ public class Room extends BaseTime {
         this.roomTagBitMask = updateRoomDto.getRoomTagBitMask();
         GeometryFactory geometryFactory = new GeometryFactory();
         Coordinate coordinate
-                = new Coordinate(updateRoomDto.getDepartureLongitude(), updateRoomDto.getDepartureLatitude());
+            = new Coordinate(updateRoomDto.getDepartureLongitude(),
+            updateRoomDto.getDepartureLatitude());
         this.departurePoint = geometryFactory.createPoint(coordinate);
         this.departureName = updateRoomDto.getDepartureName();
         this.departureTime = updateRoomDto.getDepartureTime();
@@ -87,10 +91,20 @@ public class Room extends BaseTime {
         this.durationMinutes = updateRoomDto.getDurationMinutes();
     }
 
-    public void roomStatusUpdateDelete() { this.roomStatus = RoomStatus.DELETE; }
+    public void updateRoomStatusDelete() {
+        this.roomStatus = RoomStatus.DELETE;
+    }
 
-    public void roomStatusUpdate() {
-        this.roomStatus = RoomStatus.COMPLETE;
+    public void updateRoomStatusAfterMatching() {
+        this.roomStatus = RoomStatus.AFTER_MATCHING;
+    }
+
+    public void updateRoomStatusBeforePayment() {
+        this.roomStatus = RoomStatus.BEFORE_PAYMENT;
+    }
+
+    public void updateRoomStatusAfterPayment() {
+        this.roomStatus = RoomStatus.AFTER_PAYMENT;
     }
 
     public void plusCurrentHeadCount() {

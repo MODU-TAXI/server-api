@@ -82,8 +82,11 @@ public class UpdatePaymentMemberService {
             paymentRoom, PaymentMemberStatus.INCOMPLETE);
         // 1. 정산을 완료하지 않은 멤버가 더 이상 없다면
         if (countsOfIncomplete == 0) {
-            Room room = roomRepository.findById(roomId)
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+
+            // 룸 상태 변경
+            room.updateRoomStatusAfterPayment();
 
             // 방장에게 모든 정산 완료를 알리는 메시지 전송
             ChatMessageRequestDto paymentCompleteMessageRequestDto =

@@ -49,8 +49,8 @@ public class RegisterParticipantService {
      */
     @Transactional
     public ApplyResponse acceptForParticipate(Member member, Long roomId, Long memberId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(
-            () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         Member participant = memberRepository.findByIdAndStatusTrue(memberId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
@@ -68,7 +68,7 @@ public class RegisterParticipantService {
         }
 
         //방 자체 상태가 COMPLETE면 에러
-        if (room.getRoomStatus().equals(RoomStatus.COMPLETE)) {
+        if (room.getRoomStatus().equals(RoomStatus.AFTER_MATCHING)) {
             log.error("{}번 방은 매칭 완료된 방입니다.", roomId);
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }

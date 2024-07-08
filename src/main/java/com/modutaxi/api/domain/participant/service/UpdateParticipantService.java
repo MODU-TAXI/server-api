@@ -16,11 +16,10 @@ import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -50,10 +49,9 @@ public class UpdateParticipantService {
         }
 
         // 존재하는 방이 없다면 에러
-        Room room = roomRepository.findById(Long.valueOf(chatRoomMappingInfo.getRoomId()))
-            .orElseThrow(
-                () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
-            );
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(
+                Long.valueOf(chatRoomMappingInfo.getRoomId()))
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         // 퇴장하려는 대상이 방장인 경우 에러
         if (room.getRoomManager().getId().equals(memberId)) {

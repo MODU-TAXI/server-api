@@ -32,7 +32,7 @@ public class GetPaymentRoomService {
 
     public PaymentRoom getPaymentRoomByRoomId(Long roomId) {
         // 1. 방 조회
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         // 2. 정산방 조회
         return paymentRoomRepository.findByRoomId(room.getId())

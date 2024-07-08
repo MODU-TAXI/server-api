@@ -59,7 +59,7 @@ public class RegisterPaymentRoomService {
 
     public RegisterPaymentRoomResponse register(Member member, PaymentRoomRequest request) {
         // 0. 방 가져오기
-        Room room = roomRepository.findById(request.getRoomId())
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(request.getRoomId())
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         // 1. 방장인지 확인
         checkManager(room.getRoomManager().getId(), member.getId());
@@ -74,7 +74,10 @@ public class RegisterPaymentRoomService {
         registerPaymentMemberList(room.getId(), room.getRoomManager().getId(), paymentRoom,
             request.getParticipantList(), request.getNonParticipantList());
 
-        // 5. 이용 내역 저장
+        // 5. 룸 상태 변경
+        room.updateRoomStatusBeforePayment();
+
+        // 6. 이용 내역 저장
         request.getParticipantList().forEach(participant -> {
             Member participantMember = memberRepository.findById(participant.getId())
                 .orElseThrow(() -> new BaseException(PaymentErrorCode.INVALID_ACCOUNT));
@@ -85,7 +88,7 @@ public class RegisterPaymentRoomService {
             log.info("{}번 ID Member 이용내역 저장", participantMember.getId());
         });
 
-        // 6. 방장의 이름으로 정산 해주세요~ 메시지 전송
+        // 7. 방장의 이름으로 정산 해주세요~ 메시지 전송
         String content = "목적지에 도착했어요,\n'정산하기'를 눌러주세요!";
         ChatMessageRequestDto chatMessageRequestDto =
             new ChatMessageRequestDto(room.getId(), MessageType.PAYMENT_REQUEST_COMPLETE, content,
@@ -133,7 +136,7 @@ public class RegisterPaymentRoomService {
         Member member = memberRepository.findByIdAndStatusTrue(memberId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         // 1. 방에 들어가있는지 확인
