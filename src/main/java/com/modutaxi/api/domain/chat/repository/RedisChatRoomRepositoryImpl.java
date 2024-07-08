@@ -54,6 +54,7 @@ public class RedisChatRoomRepositoryImpl extends BaseRedisRepository implements 
                 new ChatRoomMappingInfo(
                     participant.get().getRoom().getId().toString(),
                     participant.get().getMember().getNickname());
+            setUserEnterInfo(memberId, chatRoomMappingInfo);
         }
         return chatRoomMappingInfo;
     }

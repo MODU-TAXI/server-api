@@ -48,6 +48,6 @@ public class RegisterRoomController {
     public ResponseEntity<RoomDetailResponse> createRoom(
         @CurrentMember Member member,
         @Valid @RequestBody CreateRoomRequest roomRequest) {
-        return ResponseEntity.ok(roomService.createRoom(member, roomRequest));
+        return ResponseEntity.ok(roomService.createRoom(member.getId(), roomRequest));
     }
 }

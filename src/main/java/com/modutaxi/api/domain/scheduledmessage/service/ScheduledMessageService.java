@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.scheduledmessage.service;
 
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
+import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.domain.alarm.entity.AlarmType;
 import com.modutaxi.api.domain.alarm.service.RegisterAlarmService;
 import com.modutaxi.api.domain.chat.service.ChatService;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,26 +88,38 @@ public class ScheduledMessageService {
     @Transactional
     public void updateScheduledMessageStatus(Long scheduledMessageId) {
         ScheduledMessage scheduledMessage = scheduledMessageRepository.findById(scheduledMessageId)
-            .orElseThrow();
+            .orElseThrow(() -> new BaseException(StompErrorCode.FAIL_SEND_MESSAGE));
         scheduledMessage.scheduledMessageStatusUpdate();
         scheduledMessageRepository.save(scheduledMessage);
     }
 
     private Runnable deleteRoom(Long roomId) {
         return () -> {
-            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
-                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
-            if (!room.getRoomStatus().equals(RoomStatus.DELETE)) {
-                updateRoomService.deleteRoom(room.getRoomManager(), roomId);
-            }
+            transactionDeleteRoom(roomId);
         };
     }
+
+    private void transactionDeleteRoom(Long roomId) {
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
+            .orElseThrow(
+                () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
+            );
+        if (!room.getRoomStatus().equals(RoomStatus.DELETE)) {
+            updateRoomService.deleteRoom(room.getRoomManager(), roomId);
+        }
+    }
+
 
     private Runnable chatBotNotice(Long roomId, String content, Long scheduledMessageId,
         MessageType type) {
         return () -> {
-            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
-                .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId).orElseThrow(
+                () -> {
+                    log.error("{} 는 존재하지 않는 방입니다. MessageType = {}", roomId, type.getDescription());
+                    return new BaseException(RoomErrorCode.EMPTY_ROOM);
+                }
+            );
+
             if (room.getRoomStatus().equals(RoomStatus.BEFORE_MATCHING)) {
                 updateScheduledMessageStatus(scheduledMessageId);
 

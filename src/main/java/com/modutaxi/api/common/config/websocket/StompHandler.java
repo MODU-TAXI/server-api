@@ -13,7 +13,9 @@ import com.modutaxi.api.domain.chatmessage.dto.ChatMessageRequestDto;
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
+import com.modutaxi.api.domain.room.entity.RoomStatus;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class StompHandler implements ChannelInterceptor {
     private final RoomRepository roomRepository;
     private final FcmService fcmService;
     private final MemberRepository memberRepository;
+    private final ParticipantRepository participantRepository;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -64,12 +67,12 @@ public class StompHandler implements ChannelInterceptor {
                 destination.lastIndexOf('/') == -1 ? null
                     : destination.substring(destination.lastIndexOf("/") + 1);
 
-            String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
-            Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
-                () -> new BaseException(StompErrorCode.EMPTY_MEMBER));
-
-            ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(
-                memberId);
+            //없는 방 연결하려 할 때 에러
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(Long.valueOf(roomId)).orElseThrow(
+                () -> {
+                    log.error("Room with ID {} not found", roomId);
+                    return new BaseException(StompErrorCode.FAULT_ROOM_ID);
+                });
 
             //roomId가 안들어왔으면 에러
             if (roomId == null || roomId == "") {
@@ -77,10 +80,20 @@ public class StompHandler implements ChannelInterceptor {
                 throw new BaseException(StompErrorCode.ROOM_ID_IS_NULL);
             }
 
-            //없는 방 연결하려 할 때 에러
-            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(Long.valueOf(roomId))
-                .orElseThrow(
-                    () -> new BaseException(StompErrorCode.FAULT_ROOM_ID));
+
+            String memberId = redisChatRoomRepositoryImpl.findMemberBySessionId(sessionId);
+            Member member = memberRepository.findById(Long.valueOf(memberId)).orElseThrow(
+                () -> {
+                    log.error("Member with ID {} not found", memberId);
+                    return new BaseException(StompErrorCode.EMPTY_MEMBER);
+                });
+
+            ChatRoomMappingInfo chatRoomMappingInfo = redisChatRoomRepositoryImpl.findChatInfoByMemberId(
+                memberId);
+
+            if( !participantRepository.existsByMemberAndRoom(member, room) ) {
+                throw new BaseException(StompErrorCode.YOUR_IS_NOT_PARTICIPANT);
+            }
 
             //이미 연결된 방이 있는데 애꿎은 방을 들어가려고 하면 에러
             //연결되어 있는 방이 존재하면서 && 요청으로 들어온 roomId가 연결되어 있는 방과 다를 때
@@ -90,25 +103,21 @@ public class StompHandler implements ChannelInterceptor {
                 throw new BaseException(StompErrorCode.ALREADY_ROOM_IN);
             }
 
-            if (room.getCurrentHeadcount() >= FULL_MEMBER) {
-                log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
-                throw new BaseException(StompErrorCode.FULL_CHAT_ROOM);
-            }
-
-            String nickName = member.getNickname();
-
-            if (chatRoomMappingInfo == null) {
-                fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
-                chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
-                redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
-
-                room.plusCurrentHeadCount();
-                ChatMessageRequestDto joinMessage = new ChatMessageRequestDto(
-                    Long.valueOf(roomId), MessageType.JOIN, nickName + "님이 들어왔습니다.",
-                    chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now(), "");
-
-                chatService.sendChatMessage(joinMessage);
-            }
+//            String nickName = member.getNickname();
+//
+//            if (chatRoomMappingInfo == null) {
+//                log.info("첫 구독");
+//                fcmService.subscribe(Long.valueOf(memberId), Long.valueOf(roomId));
+//                chatRoomMappingInfo = new ChatRoomMappingInfo(roomId, nickName);
+//                redisChatRoomRepositoryImpl.setUserEnterInfo(memberId, chatRoomMappingInfo);
+//
+//                room.plusCurrentHeadCount();
+//                ChatMessageRequestDto joinMessage = new ChatMessageRequestDto(
+//                    Long.valueOf(roomId), MessageType.JOIN, nickName + "님이 들어왔습니다.",
+//                    chatRoomMappingInfo.getNickname(), memberId, LocalDateTime.now(), "");
+//
+//                chatService.sendChatMessage(joinMessage);
+//            }
             log.info("SUBSCRIBE");
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) {
             String sessionId = accessor.getSessionId();

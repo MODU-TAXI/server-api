@@ -14,6 +14,8 @@ public enum StompErrorCode implements ErrorCode {
     ROOM_ID_IS_NULL("SOCK_ROOM_002", "방 ID 가 null입니다.", HttpStatus.BAD_REQUEST),
     FAULT_ROOM_ID("SOCK_ROOM_003", "잘못된 방 번호입니다.", HttpStatus.BAD_REQUEST),
     ALREADY_ROOM_IN("SOCK_ROOM_004", "당신은 이미 방에 참여한 상태입니다.", HttpStatus.BAD_REQUEST),
+    DELETED_ROOM("SOCK_ROOM_005", "삭제된 방입니다.", HttpStatus.BAD_REQUEST),
+    YOUR_IS_NOT_PARTICIPANT("SOCK_ROOM_006", "당신은 해당 방의 참가자가 아닙니다.", HttpStatus.BAD_REQUEST),
 
 
     //pub/sub 관련

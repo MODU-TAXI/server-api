@@ -12,6 +12,7 @@ import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.fcm.FcmService;
 import com.modutaxi.api.domain.chat.ChatRoomMappingInfo;
 import com.modutaxi.api.domain.chat.repository.RedisChatRoomRepositoryImpl;
+import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.participant.mapper.ParticipantMapper;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
@@ -50,12 +51,21 @@ public class RegisterRoomService {
     private final ScheduledMessageService scheduledMessageService;
     private final FcmService fcmService;
     private final ParticipantRepository participantRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
-    public RoomDetailResponse createRoom(Member member, CreateRoomRequest createRoomRequest) {
+    public RoomDetailResponse createRoom(Long memberId, CreateRoomRequest createRoomRequest) {
+        Member member = memberRepository.findByIdAndStatusTrue(memberId)
+            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+
+        if (participantRepository.findByMemberId(member.getId()).isPresent()) {
+            throw new BaseException(RoomErrorCode.ALREADY_IN_ROOM);
+        }
+
         if (member.isBlocked()) {
             throw new BaseException(MemberErrorCode.BLOCKED_MEMBER);
         }
+
         createRoomRequestValidator(member, createRoomRequest);
 
         //거점 찾기
@@ -95,11 +105,10 @@ public class RegisterRoomService {
 
         roomRepository.save(room);
 
-        //fcm구독
+        // fcm 구독
         fcmService.subscribe(member.getId(), room.getId());
 
         participantRepository.save(ParticipantMapper.toEntity(member, room));
-
         registerTaxiInfoService.savePath(room.getId(), path);
 
         //매핑 정보 저장
