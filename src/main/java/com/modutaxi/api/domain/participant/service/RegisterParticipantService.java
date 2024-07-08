@@ -59,7 +59,8 @@ public class RegisterParticipantService {
 
         if (redisChatRoomRepositoryImpl.findChatInfoByMemberId(participant.getId().toString())
             != null) {
-            throw new BaseException(ChatErrorCode.ALREADY_ROOM_IN);
+            roomWaitingRepository.deleteByMemberAndRoom(participant, room);
+            throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_OTHER_ROOM);
         }
 
         //방 매니저가 아닌 사용자의 허락은 에러
@@ -86,6 +87,7 @@ public class RegisterParticipantService {
         }
 
         if (room.getCurrentHeadcount() == FULL_MEMBER) {
+            log.error("참여하려고 하는 {}방의 인원수가 4명으로 만석입니다. 따라서 방에 참가할 수 없습니다.", roomId);
             throw new BaseException(ParticipateErrorCode.ROOM_IS_FULL);
         }
 

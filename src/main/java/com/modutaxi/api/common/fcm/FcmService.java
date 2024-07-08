@@ -144,7 +144,7 @@ public class FcmService {
             participantRepository.findAllByRoomId(chatMessageRequestDto.getRoomId());
         participantList.stream()
             .filter(participant -> !participant.getMember().getId()
-                .equals(chatMessageRequestDto.getMemberId()))
+                .equals(Long.valueOf(chatMessageRequestDto.getMemberId())))
             .forEach(participant -> {
                 String fcmToken = validateAndGetFcmToken(participant.getMember().getId());
                 Message message = Message.builder()
@@ -156,7 +156,7 @@ public class FcmService {
                     .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
                     .setToken(fcmToken)
                     .setNotification(Notification.builder()
-                        .setTitle("모두의택시")
+                        .setTitle(chatMessageRequestDto.getSender() + "님")
                         .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
                             ? "사진" : chatMessageRequestDto.getContent())
                         .build())

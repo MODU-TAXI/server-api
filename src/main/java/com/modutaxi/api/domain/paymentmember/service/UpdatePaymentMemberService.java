@@ -17,6 +17,7 @@ import com.modutaxi.api.domain.paymentroom.entity.PaymentRoom;
 import com.modutaxi.api.domain.paymentroom.service.GetPaymentRoomService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.room.service.UpdateRoomService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class UpdatePaymentMemberService {
     private final GetPaymentRoomService getPaymentRoomService;
     private final RegisterAlarmService registerAlarmService;
     private final ChatService chatService;
+    private final UpdateRoomService updateRoomService;
 
     private final PaymentMemberRepository paymentMemberRepository;
     private final RoomRepository roomRepository;
@@ -85,19 +87,23 @@ public class UpdatePaymentMemberService {
             Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
+            Member manager = room.getRoomManager();
+
+            updateRoomService.deleteRoom(manager, roomId);
+
             // 방장에게 모든 정산 완료를 알리는 메시지 전송
             ChatMessageRequestDto paymentCompleteMessageRequestDto =
                 new ChatMessageRequestDto(
                     roomId, MessageType.PAYMENT_ALL_COMPLETE,
                     "모든 정산이 완료됐어요!",
                     MessageType.PAYMENT_ALL_COMPLETE.getSenderName(),
-                    room.getRoomManager().getId().toString(),
+                    manager.getId().toString(),
                     LocalDateTime.now(), "");
             chatService.sendChatMessage(paymentCompleteMessageRequestDto);
 
             // 알림 저장
             registerAlarmService.registerAlarm(AlarmType.PAYMENT_ALL_COMPLETE, roomId,
-                room.getRoomManager().getId());
+                manager.getId());
         }
     }
 }
