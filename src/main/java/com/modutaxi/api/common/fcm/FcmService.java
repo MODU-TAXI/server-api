@@ -147,6 +147,7 @@ public class FcmService {
                 .equals(Long.valueOf(chatMessageRequestDto.getMemberId())))
             .forEach(participant -> {
                 String fcmToken = validateAndGetFcmToken(participant.getMember().getId());
+                System.out.println("member = " + +participant.getMember().getId() + ", fcmToken = " + fcmToken);
                 Message message = Message.builder()
                     .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
                     .putData("messageType", chatMessageRequestDto.getType().toString())
