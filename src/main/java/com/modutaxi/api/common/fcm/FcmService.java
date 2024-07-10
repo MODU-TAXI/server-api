@@ -105,21 +105,25 @@ public class FcmService {
     }
 
     private void sendMessageForManager(ChatMessageRequestDto chatMessageRequestDto) {
-        String fcmToken = validateAndGetFcmToken(Long.valueOf(chatMessageRequestDto.getMemberId()));
-        Message message = Message.builder()
-            .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
-            .putData("messageType", chatMessageRequestDto.getType().toString())
-            .putData("message", chatMessageRequestDto.getContent())
-            .putData("sender", chatMessageRequestDto.getSender())
-            .putData("memberId", chatMessageRequestDto.getMemberId())
-            .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody(chatMessageRequestDto.getContent())
-                .build())
-            .build();
-        send(message);
+        String fcmToken = redisFcmRepository.findById(
+            Long.valueOf(chatMessageRequestDto.getMemberId()));
+        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+            || fcmToken.isBlank())) {
+            Message message = Message.builder()
+                .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
+                .putData("messageType", chatMessageRequestDto.getType().toString())
+                .putData("message", chatMessageRequestDto.getContent())
+                .putData("sender", chatMessageRequestDto.getSender())
+                .putData("memberId", chatMessageRequestDto.getMemberId())
+                .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
+                .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                    .setTitle("모두의택시")
+                    .setBody(chatMessageRequestDto.getContent())
+                    .build())
+                .build();
+            send(message);
+        }
     }
 
     private void sendMessageForEveryone(ChatMessageRequestDto chatMessageRequestDto) {
@@ -146,22 +150,25 @@ public class FcmService {
             .filter(participant -> !participant.getMember().getId()
                 .equals(Long.valueOf(chatMessageRequestDto.getMemberId())))
             .forEach(participant -> {
-                String fcmToken = validateAndGetFcmToken(participant.getMember().getId());
-                Message message = Message.builder()
-                    .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
-                    .putData("messageType", chatMessageRequestDto.getType().toString())
-                    .putData("message", chatMessageRequestDto.getContent())
-                    .putData("sender", chatMessageRequestDto.getSender())
-                    .putData("memberId", chatMessageRequestDto.getMemberId())
-                    .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
-                    .setToken(fcmToken)
-                    .setNotification(Notification.builder()
-                        .setTitle(chatMessageRequestDto.getSender() + "님")
-                        .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
-                            ? "사진" : chatMessageRequestDto.getContent())
-                        .build())
-                    .build();
-                send(message);
+                String fcmToken = redisFcmRepository.findById(participant.getMember().getId());
+                if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+                    || fcmToken.isBlank())) {
+                    Message message = Message.builder()
+                        .putData("roomId", Long.toString(chatMessageRequestDto.getRoomId()))
+                        .putData("messageType", chatMessageRequestDto.getType().toString())
+                        .putData("message", chatMessageRequestDto.getContent())
+                        .putData("sender", chatMessageRequestDto.getSender())
+                        .putData("memberId", chatMessageRequestDto.getMemberId())
+                        .putData("dateTime", chatMessageRequestDto.getDateTime().toString())
+                        .setToken(fcmToken)
+                        .setNotification(Notification.builder()
+                            .setTitle(chatMessageRequestDto.getSender() + "님")
+                            .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
+                                ? "사진" : chatMessageRequestDto.getContent())
+                            .build())
+                        .build();
+                    send(message);
+                }
             });
     }
 
@@ -183,25 +190,26 @@ public class FcmService {
         send(message);
     }
 
-
     /**
      * 새로운 참여자의 참요 요청 알림, 방장에게
      */
     public void sendNewParticipant(Member roomManager, String roomId, String nickName) {
-        String fcmToken = validateAndGetFcmToken(roomManager.getId());
-        Message message = Message.builder()
-            .putData("messageType", "PARTICIPATE_REQUEST")
-            .putData("message", nickName + "님이 매칭 대기중이에요!")
-            .putData("roomId", roomId)
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody(nickName + "님이 매칭 대기중이에요!")
-                .build())
-            .build();
-        send(message);
+        String fcmToken = roomManager.getFcmToken();
+        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+            || fcmToken.isBlank())) {
+            Message message = Message.builder()
+                .putData("messageType", "PARTICIPATE_REQUEST")
+                .putData("message", nickName + "님이 매칭 대기중이에요!")
+                .putData("roomId", roomId)
+                .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                    .setTitle("모두의택시")
+                    .setBody(nickName + "님이 매칭 대기중이에요!")
+                    .build())
+                .build();
+            send(message);
+        }
     }
-
 
     /**
      * 방 삭제 되었을 때
@@ -225,25 +233,27 @@ public class FcmService {
      * 사용자가 매칭수락 받았을 때 알림
      */
     public void sendPermitParticipate(Member participant, String roomId) {
-        String fcmToken = validateAndGetFcmToken(participant.getId());
-        Message message = Message.builder()
-            .putData("messageType", "MATCHING_SUCCESS")
-            .putData("message", "매칭이 수락되었어요! 지금 바로 채팅을 시작하세요.")
-            .putData("roomId", roomId)
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("모두의택시")
-                .setBody("매칭이 수락되었어요! 지금 바로 채팅을 시작하세요.")
-                .build())
-            .build();
-        send(message);
+        String fcmToken = redisFcmRepository.findById(participant.getId());
+        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+            || fcmToken.isBlank())) {
+            Message message = Message.builder()
+                .putData("messageType", "MATCHING_SUCCESS")
+                .putData("message", "매칭이 수락되었어요! 지금 바로 채팅을 시작하세요.")
+                .putData("roomId", roomId)
+                .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                    .setTitle("모두의택시")
+                    .setBody("매칭이 수락되었어요! 지금 바로 채팅을 시작하세요.")
+                    .build())
+                .build();
+            send(message);
+        }
     }
-
 
     public String validateAndGetFcmToken(Long memberId) {
         // 캐싱 조회 시도
         String fcmToken = redisFcmRepository.findById(memberId);
-        if (fcmToken == null || Objects.equals(fcmToken, "")) {
+        if (fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()) {
             Member member = memberRepository.findByIdAndStatusTrue(memberId)
                 .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
             fcmToken = member.getFcmToken();
