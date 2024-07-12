@@ -20,4 +20,10 @@ public class AccountResponseDto {
     public static class AccountsResponse {
         private List<AccountResponse> accounts;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteAccountResponse {
+        private boolean isDeleted;
+    }
 }

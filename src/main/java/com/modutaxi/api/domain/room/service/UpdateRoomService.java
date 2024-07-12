@@ -110,13 +110,14 @@ public class UpdateRoomService {
         MemberRoomInResponseList memberRoomInResponseList
             = getParticipantService.getParticipateInRoom(member, deleteRoomId);
 
-        //방 Soft Delete
+        // 방 Soft Delete
         room.updateRoomStatusDelete();
 
-        // 참가자들에게 방 삭제 알림 및 FCM 구독 해지
+        // 참가자들에게 방 삭제 알림 토픽으로 전송
+        fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
+        // FCM 구독 해지
         memberRoomInResponseList.getInList().forEach(item -> {
             try {
-                fcmService.sendDeleteRoom(member.getId(), deleteRoomId);
                 fcmService.unsubscribe(item.getMemberId(), deleteRoomId);
             } catch (IllegalArgumentException e) {
                 log.error("memberId: {}에 대해 roomId: {}에서 FCM 알림 전송 또는 구독 해지 실패. 오류: {}",

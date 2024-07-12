@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/accounts")
-@Tag(name = "계좌 조회", description = "계좌 조회 API")
+@Tag(name = "계좌", description = "계좌 API")
 public class GetAccountController {
 
     private final GetAccountService getAccountService;
