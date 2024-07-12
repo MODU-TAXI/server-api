@@ -30,7 +30,7 @@ public class NicknameValidator {
             throw new BaseException(MemberErrorCode.INVALID_NICKNAME);
         }
         // 비속어 포함
-        for (String profanity : ProfanityList.PROFANITIES) {
+        for (String profanity : NicknameList.PROFANITIES) {
             if (nickname.toLowerCase().contains(profanity.toLowerCase())) {
                 throw new BaseException(MemberErrorCode.INAPPROPRIATE_WORD_NICKNAME);
             }
