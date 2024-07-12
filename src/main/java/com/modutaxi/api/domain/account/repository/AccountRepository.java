@@ -19,6 +19,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @NotNull
     Optional<Account> findById(@NotNull @Param("id") Long id);
 
+    Optional<Account> findByIdAndMember(Long id, Member member);
+
     List<Account> findAllByMemberAndStatusTrue(@Param("member") Member member);
 
     void deleteByMember(@Param("member") Member member);

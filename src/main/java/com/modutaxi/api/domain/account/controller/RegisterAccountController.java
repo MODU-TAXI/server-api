@@ -7,7 +7,6 @@ import com.modutaxi.api.domain.account.service.RegisterAccountService;
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Transactional
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/accounts")
-@Tag(name = "계좌 등록", description = "계좌 등록 API")
+@Tag(name = "계좌", description = "계좌 API")
 public class RegisterAccountController {
 
     private final RegisterAccountService registerAccountService;
