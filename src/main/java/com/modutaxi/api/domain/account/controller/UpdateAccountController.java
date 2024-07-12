@@ -1,6 +1,7 @@
 package com.modutaxi.api.domain.account.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
+import com.modutaxi.api.domain.account.dto.AccountResponseDto.DeleteAccountResponse;
 import com.modutaxi.api.domain.account.service.UpdateAccountService;
 import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,10 +26,9 @@ public class UpdateAccountController {
      */
     @Operation(summary = "계좌 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Integer> delete(
+    public ResponseEntity<DeleteAccountResponse> delete(
         @CurrentMember Member member,
         @PathVariable("id") Long id) {
-        updateAccountService.delete(member, id);
-        return ResponseEntity.ok(200);
+        return ResponseEntity.ok(updateAccountService.delete(member, id));
     }
 }
