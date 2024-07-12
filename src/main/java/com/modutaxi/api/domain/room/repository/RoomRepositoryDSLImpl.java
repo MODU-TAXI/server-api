@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.room.repository;
 
+import static com.modutaxi.api.domain.room.entity.RoomStatus.BEFORE_MATCHING;
+
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchIntegrationResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchListResponse;
 import com.modutaxi.api.domain.room.dao.RoomMysqlResponse.SearchMapResponse;
@@ -11,18 +13,15 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.modutaxi.api.domain.room.entity.RoomStatus.PROCEEDING;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,12 +30,15 @@ public class RoomRepositoryDSLImpl implements RoomRepositoryDSL {
     private final QRoom room = QRoom.room;
 
     @Override
-    public Slice<SearchListResponse> findNearRoomsList(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore, Pageable pageable, RoomSortType sortType) {
+    public Slice<SearchListResponse> findNearRoomsList(Long spotId, Integer tagBitMask,
+        Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter,
+        LocalDateTime timeBefore, Pageable pageable, RoomSortType sortType) {
         return listToSlice(
             queryFactory
                 .select(createSearchExpression(SearchListResponse.class))
                 .from(room)
-                .where(createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter, timeBefore))
+                .where(createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius,
+                    timeAfter, timeBefore))
                 .orderBy(createListOrderSpecifiers(point, sortType))
                 .limit(pageable.getPageSize() + 1)
                 .offset(pageable.getOffset())
@@ -45,20 +47,28 @@ public class RoomRepositoryDSLImpl implements RoomRepositoryDSL {
     }
 
     @Override
-    public List<SearchMapResponse> findNearRoomsMap(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore) {
+    public List<SearchMapResponse> findNearRoomsMap(Long spotId, Integer tagBitMask,
+        Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter,
+        LocalDateTime timeBefore) {
         return queryFactory
             .select(createSearchExpression(SearchMapResponse.class))
             .from(room)
-            .where(createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter, timeBefore))
+            .where(
+                createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter,
+                    timeBefore))
             .fetch();
     }
 
     @Override
-    public List<SearchIntegrationResponse> findNearRoomsIntegration(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore, RoomSortType sortType) {
+    public List<SearchIntegrationResponse> findNearRoomsIntegration(Long spotId, Integer tagBitMask,
+        Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter,
+        LocalDateTime timeBefore, RoomSortType sortType) {
         return queryFactory
             .select(createSearchExpression(SearchIntegrationResponse.class))
             .from(room)
-            .where(createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter, timeBefore))
+            .where(
+                createSearchRoomPredicate(spotId, tagBitMask, isImminent, point, radius, timeAfter,
+                    timeBefore))
             .orderBy(createListOrderSpecifiers(point, sortType))
             .fetch();
     }
@@ -106,11 +116,15 @@ public class RoomRepositoryDSLImpl implements RoomRepositoryDSL {
         return null;
     }
 
-    private BooleanBuilder createSearchRoomPredicate(Long spotId, Integer tagBitMask, Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter, LocalDateTime timeBefore) {
+    private BooleanBuilder createSearchRoomPredicate(Long spotId, Integer tagBitMask,
+        Boolean isImminent, Point point, Long radius, LocalDateTime timeAfter,
+        LocalDateTime timeBefore) {
         BooleanBuilder predicate = new BooleanBuilder();
-        predicate.and(room.roomStatus.eq(PROCEEDING))
-            .and(Expressions.numberTemplate(Long.class, "ST_DISTANCE_SPHERE({0}, {1})", room.departurePoint, point).loe(radius))
-            .and(Expressions.numberTemplate(Integer.class, "BIT_AND({0}, {1})", room.roomTagBitMask, tagBitMask).eq(tagBitMask))
+        predicate.and(room.roomStatus.eq(BEFORE_MATCHING))
+            .and(Expressions.numberTemplate(Long.class, "ST_DISTANCE_SPHERE({0}, {1})",
+                room.departurePoint, point).loe(radius))
+            .and(Expressions.numberTemplate(Integer.class, "BIT_AND({0}, {1})", room.roomTagBitMask,
+                tagBitMask).eq(tagBitMask))
         ;
         if (isImminent) {
             predicate.and(room.departureTime.between(timeAfter, timeBefore));
@@ -125,16 +139,24 @@ public class RoomRepositoryDSLImpl implements RoomRepositoryDSL {
         List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
         switch (sortType) {
             case NEW:
-                orderSpecifiers.add(Expressions.numberTemplate(Long.class, "TIMESTAMPDIFF(SECOND, {0}, {1})", LocalDateTime.now(), room.createdAt).abs().asc());
-                orderSpecifiers.add(Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})", room.departurePoint, point).asc());
+                orderSpecifiers.add(
+                    Expressions.numberTemplate(Long.class, "TIMESTAMPDIFF(SECOND, {0}, {1})",
+                        LocalDateTime.now(), room.createdAt).abs().asc());
+                orderSpecifiers.add(
+                    Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})",
+                        room.departurePoint, point).asc());
                 break;
             case DISTANCE:
-                orderSpecifiers.add(Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})", room.departurePoint, point).asc());
+                orderSpecifiers.add(
+                    Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})",
+                        room.departurePoint, point).asc());
                 orderSpecifiers.add(room.departureTime.asc());
                 break;
             case ENDTIME:
                 orderSpecifiers.add(room.departureTime.asc());
-                orderSpecifiers.add(Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})", room.departurePoint, point).asc());
+                orderSpecifiers.add(
+                    Expressions.numberTemplate(Float.class, "ST_DISTANCE_SPHERE({0}, {1})",
+                        room.departurePoint, point).asc());
                 break;
         }
         return orderSpecifiers.toArray(new OrderSpecifier[orderSpecifiers.size()]);

@@ -74,8 +74,8 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.USER_ALREADY_IN_WAITING_LIST);
         }
 
-        // 방이 COMPLETE면 에러
-        if (room.getRoomStatus().equals(RoomStatus.COMPLETE)) {
+        // 방이 매칭 완료면 에러
+        if (room.getRoomStatus().equals(RoomStatus.AFTER_MATCHING)) {
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
 
@@ -93,7 +93,7 @@ public class RoomWaitingService {
     public RoomWaitingResponseList getWaitingList(Long memberId, Long roomId) {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
             -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-        Room room = roomRepository.findById(roomId).orElseThrow(
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId).orElseThrow(
             () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<RoomWaiting> waitingList = roomWaitingRepository.findAllByRoomId(roomId);
@@ -116,8 +116,8 @@ public class RoomWaitingService {
         Member member = memberRepository.findByIdAndStatusTrue(memberId).orElseThrow(()
             -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
 
-        Room room = roomRepository.findById(roomId).orElseThrow(()
-            -> new BaseException(RoomErrorCode.EMPTY_ROOM));
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
+            .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<RoomWaiting> waitingList = roomWaitingRepository.findAllByRoomId(roomId);
 

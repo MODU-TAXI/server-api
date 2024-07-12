@@ -11,6 +11,7 @@ import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Objects;
 
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
@@ -94,6 +96,7 @@ public class JwtTokenProvider {
         String memberId = getMemberIdByToken(token, refreshSecretKey);
         String refreshToken = redisRTKRepository.findAndDeleteById(memberId);
         if (refreshToken == null || !Objects.equals(token, refreshToken)) { // 검색 실패
+            log.error("{}번 ID JWT 만료!", memberId);
             throw new BaseException(AuthErrorCode.EXPIRED_MEMBER_JWT);
         }
         return getAuthentication(memberId);

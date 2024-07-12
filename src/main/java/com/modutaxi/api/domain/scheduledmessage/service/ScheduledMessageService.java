@@ -37,10 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ScheduledMessageService {
 
-    private static final String MATCHING_COMPLETE = "매칭완료 하시겠습니까?";
-    private static final String CALL_TAXI = "택시 부르러 가볼까요?";
-
-    private static final String PAYMENT_RE_REQUEST = "정산 요청을 진행하세요.";
+    private static final String MATCHING_COMPLETE = "매칭 완료를 눌러주세요.";
+    private static final String CALL_TAXI = "택시를 불러볼까요?";
+    private static final String PAYMENT_RE_REQUEST = "정산 요청을 진행해주세요.";
     private static final long BEFORE_FIVE_MINUTES = 300;
     private static final int NO_DELAY = 0;
 
@@ -101,7 +100,7 @@ public class ScheduledMessageService {
     }
 
     private void transactionDeleteRoom(Long roomId) {
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(
                 () -> new BaseException(RoomErrorCode.EMPTY_ROOM)
             );
@@ -114,14 +113,14 @@ public class ScheduledMessageService {
     private Runnable chatBotNotice(Long roomId, String content, Long scheduledMessageId,
         MessageType type) {
         return () -> {
-            Room room = roomRepository.findById(roomId).orElseThrow(
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId).orElseThrow(
                 () -> {
                     log.error("{} 는 존재하지 않는 방입니다. MessageType = {}", roomId, type.getDescription());
                     return new BaseException(RoomErrorCode.EMPTY_ROOM);
                 }
             );
 
-            if (room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+            if (room.getRoomStatus().equals(RoomStatus.BEFORE_MATCHING)) {
                 updateScheduledMessageStatus(scheduledMessageId);
 
                 if (type == MessageType.PAYMENT_RE_REQUEST) {

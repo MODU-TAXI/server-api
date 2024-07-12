@@ -36,6 +36,7 @@ public class UpdatePaymentMemberService {
     private final PaymentMemberRepository paymentMemberRepository;
     private final RoomRepository roomRepository;
 
+    @Transactional
     public UpdatePaymentMemberResponse updatePaymentMembersToComplete(Member member,
         Long roomId) {
         // 1. 정산방 가져오기
@@ -79,15 +80,19 @@ public class UpdatePaymentMemberService {
     /**
      * 모든 멤버 정산 완료 시 메시지를 전송합니다.
      */
-    private void checkAllComplete(Long roomId, PaymentRoom paymentRoom) {
+    @Transactional
+    public void checkAllComplete(Long roomId, PaymentRoom paymentRoom) {
         int countsOfIncomplete = paymentMemberRepository.countByPaymentRoomAndStatus(
             paymentRoom, PaymentMemberStatus.INCOMPLETE);
         // 1. 정산을 완료하지 않은 멤버가 더 이상 없다면
         if (countsOfIncomplete == 0) {
-            Room room = roomRepository.findById(roomId)
+            Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
                 .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
             Member manager = room.getRoomManager();
+
+            // 룸 상태 변경
+            room.updateRoomStatusAfterPayment();
 
             updateRoomService.deleteRoom(manager, roomId);
 

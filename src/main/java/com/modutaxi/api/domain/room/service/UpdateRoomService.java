@@ -68,7 +68,7 @@ public class UpdateRoomService {
     public RoomDetailResponse updateRoom(Member member, Long roomId,
         UpdateRoomRequest updateRoomRequest) {
 
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
@@ -93,8 +93,7 @@ public class UpdateRoomService {
 
     @Transactional
     public DeleteRoomResponse deleteRoom(Member member, Long roomId) {
-
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         if (room.getRoomStatus() == RoomStatus.DELETE) {
@@ -112,7 +111,7 @@ public class UpdateRoomService {
             = getParticipantService.getParticipateInRoom(member, deleteRoomId);
 
         //방 Soft Delete
-        room.roomStatusUpdateDelete();
+        room.updateRoomStatusDelete();
 
         // 참가자들에게 방 삭제 알림 및 FCM 구독 해지
         memberRoomInResponseList.getInList().forEach(item -> {
@@ -264,17 +263,17 @@ public class UpdateRoomService {
 
     @Transactional
     public UpdateRoomResponse finishMatching(Member manager, Long roomId) {
-        Room room = roomRepository.findById(roomId)
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         checkManager(room.getRoomManager().getId(), manager.getId());
 
-        if (!room.getRoomStatus().equals(RoomStatus.PROCEEDING)) {
+        if (!room.getRoomStatus().equals(RoomStatus.BEFORE_MATCHING)) {
             throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
         }
 
         // 룸 상태 변경
-        room.roomStatusUpdate();
+        room.updateRoomStatusAfterMatching();
         // 정산 요청 메시지 전송
         ChatMessageRequestDto matchingCompleteMessageRequestDto =
             new ChatMessageRequestDto(
@@ -304,4 +303,5 @@ public class UpdateRoomService {
 
         return new UpdateRoomResponse(true);
     }
+
 }

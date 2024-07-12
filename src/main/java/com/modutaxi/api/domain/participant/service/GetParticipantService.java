@@ -9,12 +9,11 @@ import com.modutaxi.api.domain.participant.mapper.ParticipantMapper;
 import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
@@ -29,7 +28,7 @@ public class GetParticipantService {
      */
     public MemberRoomInResponseList getParticipateInRoom(Member member,
         Long roomId) {
-        Room room = roomRepository.findById(roomId).orElseThrow(
+        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId).orElseThrow(
             () -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         List<Participant> participantList = participantRepository.findAllByRoom(room);

@@ -3,7 +3,6 @@ package com.modutaxi.api.domain.room.controller;
 import com.modutaxi.api.common.auth.CurrentMember;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomRequest;
-import com.modutaxi.api.domain.room.dto.RoomRequestDto.UpdateRoomStatusRequest;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.DeleteRoomResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.RoomDetailResponse;
 import com.modutaxi.api.domain.room.dto.RoomResponseDto.UpdateRoomResponse;
