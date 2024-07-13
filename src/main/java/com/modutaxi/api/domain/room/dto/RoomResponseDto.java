@@ -8,12 +8,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class RoomResponseDto {
 
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class RoomDetailResponse {
         @Schema(example = "1", description = "매니저 ID")
         private Long managerId;
@@ -74,6 +76,7 @@ public class RoomResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class RoomSimpleResponse {
         @Schema(description = "택시팟 id")
         private Long roomId;
@@ -104,6 +107,7 @@ public class RoomResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class RoomPreviewResponse {
         @Schema(description = "택시팟 id")
         private Long roomId;
@@ -129,6 +133,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class SearchRoomWithRadiusResponse {
         @Schema(example = "2", description = "방 id")
         private Long id;
@@ -142,6 +147,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class SearchRoomWithRadiusResponses {
         @Schema(description = "방 리스트")
         List<SearchRoomWithRadiusResponse> rooms;
@@ -149,6 +155,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class DeleteRoomResponse {
         @Schema(example = "true", description = "수행완료 여부")
         private Boolean isDeleted;
@@ -156,6 +163,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class UpdateRoomResponse {
         @Schema(example = "true", description = "수행완료 여부")
         private Boolean isUpdated;
@@ -164,6 +172,7 @@ public class RoomResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class SearchRoomIntegrationResponse {
         @Schema(description = "택시팟 id")
         private Long roomId;
@@ -197,6 +206,7 @@ public class RoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class SearchRoomIntegrationResponses {
         @Schema(description = "방 리스트")
         private List<SearchRoomIntegrationResponse> rooms;

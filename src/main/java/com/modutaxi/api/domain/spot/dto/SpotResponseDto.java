@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.spot.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.geo.Point;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 public class SpotResponseDto {
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class CreateSpotResponse {
         @Schema(example = "1", description = "거점 id")
         private Long id;
@@ -17,6 +19,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class DeleteSpotResponse {
         @Schema(example = "1", description = "거점 id")
         private Long id;
@@ -24,6 +27,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class UpdateSpotResponse {
         @Schema(example = "1", description = "거점 id")
         private Long id;
@@ -31,6 +35,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class GetSpotWithDistanceResponse {
         @Schema(example = "2", description = "거점 id")
         private Long id;
@@ -50,6 +55,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class GetSpotWithDistanceResponses {
         @Schema(description = "거점 리스트")
         List<GetSpotWithDistanceResponse> spots;
@@ -57,6 +63,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class GetSpotResponse {
         @Schema(example = "1", description = "거점 id")
         private Long id;
@@ -70,6 +77,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class GetSpotResponses {
         @Schema(description = "거점 리스트")
         List<GetSpotResponse> spots;
@@ -77,6 +85,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class SearchSpotWithRadiusResponse {
         @Schema(example = "2", description = "거점 id")
         private Long id;
@@ -92,6 +101,7 @@ public class SpotResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class SearchSpotWithRadiusResponses {
         @Schema(example = "126.68045", description = "최소 경도")
         private Double minLongitude;

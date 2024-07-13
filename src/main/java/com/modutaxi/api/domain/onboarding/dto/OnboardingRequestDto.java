@@ -4,12 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 public class OnboardingRequestDto {
 
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class OnboardingRequest {
         @Schema(example = "1", description = "설문조사 ID (현재 존재하는 설문조사 ID는 1~2입니다.)")
         private int questionId;

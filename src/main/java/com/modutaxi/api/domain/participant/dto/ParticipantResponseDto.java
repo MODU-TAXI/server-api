@@ -4,11 +4,13 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class ParticipantResponseDto {
     @Getter
     @AllArgsConstructor
     @Builder
+    @ToString
     public static class MemberRoomInResponse {
 
         private Long memberId;
@@ -21,6 +23,7 @@ public class ParticipantResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class MemberRoomInResponseList {
         private List<MemberRoomInResponse> inList;
     }

@@ -5,11 +5,13 @@ import jakarta.persistence.Id;
 import java.io.Serializable;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
 @Getter
 @Document(collection = "taxi-info")
+@ToString
 public class TaxiInfo implements Serializable {
 
     @Id

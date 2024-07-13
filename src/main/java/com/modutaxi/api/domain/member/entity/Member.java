@@ -17,17 +17,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Member extends BaseTime {
 
     @Id
@@ -65,6 +63,7 @@ public class Member extends BaseTime {
     @Builder.Default
     private Role role = Role.ROLE_VISITOR;
 
+//    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
     @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Account> accounts;
 

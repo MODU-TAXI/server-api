@@ -3,17 +3,20 @@ package com.modutaxi.api.domain.likedSpot.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.data.geo.Point;
 
 public class LikedSpotResponseDto {
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class LikedSpotResponse {
         @Schema(example = "true", description = "수행 여부")
         private Boolean isOperated;
     }
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class LikedSpotListResponse {
         @Schema(example = "2", description = "거점 id")
         private Long spotId;

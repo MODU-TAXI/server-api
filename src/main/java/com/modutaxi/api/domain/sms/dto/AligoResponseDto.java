@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.sms.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public class AligoResponseDto {
 
     @Getter
     @NoArgsConstructor
+    @ToString
     public static class AligoErrorResponse {
         private Long result_code;
         private String message;
@@ -17,6 +19,7 @@ public class AligoResponseDto {
 
     @Getter
     @NoArgsConstructor
+    @ToString
     public static class GetPrevMessageResponse {
         private Long mdid;
         private String type;
@@ -27,6 +30,7 @@ public class AligoResponseDto {
 
     @Getter
     @NoArgsConstructor
+    @ToString
     public static class GetPrevMessageResponseList {
         private Long result_code;
         private String message;
@@ -35,6 +39,7 @@ public class AligoResponseDto {
 
     @Getter
     @NoArgsConstructor
+    @ToString
     public static class SendSmsResponse {
         private Long result_code;
         private String message;
@@ -46,6 +51,7 @@ public class AligoResponseDto {
 
     @Getter
     @NoArgsConstructor
+    @ToString
     public static class CheckBalanceResponse {
         private Long result_code;
         private String message;

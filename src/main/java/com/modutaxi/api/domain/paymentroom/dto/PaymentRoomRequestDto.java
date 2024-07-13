@@ -4,12 +4,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 public class PaymentRoomRequestDto {
 
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class PaymentRoomRequest {
         private Long roomId;                    // 방 ID
         private Long accountId;                 // 계좌 ID
@@ -21,6 +23,7 @@ public class PaymentRoomRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class MemberId {
         private Long id;
     }
