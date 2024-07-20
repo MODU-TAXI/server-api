@@ -13,5 +13,6 @@ public class AccountRequestDto {
     public static class AccountRequest {
         private String accountNumber;
         private Bank bank;
+        private String ownerName;
     }
 }
