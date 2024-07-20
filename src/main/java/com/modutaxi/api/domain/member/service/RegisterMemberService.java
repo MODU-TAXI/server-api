@@ -7,6 +7,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.fcm.RedisFcmRepositoryImpl;
+import com.modutaxi.api.common.util.validator.NicknameService;
 import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
@@ -31,6 +32,7 @@ public class RegisterMemberService {
     private final SocialLoginService socialLoginService;
     private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
     private final RedisFcmRepositoryImpl redisFcmRepository;
+    private final NicknameService nicknameService;
 
     /**
      * 회원 가입
@@ -44,6 +46,7 @@ public class RegisterMemberService {
         checkRegister(snsId);
         // member entity 생성
         Member member = MemberMapper.toEntity(snsId, name, gender, phoneNumber);
+        member.changeNickname(nicknameService.generateUniqueNickname());
         memberRepository.save(member);
         // FCM 토큰 저장
         saveFcmToken(member, fcmToken);
