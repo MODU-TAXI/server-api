@@ -30,6 +30,8 @@ public class Account extends BaseTime {
     private String accountNumber;
     @NotNull
     private Bank bank;
+    @NotNull
+    private String ownerName;
 
     @Builder.Default
     private boolean status = true;

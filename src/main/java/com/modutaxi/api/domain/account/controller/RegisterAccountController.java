@@ -35,6 +35,7 @@ public class RegisterAccountController {
             registerAccountService.register(
                 member,
                 accountRequest.getAccountNumber(),
-                accountRequest.getBank()));
+                accountRequest.getBank(),
+                accountRequest.getOwnerName()));
     }
 }

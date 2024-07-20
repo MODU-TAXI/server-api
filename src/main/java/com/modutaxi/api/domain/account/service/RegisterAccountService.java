@@ -19,13 +19,13 @@ public class RegisterAccountService {
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
 
-    public AccountResponse register(Member member, String accountNumber, Bank bank) {
+    public AccountResponse register(Member member, String accountNumber, Bank bank, String onwerName) {
         Member loadedMember = memberRepository.findById(member.getId()).orElseThrow();
         Account account = accountRepository.findByMemberAndAccountNumberAndBank(
             loadedMember, accountNumber, bank).orElse(null);
         // 계좌가 이미 존재하지 않는다면 등록
         if(account == null) {
-            account = toEntity(loadedMember, accountNumber, bank);
+            account = toEntity(loadedMember, accountNumber, bank, onwerName);
             accountRepository.save(account);
 
             loadedMember.addAccount(account);
