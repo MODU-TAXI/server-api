@@ -1,10 +1,12 @@
 package com.modutaxi.api.common.exception;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Getter
+@ToString
 public class ExceptionResponse {
     private final String code;
     private final String message;

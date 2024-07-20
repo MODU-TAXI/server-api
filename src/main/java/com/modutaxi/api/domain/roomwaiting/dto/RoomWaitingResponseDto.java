@@ -5,12 +5,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class RoomWaitingResponseDto {
 
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class RoomWaitingResponse {
         private Long memberId;
         private String nickname;
@@ -22,6 +24,7 @@ public class RoomWaitingResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class RoomWaitingResponseList {
         @Schema(description = "대기열 리스트")
         private List<RoomWaitingResponse> waitingList;
@@ -29,6 +32,7 @@ public class RoomWaitingResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class ApplyResponse {
         private Boolean isApplied;
     }

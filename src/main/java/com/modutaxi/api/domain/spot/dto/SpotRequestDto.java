@@ -1,10 +1,7 @@
 package com.modutaxi.api.domain.spot.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.geo.Point;
 
 public class SpotRequestDto {
@@ -12,6 +9,7 @@ public class SpotRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class CreateSpotRequest {
         @Schema(example = "인하대학교 후문", description = "거점 이름")
         private String name;
@@ -26,6 +24,7 @@ public class SpotRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class UpdateSpotRequest {
         @Schema(example = "인하대학교 후문", description = "거점 이름")
         private String name;
@@ -40,6 +39,7 @@ public class SpotRequestDto {
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class GetAreaSpotRequest {
         @Schema(example = "{\"x\": 126.65157, \"y\": 37.44747}", description = "현재 위치<br>x: 경도, y: 위도")
         private Point currentPoint;

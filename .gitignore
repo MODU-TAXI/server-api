@@ -48,3 +48,6 @@ artifacts/
 
 ### QueryDSL ###
 **/generated
+
+### log files ###
+*.log

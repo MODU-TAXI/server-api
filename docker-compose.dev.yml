@@ -8,6 +8,8 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
     ports:
       - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
+    volumes:
+      - ${LOCAL_SPRING_LOG_PATH}:/app/logs
     networks:
       modutaxi_network:
         ipv4_address: ${NETWORK_SPRING_IP}

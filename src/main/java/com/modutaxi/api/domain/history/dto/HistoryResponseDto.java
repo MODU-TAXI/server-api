@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,7 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class HistoryDetailResponse {
 
         @Schema(description = "매니저 id")
@@ -39,6 +41,7 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class HistorySimpleResponse {
 
         @Schema(description = "이용내역 ID")
@@ -56,6 +59,7 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class HistorySimpleListResponse {
 
         @Schema(description = "이용내역 SimpleList")
@@ -65,6 +69,7 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class HistoryMonthlyResponse {
 
         @Schema(description = "년")
@@ -82,6 +87,7 @@ public class HistoryResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class HistoryDurationResponse {
 
         @Schema(description = "시작일")

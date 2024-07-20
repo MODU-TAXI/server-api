@@ -5,11 +5,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class TokenResponse {
         private String accessToken;
         private String refreshToken;
@@ -18,6 +20,7 @@ public class MemberResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class TokenAndMemberResponse {
         private TokenResponse tokenResponse;
         private MemberInfoResponse memberInfoResponse;
@@ -25,6 +28,7 @@ public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class CertificationResponse {
         @Schema(example = "true", description = "API 성공 여부")
         private Boolean isConfirm;
@@ -33,6 +37,7 @@ public class MemberResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class MemberInfoResponse {
         private Long id;
         private String name;
@@ -47,6 +52,7 @@ public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class NicknameResponse {
         private String nickname;
     }
@@ -54,6 +60,7 @@ public class MemberResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class MemberProfileResponse {
         @Schema(example = "1", description = "조회한 멤버의 Id")
         private Long id;
@@ -69,6 +76,7 @@ public class MemberResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class UpdateProfileResponse {
         @Schema(description = "변경한 이름")
         private String name;

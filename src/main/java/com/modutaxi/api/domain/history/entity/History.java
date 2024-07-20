@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
+@ToString
 public class History extends BaseTime{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

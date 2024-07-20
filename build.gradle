@@ -104,6 +104,11 @@ dependencies {
 
     // apple oauth
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.3.0'
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {

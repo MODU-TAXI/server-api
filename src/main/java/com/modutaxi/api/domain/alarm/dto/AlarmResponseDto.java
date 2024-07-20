@@ -5,12 +5,14 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class AlarmResponseDto {
 
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class AlarmInfo {
         private AlarmType type;
         private String message;
@@ -22,6 +24,7 @@ public class AlarmResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class AlarmCountsInfo {
         private int counts;
     }

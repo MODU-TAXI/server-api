@@ -6,12 +6,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class PaymentMemberResponseDto {
 
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class PaymentMemberResponse {
         @Schema(example = "3")
         private Long id;
@@ -29,12 +31,14 @@ public class PaymentMemberResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class PaymentMemberListResponse {
         private List<PaymentMemberResponse> participantList;
     }
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class UpdatePaymentMemberResponse {
         @Schema(example = "true", description = "수행완료 여부")
         private boolean isUpdated;

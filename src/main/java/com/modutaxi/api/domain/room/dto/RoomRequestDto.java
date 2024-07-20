@@ -5,10 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.geo.Point;
 
 public class RoomRequestDto {
@@ -16,6 +13,7 @@ public class RoomRequestDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class CreateRoomRequest {
         @Schema(description = "도착 거점 id")
         private Long spotId;
@@ -35,6 +33,7 @@ public class RoomRequestDto {
 
     @Getter
     @Builder
+    @ToString
     public static class UpdateRoomRequest {
         @Schema(description = "도착 거점 id")
         private Long spotId;
@@ -56,6 +55,7 @@ public class RoomRequestDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    @ToString
     public static class UpdateRoomStatusRequest {
         @Schema(description = "참여하지 않은 멤버 리스트")
         private List<NonParticipant> nonParticipantList;
@@ -65,6 +65,7 @@ public class RoomRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @ToString
     public static class NonParticipant {
         @Schema(description = "멤버 id")
         private Long memberId;
