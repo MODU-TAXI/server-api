@@ -21,8 +21,8 @@ public class RegisterAccountService {
 
     public AccountResponse register(Member member, String accountNumber, Bank bank, String onwerName) {
         Member loadedMember = memberRepository.findById(member.getId()).orElseThrow();
-        Account account = accountRepository.findByMemberAndAccountNumberAndBank(
-            loadedMember, accountNumber, bank).orElse(null);
+        Account account = accountRepository.findByMemberAndAccountNumberAndBankAndOwnerName(
+            loadedMember, accountNumber, bank, onwerName).orElse(null);
         // 계좌가 이미 존재하지 않는다면 등록
         if(account == null) {
             account = toEntity(loadedMember, accountNumber, bank, onwerName);
