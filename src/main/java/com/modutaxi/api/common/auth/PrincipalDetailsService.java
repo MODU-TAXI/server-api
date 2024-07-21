@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class PrincipalDetailsService implements UserDetailsService {
      * @throws UsernameNotFoundException 해당 멤버 객체를 찾지 못했을 때
      */
     @Override
+    @Transactional
     public PrincipalDetails loadUserByUsername(String username)
         throws UsernameNotFoundException {
         Member member = memberRepository.findByIdAndStatusTrue(Long.parseLong(username))

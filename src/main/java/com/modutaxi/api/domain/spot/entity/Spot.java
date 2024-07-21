@@ -16,6 +16,7 @@ import org.locationtech.jts.geom.Point;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
+@ToString
 public class Spot extends BaseTime {
 
     @Id

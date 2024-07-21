@@ -5,11 +5,13 @@ import com.modutaxi.api.domain.paymentroom.entity.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class PaymentRoomResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class RegisterPaymentRoomResponse {
         private Long paymentRoomId;
     }
@@ -17,6 +19,7 @@ public class PaymentRoomResponseDto {
     @Getter
     @Builder
     @AllArgsConstructor
+    @ToString
     public static class PaymentRoomResponse {
         private String accountNumber;
         private Bank bank;

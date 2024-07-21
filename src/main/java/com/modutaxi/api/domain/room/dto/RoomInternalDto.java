@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -16,6 +17,7 @@ public class RoomInternalDto {
     @Getter
     @Setter
     @Builder
+    @ToString
     public static class InternalUpdateRoomDto {
 
         private Spot spot;

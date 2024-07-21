@@ -1,0 +1,79 @@
+<configuration scan="true" scanPeriod="60 seconds">
+    <property name="INFO_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldGreen(%+5p) %magenta(${PID:-}) --- [%t] %cyan(%logger.[%M].[%L]) - %m%n"/>
+    <property name="ERROR_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldRed(%+5p) %magenta(${PID:-}) --- [%t] %cyan(%logger.[%M].[%L]) - %m%n"/>
+    <property name="WARN_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldYellow(%+5p) %magenta(${PID:-}) --- [%t] %cyan(%logger.[%M].[%L]) - %m%n"/>
+    <property name="DEBUG_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldBlue(%+5p) %magenta(${PID:-}) --- [%t] %cyan(%logger.[%M].[%L]) - %m%n"/>
+    <property name="TRACE_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %gray(%+5p) %magenta(${PID:-}) --- [%t] %cyan(%logger.[%M].[%L]) - %m%n"/>
+
+    <appender name="INFO_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf8</charset>
+            <Pattern>${INFO_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <appender name="ERROR_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf8</charset>
+            <Pattern>${ERROR_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <appender name="WARN_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf8</charset>
+            <Pattern>${WARN_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <appender name="DEBUG_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf8</charset>
+            <Pattern>${DEBUG_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+    <appender name="TRACE_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf8</charset>
+            <Pattern>${TRACE_LOG_PATTERN}</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.modutaxi.api.common.log.IODebugLogAnnotationAop" level="TRACE" additivity="false">
+        <appender-ref ref="INFO_CONSOLE"/>
+        <appender-ref ref="ERROR_CONSOLE"/>
+        <appender-ref ref="WARN_CONSOLE"/>
+        <appender-ref ref="DEBUG_CONSOLE"/>
+        <appender-ref ref="TRACE_CONSOLE"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="INFO_CONSOLE"/>
+        <appender-ref ref="ERROR_CONSOLE"/>
+        <appender-ref ref="WARN_CONSOLE"/>
+        <appender-ref ref="DEBUG_CONSOLE"/>
+        <appender-ref ref="TRACE_CONSOLE"/>
+    </root>
+</configuration>

@@ -2,15 +2,14 @@ package com.modutaxi.api.domain.chatmessage.dto;
 
 import com.modutaxi.api.domain.chatmessage.entity.MessageType;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ChatMessageRequestDto {
     private Long roomId;
     private MessageType type;

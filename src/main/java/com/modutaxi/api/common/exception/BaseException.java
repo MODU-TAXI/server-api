@@ -1,9 +1,11 @@
 package com.modutaxi.api.common.exception;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@ToString
 public class BaseException extends RuntimeException {
     private final String errorCode;
     private String message;

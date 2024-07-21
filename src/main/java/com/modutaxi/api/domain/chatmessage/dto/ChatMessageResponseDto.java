@@ -7,12 +7,14 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 public class ChatMessageResponseDto {
 
     @Getter
     @AllArgsConstructor
     @Builder
+    @ToString
     public static class ChatMessageResponse {
         private Long roomId;
         private MessageType messageType;
@@ -25,12 +27,14 @@ public class ChatMessageResponseDto {
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class ChatMessageResponseList {
         private List<ChatMessageResponse> messages;
     }
 
     @Getter
     @AllArgsConstructor
+    @ToString
     public static class DeleteResponse {
         private Boolean isDeleted;
     }
