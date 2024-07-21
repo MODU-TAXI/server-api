@@ -18,6 +18,7 @@ public class PaymentRoomMapper {
         return PaymentRoomResponse.builder()
             .accountNumber(account.getAccountNumber())
             .bank(account.getBank())
+            .ownerName(account.getOwnerName())
             .totalCharge(paymentRoom.getTotalCharge())
             .status(paymentRoom.getStatus())
             .build();

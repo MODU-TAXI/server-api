@@ -23,6 +23,7 @@ public class PaymentRoomResponseDto {
     public static class PaymentRoomResponse {
         private String accountNumber;
         private Bank bank;
+        private String ownerName;
         private int totalCharge;
         private PaymentStatus status;
     }

@@ -11,10 +11,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-    Optional<Account> findByMemberAndAccountNumberAndBank(
+    Optional<Account> findByMemberAndAccountNumberAndBankAndOwnerName(
         @Param("member") Member member,
         @Param("accountNumber") String accountNumber,
-        @Param("bank") Bank bank);
+        @Param("bank") Bank bank,
+        @Param("ownerName") String ownerName);
 
     @NotNull
     Optional<Account> findById(@NotNull @Param("id") Long id);
