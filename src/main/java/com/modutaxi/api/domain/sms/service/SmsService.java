@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,12 @@ public class SmsService {
     private Integer certCodeLength;
     @Value("${sms.cert-sms-restriction-seconds}")
     private Integer certSmsRestrictionSeconds;
+    @Value("${sms.cert-white-list-phone-numbers}")
+    private List<String> whiteListPhoneNumbers;
+    @Value("${sms.cert-white-list-certification-code}")
+    private String whiteListCertificationCode;
+    @Value("${sms.cert-white-list-message-id}")
+    private String whiteListMessageId;
 
     public Boolean sendCertificationCodeWithSignupKey(String signupKey, String phoneNumber) {
         checkSignupKey(signupKey);
@@ -37,25 +44,28 @@ public class SmsService {
     }
 
     private Boolean sendCertificationCode(String key, String phoneNumber) {
-        phoneNumber = checkPhoneNumberPattern(phoneNumber);
+        String finalPhoneNumber = phoneNumber;
+        boolean isWhiteList = whiteListPhoneNumbers.stream().anyMatch(finalPhoneNumber::equals);
+        phoneNumber = checkPhoneNumberPattern(phoneNumber, isWhiteList);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity != null) {
-            smsAgencyUtil.getPrevMessage(sender, phoneNumber, smsCertCodeEntity.getMessageId());
+            if(!isWhiteList)
+                smsAgencyUtil.getPrevMessage(sender, phoneNumber, smsCertCodeEntity.getMessageId());
             if (smsCertCodeEntity.getPhoneNumber().equals(phoneNumber) &&
                 smsCertCodeEntity.getCreatedAt().plusSeconds(certSmsRestrictionSeconds).isAfter(LocalDateTime.now())) {
                 throw new BaseException(SmsErrorCode.CERTIFICATION_CODE_ALREADY_SENT);
             }
         }
-        String certificationCode = CertificationCodeUtil.generateCertificationCode(certCodeLength);
-        String messageId = smsAgencyUtil.sendOne(sender, phoneNumber, String.format("[모두의택시] 인증번호는 [%s]입니다.", certificationCode));
+        String certificationCode = isWhiteList ? whiteListCertificationCode : CertificationCodeUtil.generateCertificationCode(certCodeLength);
+        String messageId = isWhiteList ? whiteListMessageId : smsAgencyUtil.sendOne(sender, phoneNumber, String.format("[모두의택시] 인증번호는 [%s]입니다.", certificationCode));
         redisSmsCertificationCodeRepository.save(key, phoneNumber, certificationCode, messageId);
         smsAgencyUtil.checkBalance();
         return true;
     }
 
-    private String checkPhoneNumberPattern(String phoneNumber) {
+    private String checkPhoneNumberPattern(String phoneNumber, boolean isWhiteList) {
         String REGEXP_ONLY_NUM = "^01([0|1|6|7|8|9])-([0-9]{3,4})-([0-9]{4})+$";
-        if (!phoneNumber.matches(REGEXP_ONLY_NUM)) {
+        if (!isWhiteList && !phoneNumber.matches(REGEXP_ONLY_NUM)) {
             throw new BaseException(SmsErrorCode.INVALID_PHONE_NUMBER_PATTERN);
         }
         String[] numbers = phoneNumber.split("-");
@@ -78,7 +88,8 @@ public class SmsService {
     }
 
     public Boolean checkSmsCertificationCode(String key, String phoneNumber, String certificationCode) {
-        phoneNumber = checkPhoneNumberPattern(phoneNumber);
+        String finalPhoneNumber = phoneNumber;
+        phoneNumber = checkPhoneNumberPattern(phoneNumber, whiteListPhoneNumbers.stream().anyMatch(finalPhoneNumber::equals));
         checkCertificationCodePattern(certificationCode);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity == null) {
