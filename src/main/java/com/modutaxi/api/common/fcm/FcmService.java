@@ -127,6 +127,7 @@ public class FcmService {
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
                         .setContentAvailable(true)
+                        .setSound("default")
                         .build())
                     .build())
                 .build();
@@ -151,6 +152,7 @@ public class FcmService {
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
                     .setContentAvailable(true)
+                    .setSound("default")
                     .build())
                 .build())
             .build();
@@ -184,7 +186,7 @@ public class FcmService {
                         .setApnsConfig(ApnsConfig.builder()
                             .setAps(Aps.builder()
                                 .setContentAvailable(true)
-                                .setContentAvailable(true)
+                                .setSound("default")
                                 .build())
                             .build())
                         .build();
@@ -211,6 +213,7 @@ public class FcmService {
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
                     .setContentAvailable(true)
+                    .setSound("default")
                     .build())
                 .build())
             .build();
@@ -237,6 +240,7 @@ public class FcmService {
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
                         .setContentAvailable(true)
+                        .setSound("default")
                         .build())
                     .build())
                 .build();
@@ -262,6 +266,7 @@ public class FcmService {
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
                     .setContentAvailable(true)
+                    .setSound("default")
                     .build())
                 .build())
             .build();
@@ -288,6 +293,7 @@ public class FcmService {
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
                         .setContentAvailable(true)
+                        .setSound("default")
                         .build())
                     .build())
                 .build();
