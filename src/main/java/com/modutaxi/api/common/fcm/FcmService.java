@@ -126,7 +126,7 @@ public class FcmService {
                 // APNS 설정 추가
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
-                        .putCustomData("contentAvailable", true)
+                        .setContentAvailable(true)
                         .build())
                     .build())
                 .build();
@@ -150,7 +150,7 @@ public class FcmService {
             // APNS 설정 추가
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
-                    .putCustomData("contentAvailable", true)
+                    .setContentAvailable(true)
                     .build())
                 .build())
             .build();
@@ -183,7 +183,8 @@ public class FcmService {
                         // APNS 설정 추가
                         .setApnsConfig(ApnsConfig.builder()
                             .setAps(Aps.builder()
-                                .putCustomData("contentAvailable", true)
+                                .setContentAvailable(true)
+                                .setContentAvailable(true)
                                 .build())
                             .build())
                         .build();
@@ -209,7 +210,7 @@ public class FcmService {
             // APNS 설정 추가
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
-                    .putCustomData("contentAvailable", true)
+                    .setContentAvailable(true)
                     .build())
                 .build())
             .build();
@@ -235,7 +236,7 @@ public class FcmService {
                 // APNS 설정 추가
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
-                        .putCustomData("contentAvailable", true)
+                        .setContentAvailable(true)
                         .build())
                     .build())
                 .build();
@@ -260,7 +261,7 @@ public class FcmService {
             // APNS 설정 추가
             .setApnsConfig(ApnsConfig.builder()
                 .setAps(Aps.builder()
-                    .putCustomData("contentAvailable", true)
+                    .setContentAvailable(true)
                     .build())
                 .build())
             .build();
@@ -286,7 +287,7 @@ public class FcmService {
                 // APNS 설정 추가
                 .setApnsConfig(ApnsConfig.builder()
                     .setAps(Aps.builder()
-                        .putCustomData("contentAvailable", true)
+                        .setContentAvailable(true)
                         .build())
                     .build())
                 .build();
