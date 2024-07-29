@@ -181,6 +181,7 @@ public class FcmService {
                             .setTitle(chatMessageRequestDto.getSender() + "님")
                             .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
                                 ? "사진" : chatMessageRequestDto.getContent())
+                            .setImage(chatMessageRequestDto.getImageUrl())
                             .build())
                         // APNS 설정 추가
                         .setApnsConfig(ApnsConfig.builder()
