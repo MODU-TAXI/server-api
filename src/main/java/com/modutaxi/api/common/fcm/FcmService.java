@@ -41,6 +41,10 @@ public class FcmService {
         if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
             || fcmToken.isBlank())){
             fcmToken = FCM_DEFAULT_TOKEN;
+            Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new BaseException(MemberErrorCode.EMPTY_MEMBER)
+            );
+            member.changeFcmToken(fcmToken);
         }
         try {
             FirebaseMessaging.getInstance()
