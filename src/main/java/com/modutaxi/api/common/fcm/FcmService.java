@@ -1,5 +1,7 @@
 package com.modutaxi.api.common.fcm;
 
+import com.google.firebase.messaging.ApnsConfig;
+import com.google.firebase.messaging.Aps;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -121,6 +123,13 @@ public class FcmService {
                     .setTitle("모두의택시")
                     .setBody(chatMessageRequestDto.getContent())
                     .build())
+                // APNS 설정 추가
+                .setApnsConfig(ApnsConfig.builder()
+                    .setAps(Aps.builder()
+                        .setContentAvailable(true)
+                        .setSound("default")
+                        .build())
+                    .build())
                 .build();
             send(message);
         }
@@ -138,6 +147,13 @@ public class FcmService {
             .setNotification(Notification.builder()
                 .setTitle("모두의택시")
                 .setBody(chatMessageRequestDto.getContent())
+                .build())
+            // APNS 설정 추가
+            .setApnsConfig(ApnsConfig.builder()
+                .setAps(Aps.builder()
+                    .setContentAvailable(true)
+                    .setSound("default")
+                    .build())
                 .build())
             .build();
         send(message);
@@ -165,6 +181,14 @@ public class FcmService {
                             .setTitle(chatMessageRequestDto.getSender() + "님")
                             .setBody(chatMessageRequestDto.getType().equals(MessageType.IMAGE)
                                 ? "사진" : chatMessageRequestDto.getContent())
+                            .setImage(chatMessageRequestDto.getImageUrl())
+                            .build())
+                        // APNS 설정 추가
+                        .setApnsConfig(ApnsConfig.builder()
+                            .setAps(Aps.builder()
+                                .setContentAvailable(true)
+                                .setSound("default")
+                                .build())
                             .build())
                         .build();
                     send(message);
@@ -186,6 +210,13 @@ public class FcmService {
                 .setTitle("모두의택시")
                 .setBody("참여해 있는 방 정보가 업데이트 되었습니다.")
                 .build())
+            // APNS 설정 추가
+            .setApnsConfig(ApnsConfig.builder()
+                .setAps(Aps.builder()
+                    .setContentAvailable(true)
+                    .setSound("default")
+                    .build())
+                .build())
             .build();
         send(message);
     }
@@ -206,6 +237,13 @@ public class FcmService {
                     .setTitle("모두의택시")
                     .setBody(nickName + "님이 매칭 대기중이에요!")
                     .build())
+                // APNS 설정 추가
+                .setApnsConfig(ApnsConfig.builder()
+                    .setAps(Aps.builder()
+                        .setContentAvailable(true)
+                        .setSound("default")
+                        .build())
+                    .build())
                 .build();
             send(message);
         }
@@ -224,6 +262,13 @@ public class FcmService {
             .setNotification(Notification.builder()
                 .setTitle("모두의택시")
                 .setBody("방이 삭제 되었습니다.")
+                .build())
+            // APNS 설정 추가
+            .setApnsConfig(ApnsConfig.builder()
+                .setAps(Aps.builder()
+                    .setContentAvailable(true)
+                    .setSound("default")
+                    .build())
                 .build())
             .build();
         send(message);
@@ -244,6 +289,13 @@ public class FcmService {
                 .setNotification(Notification.builder()
                     .setTitle("모두의택시")
                     .setBody("매칭이 수락되었어요! 지금 바로 채팅을 시작하세요.")
+                    .build())
+                // APNS 설정 추가
+                .setApnsConfig(ApnsConfig.builder()
+                    .setAps(Aps.builder()
+                        .setContentAvailable(true)
+                        .setSound("default")
+                        .build())
                     .build())
                 .build();
             send(message);
