@@ -65,7 +65,8 @@ public class FcmService {
             String fcmMessageJson = gson.toJson(message);
             log.info("FCM 메시지: " + fcmMessageJson);
         } catch (FirebaseMessagingException e) {
-            throw new BaseException(ChatErrorCode.FAIL_SEND_MESSAGE);
+            log.error(ChatErrorCode.FAIL_SEND_MESSAGE.getMessage());
+//            throw new BaseException(ChatErrorCode.FAIL_SEND_MESSAGE);
         }
     }
 
