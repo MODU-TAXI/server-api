@@ -1,5 +1,7 @@
 package com.modutaxi.api.common.fcm;
 
+import static com.modutaxi.api.common.constants.ServerConstants.FCM_DEFAULT_TOKEN;
+
 import com.google.firebase.messaging.ApnsConfig;
 import com.google.firebase.messaging.Aps;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -36,6 +38,10 @@ public class FcmService {
     @Transactional
     public void subscribe(Long memberId, Long roomId) {
         String fcmToken = validateAndGetFcmToken(memberId);
+        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+            || fcmToken.isBlank())){
+            fcmToken = FCM_DEFAULT_TOKEN;
+        }
         try {
             FirebaseMessaging.getInstance()
                 .subscribeToTopic(
