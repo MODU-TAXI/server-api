@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.member.service;
 
+import static com.modutaxi.api.common.constants.ServerConstants.FCM_DEFAULT_TOKEN;
+
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.SocialLoginType;
@@ -38,8 +40,7 @@ public class RegisterMemberService {
      * 회원 가입
      */
     public TokenAndMemberResponse registerMember(String key, String name, Gender gender,
-        String phoneNumber,
-        String fcmToken) {
+        String phoneNumber, String fcmToken) {
         // key를 이용하여 redis 에서 snsId 추출, 삭제
         String snsId = checkSnsIdKey(key);
         // DB에 가입 이력 있는지 중복 확인
@@ -134,6 +135,9 @@ public class RegisterMemberService {
      */
     @Transactional
     public void saveFcmToken(Member member, String fcmToken) {
+        if (fcmToken.isBlank() || fcmToken.isEmpty()) {
+            fcmToken = FCM_DEFAULT_TOKEN;
+        }
         // db 저장
         member.changeFcmToken(fcmToken);
         // redis 캐싱
