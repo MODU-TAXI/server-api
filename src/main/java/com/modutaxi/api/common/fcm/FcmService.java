@@ -76,6 +76,10 @@ public class FcmService {
             log.info("FCM 메시지: " + fcmMessageJson);
         } catch (FirebaseException e) {
             log.error(ChatErrorCode.FAIL_SEND_MESSAGE.getMessage());
+            log.error("message: {}", e.getMessage());
+            log.error("localizedMessage: {}", e.getLocalizedMessage());
+            log.error("cause: {}", e.getCause().getMessage());
+            log.error("message: {}", message.toString());
 //            throw new BaseException(ChatErrorCode.FAIL_SEND_MESSAGE);
         }
     }
