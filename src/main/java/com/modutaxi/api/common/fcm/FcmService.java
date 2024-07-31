@@ -1,9 +1,11 @@
 package com.modutaxi.api.common.fcm;
 
+import static com.modutaxi.api.common.constants.ServerConstants.FCM_DEFAULT_TOKEN;
+
+import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.ApnsConfig;
 import com.google.firebase.messaging.Aps;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.google.gson.Gson;
@@ -36,12 +38,20 @@ public class FcmService {
     @Transactional
     public void subscribe(Long memberId, Long roomId) {
         String fcmToken = validateAndGetFcmToken(memberId);
+        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+            || fcmToken.isBlank())){
+            fcmToken = FCM_DEFAULT_TOKEN;
+            Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new BaseException(MemberErrorCode.EMPTY_MEMBER)
+            );
+            member.changeFcmToken(fcmToken);
+        }
         try {
             FirebaseMessaging.getInstance()
                 .subscribeToTopic(
                     Collections.singletonList(fcmToken), Long.toString(roomId));
             log.info("FCM SUBSCRIBE");
-        } catch (FirebaseMessagingException e) {
+        } catch (FirebaseException e) {
             log.error("FAIL FCM SUBSCRIBE");
             throw new BaseException(ChatErrorCode.FAIL_FCM_SUBSCRIBE);
         }
@@ -53,7 +63,7 @@ public class FcmService {
             FirebaseMessaging.getInstance()
                 .unsubscribeFromTopic(
                     Collections.singletonList(fcmToken), Long.toString(roomId));
-        } catch (FirebaseMessagingException e) {
+        } catch (FirebaseException e) {
             throw new BaseException(ChatErrorCode.FAIL_FCM_UNSUBSCRIBE);
         }
     }
@@ -64,8 +74,9 @@ public class FcmService {
             Gson gson = new Gson();
             String fcmMessageJson = gson.toJson(message);
             log.info("FCM 메시지: " + fcmMessageJson);
-        } catch (FirebaseMessagingException e) {
-            throw new BaseException(ChatErrorCode.FAIL_SEND_MESSAGE);
+        } catch (FirebaseException e) {
+            log.error(ChatErrorCode.FAIL_SEND_MESSAGE.getMessage());
+//            throw new BaseException(ChatErrorCode.FAIL_SEND_MESSAGE);
         }
     }
 

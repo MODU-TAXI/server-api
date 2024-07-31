@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.modutaxi.api.common.converter.NaverMapConverter;
 import com.modutaxi.api.common.converter.RoomTagBitMaskConverter;
 import com.modutaxi.api.common.exception.BaseException;
+import com.modutaxi.api.common.exception.errorcode.ParticipateErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SpotError;
 import com.modutaxi.api.common.exception.errorcode.TaxiInfoErrorCode;
@@ -268,6 +269,10 @@ public class UpdateRoomService {
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         checkManager(room.getRoomManager().getId(), manager.getId());
+
+        if (participantRepository.findAllByRoom(room).size() == 1) {
+            throw new BaseException(ParticipateErrorCode.USER_ALONE_IN_ROOM);
+        }
 
         if (!room.getRoomStatus().equals(RoomStatus.BEFORE_MATCHING)) {
             throw new BaseException(RoomErrorCode.ALREADY_MATCHING_COMPLETE);
