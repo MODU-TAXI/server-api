@@ -2,10 +2,10 @@ package com.modutaxi.api.common.fcm;
 
 import static com.modutaxi.api.common.constants.ServerConstants.FCM_DEFAULT_TOKEN;
 
-import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.ApnsConfig;
 import com.google.firebase.messaging.Aps;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.google.gson.Gson;
@@ -51,7 +51,7 @@ public class FcmService {
                 .subscribeToTopic(
                     Collections.singletonList(fcmToken), Long.toString(roomId));
             log.info("FCM SUBSCRIBE");
-        } catch (FirebaseException e) {
+        } catch (FirebaseMessagingException e) {
             log.error("FAIL FCM SUBSCRIBE");
             throw new BaseException(ChatErrorCode.FAIL_FCM_SUBSCRIBE);
         }
@@ -63,7 +63,7 @@ public class FcmService {
             FirebaseMessaging.getInstance()
                 .unsubscribeFromTopic(
                     Collections.singletonList(fcmToken), Long.toString(roomId));
-        } catch (FirebaseException e) {
+        } catch (FirebaseMessagingException e) {
             throw new BaseException(ChatErrorCode.FAIL_FCM_UNSUBSCRIBE);
         }
     }
@@ -74,7 +74,7 @@ public class FcmService {
             Gson gson = new Gson();
             String fcmMessageJson = gson.toJson(message);
             log.info("FCM 메시지: " + fcmMessageJson);
-        } catch (FirebaseException e) {
+        } catch (FirebaseMessagingException e) {
             log.error(ChatErrorCode.FAIL_SEND_MESSAGE.getMessage());
             log.error("message: {}", e.getMessage());
             log.error("localizedMessage: {}", e.getLocalizedMessage());
