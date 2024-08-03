@@ -13,8 +13,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-
-    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
+    
     Optional<Member> findByIdAndStatusTrue(@Param("memberId") Long memberId);
 
     Optional<Member> findBySnsIdAndStatusTrue(String snsId);
