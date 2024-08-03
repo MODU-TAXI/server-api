@@ -2,9 +2,11 @@ package com.modutaxi.api.domain.member.repository;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     Optional<Member> findByIdAndStatusTrue(@Param("memberId") Long memberId);
 
     Optional<Member> findBySnsIdAndStatusTrue(String snsId);
