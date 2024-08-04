@@ -17,6 +17,7 @@ public enum ParticipateErrorCode implements ErrorCode {
     USER_NOT_IN_ROOM("PRT_007", "사용자가 해당 채팅방에 없습니다.", HttpStatus.BAD_REQUEST),
     USER_ALREADY_IN_OTHER_ROOM("PRT_008", "해당 사용자가 다른 방에 참여한 상태입니다.", HttpStatus.BAD_REQUEST),
     USER_ALONE_IN_ROOM("PRT_009", "혼자 있는 방은 매칭완료할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    YOUR_NOT_STUDENT_CERTIFICATED("PRT_010", "학생 인증 후 입장 가능한 방입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String errorCode;

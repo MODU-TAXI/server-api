@@ -15,6 +15,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.entity.RoomStatus;
+import com.modutaxi.api.domain.room.entity.RoomTagBitMask;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.ApplyResponse;
 import com.modutaxi.api.domain.roomwaiting.dto.RoomWaitingResponseDto.RoomWaitingResponseList;
@@ -79,12 +80,21 @@ public class RoomWaitingService {
             throw new BaseException(ParticipateErrorCode.PARTICIPATE_NOT_ALLOW);
         }
 
+        if (isStudentCertificationIncluded(room.getRoomTagBitMask()) && !member.isCertified()) {
+            throw new BaseException(ParticipateErrorCode.YOUR_NOT_STUDENT_CERTIFICATED);
+        }
+
         roomWaitingRepository.save(RoomWaitingMapper.toEntity(member, room));
         fcmService.sendNewParticipant(room.getRoomManager(), roomId, member.getNickname());
         registerAlarmService.registerAlarm(
             AlarmType.PARTICIPATE_REQUEST, Long.valueOf(roomId), room.getRoomManager().getId());
         return new ApplyResponse(true);
     }
+
+    public boolean isStudentCertificationIncluded(int bitMask) {
+        return (bitMask & RoomTagBitMask.STUDENT_CERTIFICATION.getValue()) != 0;
+    }
+
 
 
     /**
