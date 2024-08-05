@@ -3,10 +3,9 @@ package com.modutaxi.api.domain.participant.repository;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.participant.entity.Participant;
 import com.modutaxi.api.domain.room.entity.Room;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
 
@@ -21,4 +20,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     void deleteAllByRoom(Room room);
 
     boolean existsByMemberAndRoom(Member member, Room room);
+
+    boolean existsByMember(Member member);
 }

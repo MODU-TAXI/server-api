@@ -28,6 +28,8 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
 
     void deleteAllByRoom(Room room);
 
+    void deleteByMember(Member member);
+
     @Query("SELECT MIN(r.departureTime) as startDate, max (r.departureTime) as endDate " +
         "FROM History h JOIN Room r on h.room.id = r.id "
         + "WHERE h.member.id = :memberId ")
