@@ -17,4 +17,6 @@ public interface RoomWaitingRepository extends JpaRepository<RoomWaiting, Long> 
 
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     void deleteByMemberAndRoom(Member member, Room room);
+
+    void deleteByMember(Member member);
 }

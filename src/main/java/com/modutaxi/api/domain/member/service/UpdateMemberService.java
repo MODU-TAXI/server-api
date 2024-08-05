@@ -18,7 +18,12 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.participant.repository.ParticipantRepository;
+import com.modutaxi.api.domain.participant.service.UpdateParticipantService;
 import com.modutaxi.api.domain.paymentmember.service.UpdatePaymentMemberService;
+import com.modutaxi.api.domain.room.repository.RoomRepository;
+import com.modutaxi.api.domain.room.service.UpdateRoomService;
+import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.sms.service.SmsService;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,11 +42,16 @@ public class UpdateMemberService {
     private final MailUtil mailUtil;
     private final SmsService smsService;
     private final S3Service s3Service;
+    private final UpdateRoomService updateRoomService;
     private final UpdatePaymentMemberService updatePaymentMemberService;
+    private final UpdateParticipantService updateParticipantService;
 
     private final AccountRepository accountRepository;
     private final AlarmRepository alarmRepository;
     private final HistoryRepository historyRepository;
+    private final ParticipantRepository participantRepository;
+    private final RoomRepository roomRepository;
+    private final RoomWaitingRepository roomWaitingRepository;
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public TokenAndMemberResponse refreshAccessToken(Member member) {
@@ -140,11 +150,35 @@ public class UpdateMemberService {
 
     @Transactional
     public void deleteMember(Member member) {
-        // 내가 방장인 방이 있다면 -> 방 삭제하고 탈퇴하라는 에러메시지 반환
-        // 이용 중인 방이 있습니다. 방을 삭제하고 다시 시도해주세요.
+        deleteRoomMapping(member);
+        deleteMemberInfo(member);
+        // 멤버 hard delete
+        memberRepository.delete(member);
+    }
 
-        // 내가 방장은 아니고, 이용 중인 방이 있다면 -> 방 나가기 함수 호출
+    /**
+     * 멤버의 방 맵핑 삭제
+     */
+    private void deleteRoomMapping(Member member) {
+        // 모든 대기열 삭제
+        roomWaitingRepository.deleteByMember(member);
 
+        // 내가 방장인 방이 있다면, 방 삭제
+        if (roomRepository.existsRoomByRoomManager(member)) {
+            Long roomId = roomRepository.findIdByRoomManagerAndRoomStatusIsNotDelete(
+                member);   // 내가 이용 중인 방 ID
+            updateRoomService.deleteRoom(member, roomId);
+        }
+        // 내가 방장이 아니고 이용 중인 방이 있다면, 방 퇴장
+        else if (participantRepository.existsByMember(member)) {
+            updateParticipantService.leaveRoomAndDeleteChatRoomInfo(member.getId());
+        }
+    }
+
+    /**
+     * 멤버의 정보와 관련된 것들 삭제
+     */
+    private void deleteMemberInfo(Member member) {
         // PaymentMember hard delete
         updatePaymentMemberService.deleteByMember(member);
         // 이용 내역 hard delete
@@ -153,9 +187,6 @@ public class UpdateMemberService {
         accountRepository.deleteByMember(member);
         // 알림 hard delete
         alarmRepository.deleteByMemberId(member.getId());
-
-        // 멤버 hard delete
-        memberRepository.delete(member);
     }
 
 }
