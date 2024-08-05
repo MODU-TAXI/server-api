@@ -19,4 +19,6 @@ public interface PaymentMemberRepository extends JpaRepository<PaymentMember, Lo
     @Query("SELECT COUNT(pm) FROM PaymentMember pm WHERE pm.status = :status AND pm.paymentRoom = :paymentRoom")
     int countByPaymentRoomAndStatus(@Param("paymentRoom") PaymentRoom paymentRoom,
         @Param("status") PaymentMemberStatus status);
+
+    void deleteByMember(Member member);
 }

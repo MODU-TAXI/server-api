@@ -3,7 +3,11 @@ package com.modutaxi.api.domain.history.service;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.HistoryErrorCode;
 import com.modutaxi.api.common.exception.errorcode.RoomErrorCode;
-import com.modutaxi.api.domain.history.dto.HistoryResponseDto.*;
+import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistoryDetailResponse;
+import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistoryDurationResponse;
+import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistoryMonthlyResponse;
+import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistorySimpleListResponse;
+import com.modutaxi.api.domain.history.dto.HistoryResponseDto.HistorySimpleResponse;
 import com.modutaxi.api.domain.history.entity.History;
 import com.modutaxi.api.domain.history.mapper.HistoryMapper;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
@@ -13,12 +17,10 @@ import com.modutaxi.api.domain.paymentmember.service.GetPaymentMemberService;
 import com.modutaxi.api.domain.room.entity.Room;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import jakarta.persistence.Tuple;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service
@@ -84,6 +86,5 @@ public class HistoryService {
         LocalDateTime endDate = (LocalDateTime) tuple.get("endDate");
         return HistoryMapper.toDto(startDate, endDate);
     }
-
 
 }

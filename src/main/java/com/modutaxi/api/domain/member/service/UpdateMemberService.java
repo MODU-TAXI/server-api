@@ -7,7 +7,7 @@ import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
 import com.modutaxi.api.domain.alarm.repository.AlarmRepository;
-import com.modutaxi.api.domain.likedSpot.repository.LikedSpotRepository;
+import com.modutaxi.api.domain.history.repository.HistoryRepository;
 import com.modutaxi.api.domain.mail.service.MailService;
 import com.modutaxi.api.domain.mail.service.MailUtil;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
@@ -18,13 +18,13 @@ import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import com.modutaxi.api.domain.paymentmember.service.UpdatePaymentMemberService;
 import com.modutaxi.api.domain.sms.service.SmsService;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -37,10 +37,11 @@ public class UpdateMemberService {
     private final MailUtil mailUtil;
     private final SmsService smsService;
     private final S3Service s3Service;
+    private final UpdatePaymentMemberService updatePaymentMemberService;
 
     private final AccountRepository accountRepository;
     private final AlarmRepository alarmRepository;
-    private final LikedSpotRepository likedSpotRepository;
+    private final HistoryRepository historyRepository;
 
     //TODO: Member Profile에 필요한 정보가 확정나면 다시 수정이 필요합니다.
     public TokenAndMemberResponse refreshAccessToken(Member member) {
@@ -68,7 +69,7 @@ public class UpdateMemberService {
 
     @Transactional
     public CertificationResponse checkEmailCertificationCode(Long memberId,
-                                                             String certificationCode) {
+        String certificationCode) {
         String email = mailService.checkEmailCertificationCode(memberId, certificationCode);
         // 이메일 중복 체크
         getNotCertificatedMember(memberId, email);
@@ -89,35 +90,41 @@ public class UpdateMemberService {
         throw new BaseException(MailErrorCode.USED_EMAIL);
     }
 
-    public CertificationResponse sendSmsCertificationWithSignupKey(String signupKey, String phoneNumber) {
+    public CertificationResponse sendSmsCertificationWithSignupKey(String signupKey,
+        String phoneNumber) {
         if (memberRepository.findByPhoneNumber(phoneNumber).isPresent()) {
             throw new BaseException(SmsErrorCode.ALREADY_USED_PHONE_NUMBER);
         }
-        return new CertificationResponse(smsService.sendCertificationCodeWithSignupKey(signupKey, phoneNumber));
+        return new CertificationResponse(
+            smsService.sendCertificationCodeWithSignupKey(signupKey, phoneNumber));
     }
 
     public CertificationResponse sendSmsCertificationWithJwt(Long memberId, String phoneNumber) {
         if (memberRepository.findByPhoneNumber(phoneNumber).isPresent()) {
             throw new BaseException(SmsErrorCode.ALREADY_USED_PHONE_NUMBER);
         }
-        return new CertificationResponse(smsService.sendCertificationCodeWithJwt(memberId.toString(), phoneNumber));
+        return new CertificationResponse(
+            smsService.sendCertificationCodeWithJwt(memberId.toString(), phoneNumber));
     }
 
-    public CertificationResponse checkSmsCertificationCodeWithSignupKey(String signupKey, String phoneNumber,
-                                                                        String certificationCode) {
+    public CertificationResponse checkSmsCertificationCodeWithSignupKey(String signupKey,
+        String phoneNumber,
+        String certificationCode) {
         return new CertificationResponse(
-            smsService.checkSmsCertificationCodeWithSignupKey(signupKey, phoneNumber, certificationCode));
+            smsService.checkSmsCertificationCodeWithSignupKey(signupKey, phoneNumber,
+                certificationCode));
     }
 
     public CertificationResponse checkSmsCertificationCodeWithJwt(Long memberId, String phoneNumber,
-                                                                  String certificationCode) {
+        String certificationCode) {
         return new CertificationResponse(
-            smsService.checkSmsCertificationCodeWithJwt(memberId.toString(), phoneNumber, certificationCode));
+            smsService.checkSmsCertificationCodeWithJwt(memberId.toString(), phoneNumber,
+                certificationCode));
     }
 
     @Transactional
     public UpdateProfileResponse updateProfile(Member member, String name, Gender gender,
-                                               String phoneNumber, String imageUrl) {
+        String phoneNumber, String imageUrl) {
         // imageUrl == "" 로 들어오면 삭제 요청입니다.
         if (Objects.equals(imageUrl, "")) {
             if (member.existsImageUrl()) {   // 프로필 사진이 있었다면 s3에서 삭제
@@ -133,14 +140,22 @@ public class UpdateMemberService {
 
     @Transactional
     public void deleteMember(Member member) {
-        // 멤버 soft delete
-        member.delete();
+        // 내가 방장인 방이 있다면 -> 방 삭제하고 탈퇴하라는 에러메시지 반환
+        // 이용 중인 방이 있습니다. 방을 삭제하고 다시 시도해주세요.
+
+        // 내가 방장은 아니고, 이용 중인 방이 있다면 -> 방 나가기 함수 호출
+
+        // PaymentMember hard delete
+        updatePaymentMemberService.deleteByMember(member);
+        // 이용 내역 hard delete
+        historyRepository.deleteByMember(member);
         // 계좌 정보 hard delete
         accountRepository.deleteByMember(member);
         // 알림 hard delete
         alarmRepository.deleteByMemberId(member.getId());
-        // 즐겨찾기 hard delete
-        likedSpotRepository.deleteByMember(member);
+
+        // 멤버 hard delete
+        memberRepository.delete(member);
     }
 
 }
