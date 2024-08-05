@@ -156,11 +156,10 @@ public class UpdateMemberService {
         Member member = memberRepository.findById(id).orElseThrow(
             () -> new BaseException(MemberErrorCode.EMPTY_MEMBER)
         );
-        // 멤버 soft delete
-        member.delete();
-
         deleteRoomMapping(member);
         deleteMemberInfo(member);
+        // 멤버 soft delete
+        member.delete();
     }
 
     /**
