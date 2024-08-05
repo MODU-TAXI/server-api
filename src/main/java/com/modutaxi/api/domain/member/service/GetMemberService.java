@@ -1,5 +1,7 @@
 package com.modutaxi.api.domain.member.service;
 
+import static com.modutaxi.api.common.constants.ServerConstants.BASIC_PROFILE_IMAGE_URL;
+
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.MemberProfileResponse;
@@ -20,13 +22,17 @@ public class GetMemberService {
     }
 
     public MemberProfileResponse getMemberProfile(Long id) {
-        Member member = memberRepository.findByIdAndStatusTrue(id)
-            .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
-        return MemberMapper.toDto2(member);
+        Member member = memberRepository.findByIdAndStatusTrue(id).orElse(null);
+        if (member == null) {
+            return new MemberProfileResponse(0L, "(알수없음)", 0, false, BASIC_PROFILE_IMAGE_URL);
+        } else {
+            return MemberMapper.toDto2(member);
+        }
     }
 
     public Member getMemberByAppleSnsId(String snsId) {
         return memberRepository.findByAppleSnsIdAndStatusTrue(snsId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
     }
+
 }
