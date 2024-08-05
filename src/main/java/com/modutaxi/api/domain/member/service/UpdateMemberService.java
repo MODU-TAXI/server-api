@@ -3,6 +3,7 @@ package com.modutaxi.api.domain.member.service;
 import com.modutaxi.api.common.auth.jwt.JwtTokenProvider;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
+import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
@@ -137,7 +138,10 @@ public class UpdateMemberService {
     }
 
     @Transactional
-    public void deleteMember(Member member) {
+    public void deleteMember(Long id) {
+        Member member = memberRepository.findById(id).orElseThrow(
+            () -> new BaseException(MemberErrorCode.EMPTY_MEMBER)
+        );
         // 멤버 soft delete
         member.delete();
         // 계좌 정보 hard delete
