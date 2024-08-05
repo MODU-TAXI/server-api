@@ -49,7 +49,7 @@ public class RegisterParticipantService {
      */
     @Transactional
     public ApplyResponse acceptForParticipate(Member member, Long roomId, Long memberId) {
-        Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
+        Room room = roomRepository.findActiveRoomByIdForUpdate(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
         Member participant = memberRepository.findByIdAndStatusTrue(memberId)
