@@ -1,10 +1,17 @@
 package com.modutaxi.api.domain.member.controller;
 
 import com.modutaxi.api.common.auth.CurrentMember;
+import com.modutaxi.api.common.auth.oauth.SocialLoginService;
 import com.modutaxi.api.common.auth.oauth.apple.service.AppleService;
 import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
-import com.modutaxi.api.domain.member.dto.MemberRequestDto.*;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmMailCertificationReqeust;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificationReqeustWithJwt;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.ConfirmSmsCertificationReqeustWithSignupKey;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendMailCertificationRequest;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequestWithJwt;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.SendSmsCertificationRequestWithSignupKey;
+import com.modutaxi.api.domain.member.dto.MemberRequestDto.UpdateProfileRequest;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.CertificationResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.TokenAndMemberResponse;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.UpdateProfileResponse;
@@ -17,10 +24,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +43,7 @@ public class UpdateMemberController {
 
     private final UpdateMemberService updateMemberService;
     private final AppleService appleService;
+    private final SocialLoginService socialLoginService;
 
     /**
      * [PATCH] 로그인 토큰 갱신
@@ -196,7 +210,8 @@ public class UpdateMemberController {
     public ResponseEntity<CertificationResponse> sendSmsCertification(
         @RequestBody SendSmsCertificationRequestWithSignupKey request) {
         return ResponseEntity.ok(
-            updateMemberService.sendSmsCertificationWithSignupKey(request.getKey(), request.getPhoneNumber()));
+            updateMemberService.sendSmsCertificationWithSignupKey(request.getKey(),
+                request.getPhoneNumber()));
     }
 
     @Operation(
@@ -243,7 +258,8 @@ public class UpdateMemberController {
         @CurrentMember Member member,
         @RequestBody SendSmsCertificationRequestWithJwt request) {
         return ResponseEntity.ok(
-            updateMemberService.sendSmsCertificationWithJwt(member.getId(), request.getPhoneNumber()));
+            updateMemberService.sendSmsCertificationWithJwt(member.getId(),
+                request.getPhoneNumber()));
     }
 
     @Operation(
@@ -288,8 +304,9 @@ public class UpdateMemberController {
     @PostMapping("/sms/confirm")
     public ResponseEntity<CertificationResponse> confirmSmsCertificationWithSignupKey(
         @RequestBody ConfirmSmsCertificationReqeustWithSignupKey request) {
-        return ResponseEntity.ok(updateMemberService.checkSmsCertificationCodeWithSignupKey(request.getKey(),
-            request.getPhoneNumber(), request.getCertificationCode()));
+        return ResponseEntity.ok(
+            updateMemberService.checkSmsCertificationCodeWithSignupKey(request.getKey(),
+                request.getPhoneNumber(), request.getCertificationCode()));
     }
 
     @Operation(
@@ -335,8 +352,9 @@ public class UpdateMemberController {
     public ResponseEntity<CertificationResponse> confirmSmsCertificationWithJwt(
         @CurrentMember Member member,
         @RequestBody ConfirmSmsCertificationReqeustWithJwt request) {
-        return ResponseEntity.ok(updateMemberService.checkSmsCertificationCodeWithJwt(member.getId(),
-            request.getPhoneNumber(), request.getCertificationCode()));
+        return ResponseEntity.ok(
+            updateMemberService.checkSmsCertificationCodeWithJwt(member.getId(),
+                request.getPhoneNumber(), request.getCertificationCode()));
     }
 
     /**
@@ -374,8 +392,9 @@ public class UpdateMemberController {
     })
     @DeleteMapping("")
     public ResponseEntity<Integer> deleteMember(
-        @CurrentMember Member member) {
+        @CurrentMember Member member) throws IOException {
         updateMemberService.deleteMember(member);
+        socialLoginService.unlinkKakao(member.getSnsId());
         appleService.revokeToken(member.getSnsId());
         return ResponseEntity.ok(200);
     }
