@@ -172,17 +172,13 @@ public class UpdateMemberService {
         log.info("대기열 탈퇴 성공!");
         // 내가 방장인 방이 있다면, 방 삭제
         if (roomRepository.existsRoomByRoomManager(member)) {
-            log.info("내가 방장인 방이 있나요? 결과: {}", roomRepository.existsRoomByRoomManager(member));
             Long roomId = roomRepository.findIdByRoomManagerAndRoomStatusIsNotDelete(
                 member);   // 내가 이용 중인 방 ID
-            log.info("내 방의 ID는? 결과: {}", roomId);
             updateRoomService.deleteRoom(member, roomId);
-            roomRepository.updateMemberId(roomId, 0L);
             log.info("방 삭제 성공!");
         }
         // 내가 방장이 아니고 이용 중인 방이 있다면, 방 퇴장
         else if (participantRepository.existsByMember(member)) {
-            log.info("내가 이용 중인 방이 있나요? 결과: {}", participantRepository.existsByMember(member));
             updateParticipantService.leaveRoomAndDeleteChatRoomInfo(member.getId());
             log.info("방 퇴장 성공!");
         }
@@ -203,8 +199,6 @@ public class UpdateMemberService {
         log.info("계좌 삭제 성공!");
         // 알림 hard delete
         alarmRepository.deleteByMemberId(member.getId());
-        // 이용 내역 hard delete
-        historyRepository.deleteByMember(member);
         log.info("알림 삭제 성공!");
     }
 

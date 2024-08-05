@@ -35,5 +35,4 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
         + "WHERE h.member.id = :memberId ")
     Tuple findStartDateAndEndDateByMemberId(Long memberId);
 
-    void deleteByMember(Member member);
 }
