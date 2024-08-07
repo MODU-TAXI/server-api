@@ -27,7 +27,7 @@ public class IODebugLogAop {
         Method method = getMethod(joinPoint);
         StringBuilder parameters = new StringBuilder();
         parameters.append(String.format("BEFORE[%d] %s.%s => ", Thread.currentThread().getId(), joinPoint.getTarget().getClass().getCanonicalName(), method.getName()));
-        Arrays.stream(joinPoint.getArgs()).peek(arg -> parameters.append(arg).append(", ")).close();
+        Arrays.stream(joinPoint.getArgs()).forEach(arg -> parameters.append(arg).append(", "));
         log.debug(parameters.toString());
         Object returnObj = joinPoint.proceed();
         log.debug(String.format("AFTER[%d] %s.%s => %s", Thread.currentThread().getId(), joinPoint.getTarget().getClass().getCanonicalName(), method.getName(), returnObj));
