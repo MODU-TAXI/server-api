@@ -111,4 +111,12 @@ public class UpdatePaymentMemberService {
                 manager.getId());
         }
     }
+
+    /**
+     * 회원 탈퇴에서 사용하는 메서드
+     */
+    @Transactional
+    public void deleteByMember(Member member) {
+        paymentMemberRepository.deleteByMember(member);
+    }
 }

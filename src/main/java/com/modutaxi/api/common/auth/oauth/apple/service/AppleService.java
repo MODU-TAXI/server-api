@@ -20,19 +20,18 @@ import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.openssl.PEMException;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-import org.springframework.stereotype.Service;
-
 import java.security.PrivateKey;
 import java.security.Security;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMException;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.springframework.stereotype.Service;
 
 
 @Slf4j
@@ -49,12 +48,16 @@ public class AppleService {
         try {
             Events events = null;
             try {
-                events = new ObjectMapper().readValue(decodePayload(payload.getPayload(), StsRequest.class).getEvents(), Events.class);
+                events = new ObjectMapper().readValue(
+                    decodePayload(payload.getPayload(), StsRequest.class).getEvents(),
+                    Events.class);
             } catch (JsonProcessingException e) {
                 log.error("Apple Server To Server Error : Object Mapper Error");
             }
-            if (events.getType().equals("consent-revoked") || events.getType().equals("account-delete")) {
-                updateMemberService.deleteMember(getMemberService.getMemberByAppleSnsId(events.getSub()));
+            if (events.getType().equals("consent-revoked") || events.getType()
+                .equals("account-delete")) {
+                updateMemberService.deleteMember(
+                    getMemberService.getMemberByAppleSnsId(events.getSub()).getId());
                 appleRefreshTokenMongoRepository.deleteById(events.getSub());
             }
         } catch (BaseException e) {
@@ -64,8 +67,10 @@ public class AppleService {
 
     private <T> T decodePayload(String token, Class<T> targetClass) {
         try {
-            return (new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false))
-                .readValue(new String(Base64.getDecoder().decode(token.split("\\.")[1])), targetClass);
+            return (new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false))
+                .readValue(new String(Base64.getDecoder().decode(token.split("\\.")[1])),
+                    targetClass);
         } catch (JsonProcessingException e) {
             log.error("Apple Server To Server payload 디코딩 실패 : {}", token);
             throw new BaseException(null); // api 이용자는 Apple 인증서버이므로 에러를 보내지 않아도 됨
@@ -82,9 +87,11 @@ public class AppleService {
                 null,
                 null
             ));
-        AppleIdTokenPayload appleIdTokenPayload = decodeUrlPayload(appleSocialTokenResponse.getIdToken(), AppleIdTokenPayload.class);
+        AppleIdTokenPayload appleIdTokenPayload = decodeUrlPayload(
+            appleSocialTokenResponse.getIdToken(), AppleIdTokenPayload.class);
         appleRefreshTokenMongoRepository.deleteById(appleIdTokenPayload.getSub());
-        appleRefreshTokenMongoRepository.save(new AppleRefreshToken(appleIdTokenPayload.getSub(), appleSocialTokenResponse.getRefreshToken()));
+        appleRefreshTokenMongoRepository.save(new AppleRefreshToken(appleIdTokenPayload.getSub(),
+            appleSocialTokenResponse.getRefreshToken()));
         return appleIdTokenPayload;
     }
 
@@ -104,7 +111,8 @@ public class AppleService {
     private PrivateKey getPrivateKey() {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         try {
-            byte[] privateKeyBytes = Base64.getDecoder().decode(appleOauthProperties.getPrivate_key());
+            byte[] privateKeyBytes = Base64.getDecoder()
+                .decode(appleOauthProperties.getPrivate_key());
             PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKeyBytes);
             return (new JcaPEMKeyConverter().setProvider("BC")).getPrivateKey(privateKeyInfo);
         } catch (PEMException e) {
@@ -115,8 +123,10 @@ public class AppleService {
 
     private <T> T decodeUrlPayload(String token, Class<T> targetClass) {
         try {
-            return (new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false))
-                .readValue(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1])), targetClass);
+            return (new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                false))
+                .readValue(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1])),
+                    targetClass);
         } catch (JsonProcessingException e) {
             log.error("Apple Id Token Payload 디코딩 실패 : {}", token);
             throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);

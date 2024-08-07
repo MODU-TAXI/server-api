@@ -2,18 +2,16 @@ package com.modutaxi.api.domain.member.repository;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
-import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
-    
+
     Optional<Member> findByIdAndStatusTrue(@Param("memberId") Long memberId);
 
     Optional<Member> findBySnsIdAndStatusTrue(String snsId);
@@ -46,4 +44,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByAppleSnsIdAndStatusTrue(@Param("snsId") String snsId);
 
     Optional<Member> findByPhoneNumber(String phoneNumber);
+
+    @Query("SELECT m.id FROM Member m ORDER BY m.id DESC")
+    Long getIdByIdOrderByIdDesc();
 }

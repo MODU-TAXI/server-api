@@ -375,7 +375,7 @@ public class UpdateMemberController {
     @DeleteMapping("")
     public ResponseEntity<Integer> deleteMember(
         @CurrentMember Member member) {
-        updateMemberService.deleteMember(member);
+        updateMemberService.deleteMember(member.getId());
         appleService.revokeToken(member.getSnsId());
         return ResponseEntity.ok(200);
     }

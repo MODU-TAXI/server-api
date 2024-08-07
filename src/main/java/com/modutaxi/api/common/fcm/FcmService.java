@@ -38,7 +38,7 @@ public class FcmService {
     @Transactional
     public void subscribe(Long memberId, Long roomId) {
         String fcmToken = validateAndGetFcmToken(memberId);
-        if (!(fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
+        if ((fcmToken == null || Objects.equals(fcmToken, "") || fcmToken.isEmpty()
             || fcmToken.isBlank())){
             fcmToken = FCM_DEFAULT_TOKEN;
             Member member = memberRepository.findById(memberId).orElseThrow(

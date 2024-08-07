@@ -17,8 +17,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Objects;
-
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -63,7 +67,7 @@ public class Member extends BaseTime {
     @Builder.Default
     private Role role = Role.ROLE_VISITOR;
 
-//    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
+    //    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
     @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Account> accounts;
 
@@ -132,6 +136,11 @@ public class Member extends BaseTime {
     public void delete() {
         this.status = false;
         this.nickname = "(알 수 없음)";
+        this.snsId = "xxxxxxxxxxxxxx";
+        this.phoneNumber = "xxxxxxxxxxxxxx";
+        this.fcmToken = "";
+        this.email = null;
+        this.imageUrl = null;
     }
 
 }

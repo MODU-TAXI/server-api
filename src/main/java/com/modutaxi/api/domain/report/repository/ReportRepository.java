@@ -2,7 +2,6 @@ package com.modutaxi.api.domain.report.repository;
 
 import com.modutaxi.api.domain.report.entity.Report;
 import io.lettuce.core.dynamic.annotation.Param;
-import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
