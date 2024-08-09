@@ -22,6 +22,10 @@ public class SlackService {
     @Value("${slack.webhook-uri.report}")
     private String reportSlackToken;
 
+    @Value("${slack.webhook-uri.member}")
+    private String memberSlackToken;
+
+
     /**
      * 슬랙 메시지 전송
      *
@@ -52,7 +56,7 @@ public class SlackService {
      * 신고 발생 시 슬랙 메시지 전송
      **/
     public void sendReportMessage(Report report) {
-        String title = "새로운 신고가 접수되었습니다!";
+        String title = "[신고 접수]";
         HashMap<String, String> data = new HashMap<>();
         data.put("0. 택시팟 ID", Long.toString(report.getRoomId()));
         data.put("1. 신고자 ID", Long.toString(report.getReporterId()));
@@ -67,12 +71,38 @@ public class SlackService {
      * 신고 누적으로 인한 임시 차단 멤버 발생 시 슬랙 메시지 전송
      **/
     public void sendTemporaryBlockMemberMessage(Member member) {
-        String title = "신고 누적으로 인해 임시 차단 멤버가 발생했습니다!";
+        String title = "[신고 누적으로 인한 멤버 임시 차단]";
         HashMap<String, String> data = new HashMap<>();
         data.put("멤버 ID", Long.toString(member.getId()));
         data.put("닉네임", member.getNickname());
 
         sendMessage(reportSlackToken, title, data, Color.RED.getCode());
+    }
+
+    /**
+     * 신규 회원가입 시 슬랙 메시지 전송
+     **/
+    public void sendNewMemberMessage(Member member) {
+        String title = "[신규 회원가입]";
+        HashMap<String, String> data = new HashMap<>();
+        data.put("멤버 ID", Long.toString(member.getId()));
+        data.put("이름", member.getName());
+        data.put("전화번호", member.getPhoneNumber());
+
+        sendMessage(memberSlackToken, title, data, Color.GREEN.getCode());
+    }
+
+    /**
+     * 회원 탈퇴 시 슬랙 메시지 전송
+     **/
+    public void sendDeleteMemberMessage(Member member) {
+        String title = "[회원 탈퇴]";
+        HashMap<String, String> data = new HashMap<>();
+        data.put("멤버 ID", Long.toString(member.getId()));
+        data.put("이름", member.getName());
+        data.put("전화번호", member.getPhoneNumber());
+
+        sendMessage(memberSlackToken, title, data, Color.RED.getCode());
     }
 
     /**
