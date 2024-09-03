@@ -8,6 +8,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -68,7 +69,7 @@ public class Member extends BaseTime {
     private Role role = Role.ROLE_VISITOR;
 
     //    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
-    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Account> accounts;
 
     @NotNull
