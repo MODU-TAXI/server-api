@@ -11,6 +11,7 @@ import com.modutaxi.api.domain.member.entity.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @Tag(name = "pub/sub 관련 API")
 public class ChatController {
 
@@ -38,7 +40,6 @@ public class ChatController {
         message.setSender(chatRoomMappingInfo.getNickname());
         message.setMemberId(memberId);
         message.setDateTime(LocalDateTime.now());
-
 
         // Websocket에 발행된 메시지를 redis로 발행(publish)
         chatService.sendChatMessage(message);

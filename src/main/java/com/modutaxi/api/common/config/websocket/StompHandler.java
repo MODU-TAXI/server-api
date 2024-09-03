@@ -117,6 +117,7 @@ public class StompHandler implements ChannelInterceptor {
             String sessionId = accessor.getSessionId();
             // 세션에 대한 정보 삭제
             redisChatRoomRepositoryImpl.removeUserBySessionIdEnterInfo(sessionId);
+            log.info("SESSION DELETE");
         }
 
         return message;

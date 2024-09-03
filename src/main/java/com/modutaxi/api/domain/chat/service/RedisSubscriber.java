@@ -6,9 +6,11 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.StompErrorCode;
 import com.modutaxi.api.domain.chatmessage.dto.ChatMessageResponseDto.ChatMessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisSubscriber {
@@ -20,8 +22,17 @@ public class RedisSubscriber {
         try {
             ChatMessageResponse chatMessageResponse;
             chatMessageResponse = objectMapper.readValue(publishMessage, ChatMessageResponse.class);
+
+            // Log each field of ChatMessageResponse
+            log.info("Room ID: {}", chatMessageResponse.getRoomId());
+            log.info("Message Type: {}", chatMessageResponse.getMessageType());
+            log.info("Content: {}", chatMessageResponse.getContent());
+            log.info("Sender: {}", chatMessageResponse.getSender());
+            log.info("Member ID: {}", chatMessageResponse.getMemberId());
+            log.info("Date and Time: {}", chatMessageResponse.getDateTime());
+
             messageSendingOperations.convertAndSend("/sub/chat/" + chatMessageResponse.getRoomId(),
-                    chatMessageResponse);
+                chatMessageResponse);
         } catch (JsonProcessingException e) {
             throw new BaseException(StompErrorCode.FAIL_SEND_MESSAGE);
         }
