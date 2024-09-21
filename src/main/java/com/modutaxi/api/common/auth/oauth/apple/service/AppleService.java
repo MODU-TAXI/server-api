@@ -12,7 +12,7 @@ import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.Events;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.StsPayload;
 import com.modutaxi.api.common.auth.oauth.apple.dto.AppleRequest.StsRequest;
 import com.modutaxi.api.common.auth.oauth.apple.entity.AppleRefreshToken;
-import com.modutaxi.api.common.auth.oauth.apple.repository.AppleRefreshTokenMongoRepository;
+import com.modutaxi.api.common.auth.oauth.apple.repository.AppleRefreshTokenRepository;
 import com.modutaxi.api.common.auth.oauth.apple.vo.AppleOauthProperties;
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
@@ -20,18 +20,19 @@ import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.member.service.UpdateMemberService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Date;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.stereotype.Service;
+
+import java.security.PrivateKey;
+import java.security.Security;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.Date;
+import java.util.NoSuchElementException;
 
 
 @Slf4j
@@ -42,7 +43,7 @@ public class AppleService {
     private final GetMemberService getMemberService;
     private final AppleOauthClient appleOauthClient;
     private final AppleOauthProperties appleOauthProperties;
-    private final AppleRefreshTokenMongoRepository appleRefreshTokenMongoRepository;
+    private final AppleRefreshTokenRepository appleRefreshTokenRepository;
 
     public void appleServerToServer(StsPayload payload) {
         try {
@@ -58,7 +59,7 @@ public class AppleService {
                 .equals("account-delete")) {
                 updateMemberService.deleteMember(
                     getMemberService.getMemberByAppleSnsId(events.getSub()).getId());
-                appleRefreshTokenMongoRepository.deleteById(events.getSub());
+                appleRefreshTokenRepository.deleteById(events.getSub());
             }
         } catch (BaseException e) {
             log.error("Apple Server To Server Error : {}", e);
@@ -89,8 +90,8 @@ public class AppleService {
             ));
         AppleIdTokenPayload appleIdTokenPayload = decodeUrlPayload(
             appleSocialTokenResponse.getIdToken(), AppleIdTokenPayload.class);
-        appleRefreshTokenMongoRepository.deleteById(appleIdTokenPayload.getSub());
-        appleRefreshTokenMongoRepository.save(new AppleRefreshToken(appleIdTokenPayload.getSub(),
+        appleRefreshTokenRepository.deleteById(appleIdTokenPayload.getSub());
+        appleRefreshTokenRepository.save(new AppleRefreshToken(appleIdTokenPayload.getSub(),
             appleSocialTokenResponse.getRefreshToken()));
         return appleIdTokenPayload;
     }
@@ -134,20 +135,20 @@ public class AppleService {
     }
 
     public void revokeToken(String sub) {
-        if (appleRefreshTokenMongoRepository.existsById(sub)) {
+        if (appleRefreshTokenRepository.existsById(sub)) {
             try {
                 appleOauthClient.revokeToken(
                     new RevokeTokenRequest(
                         appleOauthProperties.getClient_id(),
                         generateClientSecret(),
-                        appleRefreshTokenMongoRepository.findById(sub).get().getRefresh_token(),
+                        appleRefreshTokenRepository.findById(sub).get().getRefresh_token(),
                         "refresh_token"
                     ));
             } catch (NoSuchElementException e) {
                 log.error("Mongo Database has No refresh token : {}", sub);
-                appleRefreshTokenMongoRepository.deleteById(sub);
+                appleRefreshTokenRepository.deleteById(sub);
             }
-            appleRefreshTokenMongoRepository.deleteById(sub);
+            appleRefreshTokenRepository.deleteById(sub);
         }
     }
 }
