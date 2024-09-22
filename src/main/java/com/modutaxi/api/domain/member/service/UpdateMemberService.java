@@ -6,6 +6,7 @@ import com.modutaxi.api.common.exception.errorcode.MailErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
 import com.modutaxi.api.common.s3.S3Service;
+import com.modutaxi.api.common.slack.SlackService;
 import com.modutaxi.api.domain.account.repository.AccountRepository;
 import com.modutaxi.api.domain.alarm.repository.AlarmRepository;
 import com.modutaxi.api.domain.history.repository.HistoryRepository;
@@ -48,6 +49,7 @@ public class UpdateMemberService {
     private final UpdateRoomService updateRoomService;
     private final UpdatePaymentMemberService updatePaymentMemberService;
     private final UpdateParticipantService updateParticipantService;
+    private final SlackService slackService;
 
     private final AccountRepository accountRepository;
     private final AlarmRepository alarmRepository;
@@ -156,15 +158,20 @@ public class UpdateMemberService {
         Member member = memberRepository.findById(id).orElseThrow(
             () -> new BaseException(MemberErrorCode.EMPTY_MEMBER)
         );
+        // 슬랙에 메시지 전송
+        slackService.sendDeleteMemberMessage(member);
+        // 데이터 삭제
         deleteRoomMapping(member);
         deleteMemberInfo(member);
         // 멤버 soft delete
         member.delete();
+
     }
 
     /**
      * 멤버의 방 맵핑 삭제
      */
+    @Transactional
     public void deleteRoomMapping(Member member) {
         // 모든 대기열 삭제
         roomWaitingRepository.deleteByMember(member);
@@ -186,6 +193,7 @@ public class UpdateMemberService {
     /**
      * 멤버의 정보와 관련된 것들 삭제
      */
+    @Transactional
     public void deleteMemberInfo(Member member) {
         // PaymentMember hard delete
         updatePaymentMemberService.deleteByMember(member);

@@ -9,6 +9,7 @@ import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.MemberErrorCode;
 import com.modutaxi.api.common.fcm.RedisFcmRepositoryImpl;
+import com.modutaxi.api.common.slack.SlackService;
 import com.modutaxi.api.common.util.validator.NicknameService;
 import com.modutaxi.api.common.util.validator.NicknameValidator;
 import com.modutaxi.api.domain.member.dto.MemberResponseDto.NicknameResponse;
@@ -35,6 +36,7 @@ public class RegisterMemberService {
     private final RedisSnsIdRepositoryImpl redisSnsIdRepository;
     private final RedisFcmRepositoryImpl redisFcmRepository;
     private final NicknameService nicknameService;
+    private final SlackService slackService;
 
     /**
      * 회원 가입
@@ -51,6 +53,8 @@ public class RegisterMemberService {
         memberRepository.save(member);
         // FCM 토큰 저장
         saveFcmToken(member, fcmToken);
+        // 슬랙에 메시지 전송
+        slackService.sendNewMemberMessage(member);
         // 로그인 토큰 생성 및 저장
         return generateMemberToken(member);
     }
