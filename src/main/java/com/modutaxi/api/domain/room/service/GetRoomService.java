@@ -26,7 +26,7 @@ import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.room.repository.RoomRepositoryDSL;
 import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.spot.service.GetSpotService;
-import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
+import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoRepository;
 import com.mongodb.client.model.geojson.LineString;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GetRoomService {
     private final RoomRepository roomRepository;
-    private final TaxiInfoMongoRepository taxiInfoMongoRepository;
+    private final TaxiInfoRepository taxiInfoRepository;
     private final GetSpotService getSpotService;
     private final RoomRepositoryDSL roomRepositoryDSL;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepository;
@@ -56,7 +56,7 @@ public class GetRoomService {
         Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        LineString path = taxiInfoMongoRepository.findById(roomId)
+        LineString path = taxiInfoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(
                 TaxiInfoErrorCode.EMPTY_TAXI_INFO)).getPath();
 

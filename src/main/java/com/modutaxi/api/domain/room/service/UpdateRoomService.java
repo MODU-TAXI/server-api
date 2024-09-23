@@ -36,7 +36,7 @@ import com.modutaxi.api.domain.room.mapper.RoomMapper;
 import com.modutaxi.api.domain.room.repository.RoomRepository;
 import com.modutaxi.api.domain.spot.repository.SpotRepository;
 import com.modutaxi.api.domain.taxiinfo.entity.TaxiInfo;
-import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoMongoRepository;
+import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoRepository;
 import com.modutaxi.api.domain.taxiinfo.service.GetTaxiInfoService;
 import com.mongodb.client.model.geojson.LineString;
 import jakarta.transaction.Transactional;
@@ -55,7 +55,7 @@ public class UpdateRoomService {
     private static final float MIN_LONGITUDE = 124;
     private static final float MAX_LONGITUDE = 132;
     private final RoomRepository roomRepository;
-    private final TaxiInfoMongoRepository taxiInfoMongoRepository;
+    private final TaxiInfoRepository taxiInfoRepository;
     private final SpotRepository spotRepository;
     private final GetTaxiInfoService getTaxiInfoService;
     private final RedisChatRoomRepositoryImpl redisChatRoomRepositoryImpl;
@@ -72,7 +72,7 @@ public class UpdateRoomService {
         Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
 
-        TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
+        TaxiInfo taxiInfo = taxiInfoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
         checkManager(room.getRoomManager().getId(), member.getId());
@@ -101,7 +101,7 @@ public class UpdateRoomService {
             throw new BaseException(RoomErrorCode.EMPTY_ROOM);
         }
 
-        TaxiInfo taxiInfo = taxiInfoMongoRepository.findById(roomId)
+        TaxiInfo taxiInfo = taxiInfoRepository.findById(roomId)
             .orElseThrow(() -> new BaseException(TaxiInfoErrorCode.EMPTY_TAXI_INFO));
 
         checkManager(room.getRoomManager().getId(), member.getId());
@@ -247,7 +247,7 @@ public class UpdateRoomService {
         internalUpdateRoomDto.setDurationMinutes(
             jsonNode.get("duration").asLong() / MILLIS_PER_MINUTE);
 
-        taxiInfoMongoRepository.save(TaxiInfo.toEntity(roomId, path));
+        taxiInfoRepository.save(TaxiInfo.toEntity(roomId, path));
         return path;
     }
 
