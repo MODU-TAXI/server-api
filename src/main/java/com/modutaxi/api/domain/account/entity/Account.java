@@ -34,5 +34,6 @@ public class Account extends BaseTime {
     private boolean status = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Member member;
 }

@@ -68,6 +68,7 @@ public class Member extends BaseTime {
     private Role role = Role.ROLE_VISITOR;
 
     //    @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = jakarta.persistence.FetchType.EAGER)
+    @ToString.Exclude
     @OneToMany(mappedBy = "member", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Account> accounts;
 

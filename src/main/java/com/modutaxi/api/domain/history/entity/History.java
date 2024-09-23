@@ -19,10 +19,12 @@ public class History extends BaseTime{
     private Long id;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "member_id")
     private Member member;
 
