@@ -19,8 +19,10 @@ public class Participant extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Room room;
 }

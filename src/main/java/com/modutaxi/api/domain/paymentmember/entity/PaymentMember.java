@@ -30,9 +30,11 @@ public class PaymentMember extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private PaymentRoom paymentRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Member member;
 
     @NotNull

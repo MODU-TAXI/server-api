@@ -24,9 +24,11 @@ public class LikedSpot extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Spot spot;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Member member;
 
     public static LikedSpot toEntity(Spot spot, Member member){

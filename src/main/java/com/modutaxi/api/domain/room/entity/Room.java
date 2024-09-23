@@ -36,10 +36,12 @@ public class Room extends BaseTime {
     private Long id;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "spot_id")
     private Spot spot;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "member_id")
     private Member roomManager;
 
