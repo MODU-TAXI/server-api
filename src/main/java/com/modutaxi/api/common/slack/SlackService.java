@@ -5,6 +5,7 @@ import static com.slack.api.webhook.WebhookPayloads.payload;
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.report.entity.Report;
+import com.modutaxi.api.domain.room.service.GetRoomService;
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
@@ -27,6 +28,7 @@ public class SlackService {
 
     private final Slack slackClient = Slack.getInstance();
     private final GetMemberService getMemberService;
+    private final GetRoomService getRoomService;
 
     @Value("${slack.webhook-uri.report}")
     private String reportSlackToken;
@@ -127,6 +129,10 @@ public class SlackService {
         HashMap<String, String> data = new HashMap<>();
         data.put("날짜", LocalDate.now().format(DateTimeFormatter.ofPattern("YYYY년 MM월 dd일")));
         data.put("가입자", getMemberService.countTodaySignups() + " 명");
+        data.put("생성된 택시팟", getRoomService.countTodayRoom(0, 3) + " 개");
+        data.put("매칭 완료된 택시팟", getRoomService.countTodayRoom(1, 3) + " 개");
+        data.put("정산 완료된 택시팟", getRoomService.countTodayRoom(3, 3) + " 개");
+        data.put("삭제된 택시팟", getRoomService.countTodayRoom(4, 4) + " 개");
 
         sendMessage(statsSlackToken, title, data, Color.YELLOW.getCode());
     }
