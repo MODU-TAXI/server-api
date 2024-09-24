@@ -3,27 +3,39 @@ package com.modutaxi.api.common.slack;
 import static com.slack.api.webhook.WebhookPayloads.payload;
 
 import com.modutaxi.api.domain.member.entity.Member;
+import com.modutaxi.api.domain.member.service.GetMemberService;
 import com.modutaxi.api.domain.report.entity.Report;
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j2
+@RequiredArgsConstructor
 public class SlackService {
 
     private final Slack slackClient = Slack.getInstance();
+    private final GetMemberService getMemberService;
 
     @Value("${slack.webhook-uri.report}")
     private String reportSlackToken;
 
     @Value("${slack.webhook-uri.member}")
     private String memberSlackToken;
+
+    @Value("${slack.webhook-uri.stats}")
+    private String statsSlackToken;
 
 
     /**
@@ -104,6 +116,21 @@ public class SlackService {
 
         sendMessage(memberSlackToken, title, data, Color.RED.getCode());
     }
+
+    /**
+     * 매일 23시 59분 59초에 가입, 이용통계 슬랙 메시지 전송
+     **/
+    @Scheduled(cron = "59 59 23 * * *")
+    public void sendStatsMessage() {
+        log.info("[SlackService] 가입 및 이용 통계 Scheduler 작동");
+        String title = "[데일리 통계]";
+        HashMap<String, String> data = new HashMap<>();
+        data.put("날짜", LocalDate.now().format(DateTimeFormatter.ofPattern("YYYY년 MM월 dd일")));
+        data.put("가입자", getMemberService.countTodaySignups() + " 명");
+
+        sendMessage(statsSlackToken, title, data, Color.YELLOW.getCode());
+    }
+
 
     /**
      * Slack Field 생성
