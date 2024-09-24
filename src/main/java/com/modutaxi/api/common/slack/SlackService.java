@@ -123,7 +123,7 @@ public class SlackService {
     /**
      * 매일 23시 55분 00초에 가입, 이용통계 슬랙 메시지 전송
      **/
-    @Scheduled(cron = "00 55 23 * * *")
+    @Scheduled(cron = "0 55 23 * * *")
     public void sendStatsMessage() {
         log.info("[SlackService] 가입 및 이용 통계 Scheduler 작동");
         String title = "[데일리 통계]";
