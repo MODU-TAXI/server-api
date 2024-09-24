@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class SlackService {
      * @Param 메시지 데이터 셋
      * @Param 메시지 컬러 코드
      **/
-    public void sendMessage(String token, String title, HashMap<String, String> data,
+    public void sendMessage(String token, String title, LinkedHashMap<String, String> data,
         String colorCode) {
         try {
             slackClient.send(token, payload(p -> p
@@ -71,12 +72,12 @@ public class SlackService {
      **/
     public void sendReportMessage(Report report) {
         String title = "[신고 접수]";
-        HashMap<String, String> data = new HashMap<>();
-        data.put("0. 택시팟 ID", Long.toString(report.getRoomId()));
-        data.put("1. 신고자 ID", Long.toString(report.getReporterId()));
-        data.put("2. 신고 대상자 ID", Long.toString(report.getTargetId()));
-        data.put("3. 신고 유형", report.getType().getMessage());
-        data.put("4. 신고 내용", report.getContent());
+        LinkedHashMap<String, String> data = new LinkedHashMap<>();
+        data.put("택시팟 ID", Long.toString(report.getRoomId()));
+        data.put("신고자 ID", Long.toString(report.getReporterId()));
+        data.put("신고 대상자 ID", Long.toString(report.getTargetId()));
+        data.put("신고 유형", report.getType().getMessage());
+        data.put("신고 내용", report.getContent());
 
         sendMessage(reportSlackToken, title, data, Color.GREEN.getCode());
     }
@@ -86,7 +87,7 @@ public class SlackService {
      **/
     public void sendTemporaryBlockMemberMessage(Member member) {
         String title = "[신고 누적으로 인한 멤버 임시 차단]";
-        HashMap<String, String> data = new HashMap<>();
+        LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("멤버 ID", Long.toString(member.getId()));
         data.put("닉네임", member.getNickname());
 
@@ -98,7 +99,7 @@ public class SlackService {
      **/
     public void sendNewMemberMessage(Member member) {
         String title = "[신규 회원가입]";
-        HashMap<String, String> data = new HashMap<>();
+        LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("멤버 ID", Long.toString(member.getId()));
         data.put("이름", member.getName());
         data.put("전화번호", member.getPhoneNumber());
@@ -111,7 +112,7 @@ public class SlackService {
      **/
     public void sendDeleteMemberMessage(Member member) {
         String title = "[회원 탈퇴]";
-        HashMap<String, String> data = new HashMap<>();
+        LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("멤버 ID", Long.toString(member.getId()));
         data.put("이름", member.getName());
         data.put("전화번호", member.getPhoneNumber());
@@ -126,7 +127,7 @@ public class SlackService {
     public void sendStatsMessage() {
         log.info("[SlackService] 가입 및 이용 통계 Scheduler 작동");
         String title = "[데일리 통계]";
-        HashMap<String, String> data = new HashMap<>();
+        LinkedHashMap<String, String> data = new LinkedHashMap<>();
         data.put("날짜", LocalDate.now().format(DateTimeFormatter.ofPattern("YYYY년 MM월 dd일")));
         data.put("가입자", getMemberService.countTodaySignups() + " 명");
         data.put("생성된 택시팟", getRoomService.countTodayRoom(0, 3) + " 개");
