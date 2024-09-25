@@ -28,6 +28,7 @@ import com.modutaxi.api.domain.roomwaiting.repository.RoomWaitingRepository;
 import com.modutaxi.api.domain.spot.service.GetSpotService;
 import com.modutaxi.api.domain.taxiinfo.repository.TaxiInfoRepository;
 import com.mongodb.client.model.geojson.LineString;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,6 +123,15 @@ public class GetRoomService {
         Room room = roomRepository.findByIdAndRoomStatusIsNotDelete(roomId)
             .orElseThrow(() -> new BaseException(RoomErrorCode.EMPTY_ROOM));
         return RoomMapper.toDto(room);
+    }
+
+    public Integer countTodayRoom(Integer startRoomStatusFlag, Integer endRoomStatusFlag) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        return roomRepository.countByCreatedAtBetweenAndRoomStatus(
+            startOfDay, endOfDay, startRoomStatusFlag, endRoomStatusFlag);
     }
 
     private Integer checkTags(List<RoomTagBitMask> tags) {

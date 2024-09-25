@@ -2,6 +2,7 @@ package com.modutaxi.api.domain.member.repository;
 
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.entity.Role;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,6 +46,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByPhoneNumber(String phoneNumber);
 
-    @Query("SELECT m.id FROM Member m ORDER BY m.id DESC")
-    Long getIdByIdOrderByIdDesc();
+    @Query("SELECT COUNT(m) FROM Member m WHERE m.createdAt >= :startOfDay AND m.createdAt <= :endOfDay")
+    Integer countByCreatedAtBetween(@Param("startOfDay") LocalDateTime startOfDay,
+        @Param("endOfDay") LocalDateTime endOfDay);
 }

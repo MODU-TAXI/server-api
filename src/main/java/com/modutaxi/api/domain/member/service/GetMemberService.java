@@ -8,6 +8,8 @@ import com.modutaxi.api.domain.member.dto.MemberResponseDto.MemberProfileRespons
 import com.modutaxi.api.domain.member.entity.Member;
 import com.modutaxi.api.domain.member.mapper.MemberMapper;
 import com.modutaxi.api.domain.member.repository.MemberRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,14 @@ public class GetMemberService {
     public Member getMemberByAppleSnsId(String snsId) {
         return memberRepository.findByAppleSnsIdAndStatusTrue(snsId)
             .orElseThrow(() -> new BaseException(MemberErrorCode.EMPTY_MEMBER));
+    }
+
+    public Integer countTodaySignups() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        return memberRepository.countByCreatedAtBetween(startOfDay, endOfDay);
     }
 
 }
