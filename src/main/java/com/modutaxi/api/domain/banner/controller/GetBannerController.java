@@ -20,7 +20,7 @@ public class GetBannerController {
     private final GetBannerService getBannerService;
 
     @Operation(summary = "배너 리스트 조회",
-        description = "actibe상태의 배너 리스트를 조회합니다."
+        description = "active 상태의 배너 리스트를 조회합니다."
     )
     @GetMapping
     public ResponseEntity<BannerResponseList> getBannerList() {
