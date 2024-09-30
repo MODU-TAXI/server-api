@@ -121,6 +121,7 @@ public class RegisterMemberService {
         return switch (type) {
             case KAKAO -> socialLoginService.getKaKaoSnsId(accessToken);
             case APPLE -> socialLoginService.getAppleSub(accessToken);
+            case GOOGLE -> socialLoginService.getGoogleAccessToken(accessToken);
         };
     }
 
