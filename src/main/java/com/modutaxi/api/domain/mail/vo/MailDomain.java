@@ -8,6 +8,8 @@ public enum MailDomain {
     INHA_UNIVERSITY_2("inha.ac.kr"),
     INHA_TECHNICAL_COLLEGE_1("itc.ac.kr"),
     INHA_TECHNICAL_COLLEGE_2("inhatc.ac.kr"),
+    HANYANG_UNIVERSITY_1("hanyang.ac.kr"),
+    HANYANG_UNIVERSITY_2("hmail.hanyang.ac.kr"),
     ;
     private final String domain;
     public static Boolean isExistDomain(String domain){
