@@ -1,6 +1,5 @@
 package com.modutaxi.api.domain.sms.service;
 
-
 import com.modutaxi.api.common.exception.BaseException;
 import com.modutaxi.api.common.exception.errorcode.AuthErrorCode;
 import com.modutaxi.api.common.exception.errorcode.SmsErrorCode;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +25,8 @@ public class SmsService {
     private Integer certCodeLength;
     @Value("${sms.cert-sms-restriction-seconds}")
     private Integer certSmsRestrictionSeconds;
-    @Value("${sms.cert-white-list-phone-numbers}")
-    private List<String> whiteListPhoneNumbers;
+    @Value("${sms.cert-white-list-phone-number-prefix}")
+    private String whiteListPhoneNumberPrefix;
     @Value("${sms.cert-white-list-certification-code}")
     private String whiteListCertificationCode;
     @Value("${sms.cert-white-list-message-id}")
@@ -45,7 +43,8 @@ public class SmsService {
 
     private Boolean sendCertificationCode(String key, String phoneNumber) {
         String finalPhoneNumber = phoneNumber;
-        boolean isWhiteList = whiteListPhoneNumbers.stream().anyMatch(finalPhoneNumber::equals);
+        boolean isWhiteList = finalPhoneNumber.substring(0, 3).equals(whiteListPhoneNumberPrefix);
+        System.out.println(isWhiteList);
         phoneNumber = checkPhoneNumberPattern(phoneNumber, isWhiteList);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity != null) {
@@ -59,7 +58,8 @@ public class SmsService {
         String certificationCode = isWhiteList ? whiteListCertificationCode : CertificationCodeUtil.generateCertificationCode(certCodeLength);
         String messageId = isWhiteList ? whiteListMessageId : smsAgencyUtil.sendOne(sender, phoneNumber, String.format("[모두의택시] 인증번호는 [%s]입니다.", certificationCode));
         redisSmsCertificationCodeRepository.save(key, phoneNumber, certificationCode, messageId);
-        smsAgencyUtil.checkBalance();
+        if(!isWhiteList)
+            smsAgencyUtil.checkBalance();
         return true;
     }
 
@@ -89,7 +89,7 @@ public class SmsService {
 
     public Boolean checkSmsCertificationCode(String key, String phoneNumber, String certificationCode) {
         String finalPhoneNumber = phoneNumber;
-        phoneNumber = checkPhoneNumberPattern(phoneNumber, whiteListPhoneNumbers.stream().anyMatch(finalPhoneNumber::equals));
+        phoneNumber = checkPhoneNumberPattern(phoneNumber, finalPhoneNumber.substring(0, 3).equals(whiteListPhoneNumberPrefix));
         checkCertificationCodePattern(certificationCode);
         SmsCertCodeEntity smsCertCodeEntity = redisSmsCertificationCodeRepository.findById(key);
         if (smsCertCodeEntity == null) {
