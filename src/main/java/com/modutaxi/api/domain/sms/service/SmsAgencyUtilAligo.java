@@ -80,16 +80,20 @@ public class SmsAgencyUtilAligo implements SmsAgencyUtil {
     }
 
     private <T> T aligoReqeust(String url, List<NameValuePair> nvps, Class<T> responseType) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = generateAligoHttpPost(httpClient, url, nvps);
-        CloseableHttpResponse response = executeAligoHttpClient(httpClient, httpPost);
-        AligoErrorHandle(httpClient, response);
-        T responseBody = mapValue(httpClient, response, responseType);
-        closeHttpClient(httpClient);
-        return responseBody;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = generateAligoHttpPost(url, nvps);
+            try (CloseableHttpResponse response = executeAligoHttpClient(httpClient, httpPost)) {
+                aligoErrorHandle(response);
+                T responseBody = mapValue(response, responseType);
+                return responseBody;
+            }
+        } catch (IOException e) {
+            log.error("[Aligo] HTTP 클라이언트 종료에 실패했습니다.");
+            throw new BaseException(SmsErrorCode.SMS_AGENCY_ERROR);
+        }
     }
 
-    private HttpPost generateAligoHttpPost(CloseableHttpClient httpClient, String url, List<NameValuePair> nvps) {
+    private HttpPost generateAligoHttpPost(String url, List<NameValuePair> nvps) {
         HttpPost httpPost = new HttpPost(url);
         nvps.add(new BasicNameValuePair("key", apiKey));
         nvps.add(new BasicNameValuePair("user_id", userId));
@@ -97,58 +101,42 @@ public class SmsAgencyUtilAligo implements SmsAgencyUtil {
             httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             log.error("[Aligo] 문자 전송 메시지 인코딩에 실패했습니다.");
-            closeHttpClient(httpClient);
             throw new BaseException(SmsErrorCode.SMS_AGENCY_ERROR);
         }
         return httpPost;
     }
 
     private CloseableHttpResponse executeAligoHttpClient(CloseableHttpClient httpClient, HttpPost httpPost) {
-        CloseableHttpResponse response;
         try {
-            response = httpClient.execute(httpPost);
+            return httpClient.execute(httpPost);
         } catch (IOException e) {
             log.error("[Aligo] 메세지 서버와 연결에 실패했습니다.");
-            closeHttpClient(httpClient);
             throw new BaseException(SmsErrorCode.SMS_AGENCY_ERROR);
         }
-        return response;
     }
 
-    private void AligoErrorHandle(CloseableHttpClient httpClient, CloseableHttpResponse response) {
+    private void aligoErrorHandle(CloseableHttpResponse response) {
         if (response.getStatusLine().getStatusCode() > 0) return;
 
-        AligoErrorResponse errorBody = mapValue(httpClient, response, AligoErrorResponse.class);
+        AligoErrorResponse errorBody = mapValue(response, AligoErrorResponse.class);
         switch (response.getStatusLine().getStatusCode()) {
             case (-101) -> log.error("[Aligo] 인증오류입니다.");
             case (-304) -> log.error("[Aligo] 발송 5분전까지만 취소가 가능합니다.");
             default ->
                 log.error(String.format("[Aligo] 알 수 없는 에러가 발생했습니다. (%s, %s)", errorBody.getResult_code(), errorBody.getMessage()));
         }
-        closeHttpClient(httpClient);
         throw new BaseException(SmsErrorCode.SMS_AGENCY_ERROR);
     }
 
-    private <T> T mapValue(CloseableHttpClient httpClient, CloseableHttpResponse response, Class<T> bodyType) {
+    private <T> T mapValue(CloseableHttpResponse response, Class<T> bodyType) {
         ObjectMapper objectMapper = new ObjectMapper()
             .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        T responseBody;
         try {
-            responseBody = objectMapper.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), bodyType);
+            return objectMapper.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), bodyType);
         } catch (IOException e) {
             log.error(String.format("[Aligo] 문자 전송 응답 메시지(%s dto) 파싱에 실패했습니다.", bodyType.getName()));
-            closeHttpClient(httpClient);
             throw new BaseException(SmsErrorCode.SMS_AGENCY_ERROR);
-        }
-        return responseBody;
-    }
-
-    private void closeHttpClient(CloseableHttpClient httpClient) {
-        try {
-            httpClient.close();
-        } catch (IOException e) {
-            log.error("[Aligo] HTTP 클라이언트 종료에 실패했습니다.");
         }
     }
 }

@@ -28,7 +28,6 @@ import java.util.List;
 @Slf4j
 public class AppleOauthClient {
     public AppleSocialTokenResponse generateAndValidateToken(IdTokenRequest idTokenRequest) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("https://appleid.apple.com/auth/token");
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("client_id", idTokenRequest.getClient_id()));
@@ -43,28 +42,23 @@ public class AppleOauthClient {
             log.error("Apple Token Request Body 인코딩 실패 : {}", idTokenRequest);
             throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
-        CloseableHttpResponse response;
-        try {
-            response = httpClient.execute(httpPost);
+        ObjectMapper objectMapper = new ObjectMapper()
+            .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try(CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            try(CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                return objectMapper.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), AppleSocialTokenResponse.class);
+            } catch (IOException e) {
+                log.error("Apple Token Payload 디코딩 실패 : {}", idTokenRequest);
+                throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
+            }
         } catch (IOException e) {
             log.error("Apple Token 요청 실패 : {}", idTokenRequest);
             throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
         }
-        ObjectMapper objectMapper = new ObjectMapper()
-            .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        AppleSocialTokenResponse responseBody;
-        try {
-            responseBody = objectMapper.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), AppleSocialTokenResponse.class);
-        } catch (IOException e) {
-            log.error("Apple Token Payload 디코딩 실패 : {}", idTokenRequest);
-            throw new BaseException(AuthErrorCode.APPLE_LOGIN_ERROR);
-        }
-        return responseBody;
     }
 
     public void revokeToken(RevokeTokenRequest revokeTokenRequest) throws BaseException{
-        CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost("https://appleid.apple.com/auth/revoke");
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("client_id", revokeTokenRequest.getClient_id()));
@@ -77,7 +71,7 @@ public class AppleOauthClient {
             log.error("Apple Revoke Token Request Body 인코딩 실패 : {}", revokeTokenRequest);
             throw new BaseException(AuthErrorCode.APPLE_REVOKE_ERROR);
         }
-        try {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             httpClient.execute(httpPost);
         } catch (IOException e) {
             log.error("Apple Revoke Token 요청 실패 : {}", revokeTokenRequest);
